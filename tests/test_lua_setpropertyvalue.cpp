@@ -39,20 +39,35 @@
 using namespace openspace;
 
 namespace {
+    // A monotonic virtual clock used to drive property interpolations deterministically.
+    // Using a fake clock instead of real sleeps makes the interpolation tests immune to
+    // timer granularity and scheduling jitter (which is especially poor on Windows). Only
+    // the elapsed time between an interpolation's start and the subsequent updates
+    // matters, so this clock simply accumulates and never needs resetting between tests
+    std::chrono::steady_clock::time_point virtualInterpolationTime;
+
     // Offloading this into a separate function as it would otherwise be a lot of
     // non-intuitive copy-and-paste that we might want to change later anyway
     void triggerScriptRun() {
+        // Pin the active scene's interpolation clock to virtual time before running the
+        // scripts so that any interpolation started here captures its begin time on the
+        // same clock that updateInterpolations advances
+        if (Scene* scene = global::renderEngine->scene()) {
+            scene->setInterpolationTimeReference(virtualInterpolationTime);
+        }
         global::scriptEngine->preSync(true);
         global::scriptEngine->postSync(true);
     }
 
-    // Updates any ongoing interpolations with an optional time delay
+    // Updates any ongoing interpolations, optionally advancing the virtual clock first
     void updateInterpolations(std::optional<std::chrono::milliseconds> ms = std::nullopt)
     {
         if (ms.has_value()) {
-            std::this_thread::sleep_for(*ms);
+            virtualInterpolationTime += *ms;
         }
-        global::renderEngine->scene()->updateInterpolations();
+        Scene* scene = global::renderEngine->scene();
+        scene->setInterpolationTimeReference(virtualInterpolationTime);
+        scene->updateInterpolations();
     }
 } // namespace
 
@@ -319,10 +334,6 @@ TEST_CASE("SetPropertyValueSingle: PostScript 0 duration", "[setpropertyvalue]")
 }
 
 TEST_CASE("SetPropertyValueSingle: Bouncing", "[setpropertyvalue]") {
-#ifdef NDEBUG
-    // Disabling this test in Debug mode as it is very sensitive to performance-based
-    // timers
-
     std::unique_ptr<Scene> scene = std::make_unique<Scene>(
         std::make_unique<SceneInitializer>()
     );
@@ -376,18 +387,22 @@ TEST_CASE("SetPropertyValueSingle: Bouncing", "[setpropertyvalue]") {
         CHECK_THAT(p1, Catch::Matchers::WithinAbs(1.5, 0.05));
         CHECK(p2 == 1.f);
 
-
-        global::scriptEngine->queueScript(R"(
-            openspace.stopPropertyInterpolation('base.p1',)
-        )");
-
+        // Stop the bouncing. The value eases back to its original value over the original
+        // duration; once it settles the interpolation expires and runs the post-script,
+        // which sets 'base.p2'
+        global::scriptEngine->queueScript(
+            "openspace.stopPropertyBouncing('base.p1')"
+        );
         triggerScriptRun();
-        updateInterpolations(std::chrono::milliseconds(100));
+
+        // First tick latches the abort; a tick a full duration later completes the
+        // ease-back, expires the interpolation, and queues the post-script
+        updateInterpolations(std::chrono::milliseconds(50));
+        updateInterpolations(std::chrono::milliseconds(200));
         triggerScriptRun();
         CHECK(p1 == 1.f);
-        CHECK(p2 == 2.f);
+        CHECK(p2 == 0.75f);
     }
-#endif // !(defined(NDEBUG) || defined(DEBUG))
 }
 
 TEST_CASE("SetPropertyValue: Basic", "[setpropertyvalue]") {

@@ -83,7 +83,9 @@ namespace {
 //
 TEST_CASE("Minimal", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/minimal.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -96,7 +98,9 @@ TEST_CASE("Minimal", "[profile]") {
 //
 TEST_CASE("Basic Meta (full)", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/meta_full.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -114,7 +118,9 @@ TEST_CASE("Basic Meta (full)", "[profile]") {
 
 TEST_CASE("Basic Meta (empty)", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/meta_empty.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -125,7 +131,9 @@ TEST_CASE("Basic Meta (empty)", "[profile]") {
 
 TEST_CASE("Basic Meta (no name)", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/meta_no_name.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -143,7 +151,9 @@ TEST_CASE("Basic Meta (no name)", "[profile]") {
 
 TEST_CASE("Basic Meta (no version)", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/meta_no_version.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -160,7 +170,9 @@ TEST_CASE("Basic Meta (no version)", "[profile]") {
 
 TEST_CASE("Basic Meta (no description)", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/meta_no_description.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -177,7 +189,9 @@ TEST_CASE("Basic Meta (no description)", "[profile]") {
 
 TEST_CASE("Basic Meta (no author)", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/meta_no_author.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -194,7 +208,9 @@ TEST_CASE("Basic Meta (no author)", "[profile]") {
 
 TEST_CASE("Basic Meta (no url)", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/meta_no_url.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -211,7 +227,9 @@ TEST_CASE("Basic Meta (no url)", "[profile]") {
 
 TEST_CASE("Basic Meta (no license)", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/meta_no_license.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -228,7 +246,9 @@ TEST_CASE("Basic Meta (no license)", "[profile]") {
 
 TEST_CASE("Basic Module", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/modules.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -254,7 +274,9 @@ TEST_CASE("Basic Module", "[profile]") {
 
 TEST_CASE("Basic Assets", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/assets.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -267,7 +289,9 @@ TEST_CASE("Basic Assets", "[profile]") {
 
 TEST_CASE("Basic Properties", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/properties.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -307,7 +331,9 @@ TEST_CASE("Basic Properties", "[profile]") {
 
 TEST_CASE("Basic Keybindings", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/keybindings.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -355,7 +381,9 @@ TEST_CASE("Basic Keybindings", "[profile]") {
 
 TEST_CASE("Basic Time Relative", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/time_relative.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -369,7 +397,9 @@ TEST_CASE("Basic Time Relative", "[profile]") {
 
 TEST_CASE("Basic Time Absolute", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/time_absolute.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -383,7 +413,9 @@ TEST_CASE("Basic Time Absolute", "[profile]") {
 
 TEST_CASE("Basic Delta Times", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/deltatimes.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -398,7 +430,9 @@ TEST_CASE("Basic Delta Times", "[profile]") {
 
 TEST_CASE("Basic Camera NavState (full)", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/camera_navstate_full.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -418,7 +452,9 @@ TEST_CASE("Basic Camera NavState (full)", "[profile]") {
 TEST_CASE("Basic Camera NavState (no aim)", "[profile]") {
     constexpr std::string_view File =
         "${TESTDIR}/profile/basic/camera_navstate_no_aim.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -437,7 +473,9 @@ TEST_CASE("Basic Camera NavState (no aim)", "[profile]") {
 TEST_CASE("Basic Camera NavState (no pitch)", "[profile]") {
     constexpr std::string_view File =
         "${TESTDIR}/profile/basic/camera_navstate_no_pitch.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -456,7 +494,9 @@ TEST_CASE("Basic Camera NavState (no pitch)", "[profile]") {
 TEST_CASE("Basic Camera NavState (no up)", "[profile]") {
     constexpr std::string_view File =
         "${TESTDIR}/profile/basic/camera_navstate_no_up.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -475,7 +515,9 @@ TEST_CASE("Basic Camera NavState (no up)", "[profile]") {
 TEST_CASE("Basic Camera NavState (no yaw)", "[profile]") {
     constexpr std::string_view File =
         "${TESTDIR}/profile/basic/camera_navstate_no_yaw.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -493,7 +535,9 @@ TEST_CASE("Basic Camera NavState (no yaw)", "[profile]") {
 
 TEST_CASE("Basic Camera GoToGeo (full)", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/camera_gotogeo.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -509,7 +553,9 @@ TEST_CASE("Basic Camera GoToGeo (full)", "[profile]") {
 TEST_CASE("Basic Camera GoToGeo (with altitude)", "[profile]") {
     constexpr std::string_view File =
         "${TESTDIR}/profile/basic/camera_gotogeo_altitude.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -526,7 +572,9 @@ TEST_CASE("Basic Camera GoToGeo (with altitude)", "[profile]") {
 TEST_CASE("Basic Camera GoToNode", "[profile]") {
     constexpr std::string_view File =
         "${TESTDIR}/profile/basic/camera_gotonode.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -540,7 +588,9 @@ TEST_CASE("Basic Camera GoToNode", "[profile]") {
 TEST_CASE("Basic Camera GoToNode (with height)", "[profile]") {
     constexpr std::string_view File =
         "${TESTDIR}/profile/basic/camera_gotonode_height.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -554,7 +604,9 @@ TEST_CASE("Basic Camera GoToNode (with height)", "[profile]") {
 
 TEST_CASE("Basic Mark Nodes", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/basic/mark_nodes.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -568,7 +620,9 @@ TEST_CASE("Basic Mark Nodes", "[profile]") {
 TEST_CASE("Basic Additional Scripts", "[profile]") {
     constexpr std::string_view File =
         "${TESTDIR}/profile/basic/additional_scripts.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;
@@ -653,7 +707,9 @@ TEST_CASE("Basic Addon Recommended w/ general", "[profile]") {
 //
 TEST_CASE("Integration Full Test", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/integration/full_test.profile";
+    PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    profile.addons.general.clear();
 
     Profile ref;
     ref.version = Profile::CurrentVersion;

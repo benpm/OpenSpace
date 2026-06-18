@@ -381,8 +381,12 @@ void PropertyOwner::removePropertySubOwner(PropertyOwner* owner) {
         return;
     }
 
-    for (Property* prop : (*it)->propertiesRecursive()) {
-        global::renderEngine->scene()->removePropertyInterpolation(prop);
+    // The render engine might not have an active scene (e.g. during shutdown or in
+    // tests), in which case there are no interpolations to remove
+    if (Scene* scene = global::renderEngine->scene()) {
+        for (Property* prop : (*it)->propertiesRecursive()) {
+            scene->removePropertyInterpolation(prop);
+        }
     }
 
     // Notify the change so the UI can update
