@@ -39,7 +39,7 @@
             "name": "windows-llvm",
             "description": "LLVM toolchain (clang-cl + lld-link), Ninja Multi-Config",
             "generator": "Ninja Multi-Config",
-            "binaryDir": "${sourceDir}/build-llvm",
+            "binaryDir": "${sourceDir}/build",
             "warnings": {
                 "dev": false,
                 "deprecated": false,

@@ -158,6 +158,114 @@ if (MSVC AND TARGET OpenSpace)
 endif ()
 
 
+##########################################################################################
+# clang/LLVM (clang-cl) build fixups for third-party submodule targets.                  #
+# Kept here, in the main repo, so the submodule working trees stay pristine. Each is      #
+# guarded on the Clang compiler id so the MSVC build is unaffected. See the global        #
+# CMAKE_C_FLAGS / CMAKE_RC_FLAGS in CMakePresets.json for the companion C/RC fixes.        #
+##########################################################################################
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # assimp's generated revision.h hardcodes VER_COPYRIGHT_STR "\xA9 2006-2023". llvm-rc
+  # decodes the \xA9 escape to byte 169 and rejects it ("Non-ASCII 8-bit codepoint ...
+  # can't occur in a non-Unicode string"); MSVC's rc.exe tolerates it. Rewrite the
+  # generated header (a build-dir artifact, not the submodule) to ASCII "(C)". This runs
+  # every configure, after assimp's configure_file has (re)generated the header.
+  if (TARGET assimp)
+    # configure_file writes revision.h from assimp's root binary dir (the target itself
+    # is defined in the code/ subdir, so its BINARY_DIR is the wrong place to look).
+    set(_assimp_rev "${CMAKE_BINARY_DIR}/ext/ghoul/ext/assimp/include/assimp/revision.h")
+    if (EXISTS "${_assimp_rev}")
+      file(READ "${_assimp_rev}" _rev_contents)
+      # Bracket argument: no escape processing, so the literal \xA9 is matched as-is
+      # (a quoted "\\xA9" would trip CMake's "invalid character escape '\x'").
+      string(REPLACE [[\xA9 2006]] "(C) 2006" _rev_contents "${_rev_contents}")
+      file(WRITE "${_assimp_rev}" "${_rev_contents}")
+    endif ()
+  endif ()
+
+  # tiny-process-library/CMakeLists.txt passes "/D_CRT_SECURE_NO_WARNINGS" to
+  # target_compile_definitions(), which auto-prepends -D and yields the invalid
+  # "-D/D_CRT_SECURE_NO_WARNINGS" (clang: "macro name must be an identifier"). Overwrite
+  # the property with the bare macro name.
+  if (TARGET tiny-process-library)
+    set_property(TARGET tiny-process-library
+      PROPERTY COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS
+    )
+  endif ()
+
+  # spice is legacy f2c-generated K&R C that trips clang diagnostics which default to
+  # errors (clang 16+); spice's own /W0 doesn't downgrade those. Applied per-target
+  # rather than via global CMAKE_C_FLAGS so we don't clobber CMake's clang-cl defaults
+  # (/DWIN32 etc.) that other C deps such as cdf rely on.
+  # It also forces SpiceZfc.h into a PCH whose prototypes conflict with the f2c sources'
+  # own local prototypes under clang (an unsuppressible "conflicting types" error), so
+  # disable the forced PCH; the affected sources include what they need themselves.
+  if (TARGET spice)
+    target_compile_options(spice PRIVATE
+      -Wno-implicit-int
+      -Wno-implicit-function-declaration
+      -Wno-int-conversion
+      -Wno-deprecated-non-prototype
+      -Wno-error=incompatible-function-pointer-types
+    )
+    set_property(TARGET spice PROPERTY DISABLE_PRECOMPILE_HEADERS ON)
+  endif ()
+
+  # sgct/src/image.cpp includes stb inside an anonymous namespace. stb_image.h pulls
+  # <stddef.h>, whose clang piece declares `namespace std { typedef ... nullptr_t; }`
+  # *inside* that anonymous namespace, so every subsequent `std::` is ambiguous. Flags
+  # can't fix a source-structure defect, so compile a patched copy (stb moved to global
+  # scope with internal linkage via the _STATIC macros) generated into the build tree,
+  # leaving the submodule source untouched.
+  if (TARGET sgct)
+    set(_sgct_img_orig "${CMAKE_SOURCE_DIR}/apps/OpenSpace/ext/sgct/src/image.cpp")
+    set(_sgct_img_patched "${CMAKE_BINARY_DIR}/sgct_clang_fix/image.cpp")
+    if (EXISTS "${_sgct_img_orig}")
+      file(READ "${_sgct_img_orig}" _img)
+      string(REPLACE "\r\n" "\n" _img "${_img}")
+      set(_img_before "${_img}")
+      string(REPLACE
+[[namespace {
+#define STBI_NO_SIMD
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+} // namespace]]
+[[// [OpenSpace clang fix] stb hoisted out of the anonymous namespace (see the root
+// CMakeLists.txt); _STATIC gives internal linkage, which the namespace used to provide.
+#define STBI_NO_SIMD
+#define STB_IMAGE_WRITE_STATIC
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
+#define STB_IMAGE_STATIC
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>]]
+        _img "${_img}")
+      if (_img STREQUAL _img_before)
+        message(FATAL_ERROR
+          "sgct image.cpp clang fix: expected stb anonymous-namespace block not found; "
+          "the submodule source changed. Update the patch in the root CMakeLists.txt.")
+      endif ()
+      file(WRITE "${_sgct_img_patched}" "${_img}")
+
+      # Swap the original image.cpp out of sgct's SOURCES for the patched copy.
+      get_target_property(_sgct_srcs sgct SOURCES)
+      set(_sgct_srcs_new "")
+      foreach (_s IN LISTS _sgct_srcs)
+        if (NOT _s MATCHES "(^|/)image\\.cpp$")
+          list(APPEND _sgct_srcs_new "${_s}")
+        endif ()
+      endforeach ()
+      list(APPEND _sgct_srcs_new "${_sgct_img_patched}")
+      set_property(TARGET sgct PROPERTY SOURCES "${_sgct_srcs_new}")
+    endif ()
+  endif ()
+endif ()
+
+
 if (OPENSPACE_HAVE_TESTS)
   add_subdirectory(support/coding/codegen/tests)
   set_target_properties(run_test_codegen PROPERTIES FOLDER "Unit Tests/support")
