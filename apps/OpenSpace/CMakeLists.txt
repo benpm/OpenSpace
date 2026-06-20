@@ -188,6 +188,14 @@ if (OPENSPACE_NVTOOLS_ENABLED)
   target_link_libraries(OpenSpace PRIVATE "${OPENSPACE_NVTOOLS_PATH}/lib/x64/nvToolsExt64_1.lib")
 endif ()
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND MSVC)
+  # zlib is bundled both standalone (zlibstatic) and inside the CDF library (kameleon),
+  # so symbols such as `z_errmsg` are defined twice. MSVC's linker resolves this via
+  # archive member selection; lld-link errors on the duplicate. Take the first definition
+  # (the two copies are identical zlib sources).
+  target_link_options(OpenSpace PRIVATE /force:multiple)
+endif ()
+
 if (WIN32)
   add_custom_command(TARGET OpenSpace POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:OpenSpace> $<TARGET_FILE_DIR:OpenSpace>

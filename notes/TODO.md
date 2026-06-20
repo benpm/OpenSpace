@@ -12,7 +12,7 @@
 - [ ] overlaying geospatial animated maps onto Earth’s surface, there are other examples
   - Related: [`#3846`](https://github.com/OpenSpace/OpenSpace/issues/3846) Mismatching video / NOAA SOS layer on Earth; [`#4025`](https://github.com/OpenSpace/OpenSpace/issues/4025) Globe Imagery Browser should add Temporal layers when possible (duplicate of the task above)
 - [ ] Finish postprocessing pipeline work
-  - Related: [`#3828`](https://github.com/OpenSpace/OpenSpace/issues/3828) Robust Postprocessing Support; [`#249`](https://github.com/OpenSpace/OpenSpace/issues/249) Add post-processing operation to change brightness/contrast (closed)
+  - Related: [`#3828`](https://github.com/OpenSpace/OpenSpace/issues/3828) Robust Postprocessing Support; [`#249`](https://github.com/OpenSpace/OpenSpace/issues/249) Add post-processing operation to change brightness/contrast (closed)\
 ## Notes
  Finally there are a bunch of GDAL layers that can be loaded and toggled on/off in Row 8. These are the ones that might load at the start and render, but after a while, they stop showing up. (Or they partially render; for these geospatial maps, I tend to see the layers show up in the northeastern corner of the US, while staying invisible elsewhere.)
     - You’ll find in the zip file a user/data/… and user/recordings/ folder structure that are copied into the user/ folder. There’s also a HTML_BROWSER_CONTROLS/ folder that contains the HTML page for loading and controlling the presentation. If you click through the top row of LOAD and SETUP buttons in order, you’ll load and configure the geoJSONs. (You’ll see them flash on and off in OpenSpace as each configuration loop runs.)  

@@ -41,6 +41,40 @@ cmake --build --preset windows-min  # builds the OpenSpace target
 - To build without Qt, set `OPENSPACE_APPLICATION_OPENSPACE-LAUNCHER=OFF` and
   `OPENSPACE_APPLICATION_ASSETBUILDER=OFF` (the main OpenSpace target links the Launcher).
 
+### Windows LLVM build (clang-cl + lld-link, Ninja Multi-Config)
+Use the `windows-llvm` preset. It uses `clang-cl` (MSVC-compatible driver, so `MSVC=1`
+and the MSVC ABI/Qt still apply) + `lld-link`, with the `Ninja Multi-Config` generator.
+Builds into `build-llvm/` (separate from the VS `build/`).
+
+Ninja does not set up the MSVC environment itself (clang-cl needs the Windows SDK + MSVC
+headers/libs), so configure and build from inside `vcvars64`. The helper `build-llvm.bat`
+wraps any command in the VS18 dev environment:
+```bash
+cmd //C "build-llvm.bat cmake --preset windows-llvm"          # configure
+cmd //C "build-llvm.bat cmake --build --preset windows-llvm"  # build OpenSpace
+```
+- Toolchain: LLVM 22 at `C:/Program Files/LLVM`, VS18 Community for the SDK/MSVC libs.
+- Source fixes required for clang's stricter checks (all guarded so the MSVC build is
+  unaffected; submodule edits show as dirty submodules in `git status`):
+  - `ext/spice/CMakeLists.txt` — legacy f2c K&R C: add `-Wno-implicit-int`,
+    `-Wno-implicit-function-declaration`, `-Wno-int-conversion`,
+    `-Wno-deprecated-non-prototype`, `-Wno-error=incompatible-function-pointer-types`;
+    drop `SpiceZfc.h` from the forced PCH for Clang (it conflicts with the f2c files'
+    own inconsistent local prototypes — an unsuppressible `conflicting types` error).
+  - `ext/ghoul/ext/tiny-process-library/CMakeLists.txt` — `target_compile_definitions`
+    had a bogus `/D` prefix (`-D/D_CRT_SECURE_NO_WARNINGS`); removed it.
+  - `apps/OpenSpace/ext/sgct/src/image.cpp` — stb includes were inside an anonymous
+    namespace, making clang nest `namespace std` (`reference to 'std' is ambiguous`);
+    moved them to global scope with `STB_IMAGE_STATIC`/`STB_IMAGE_WRITE_STATIC`.
+  - `modules/fitsfilereader/src/fitsfilereader.cpp` — `make_unique<FITS>(path, …)` needs
+    `path.string()` (CCfits wants `std::string`, not `std::filesystem::path`).
+  - `modules/webbrowser/src/processhelperwindows.cpp` — entry point was a `WinMain`-
+    signature `main`; the exe is Console-subsystem (`mainCRTStartup`→`main`), so replaced
+    with `int main(int, char**)` using `GetModuleHandle(nullptr)`.
+  - `apps/OpenSpace/CMakeLists.txt` — `/force:multiple` on the OpenSpace link (Clang only):
+    zlib is bundled in both `zlibstatic` and CDF, so `z_errmsg` etc. are defined twice;
+    MSVC's linker tolerates it via archive member selection, lld-link errors by default.
+
 ### Code Generation
 OpenSpace uses a custom code generation system:
 - The `codegen-tool` processes modules and src directories
