@@ -71,9 +71,12 @@ cmd //C "build-llvm.bat cmake --build --preset windows-llvm"  # build OpenSpace
   - `modules/webbrowser/src/processhelperwindows.cpp` — entry point was a `WinMain`-
     signature `main`; the exe is Console-subsystem (`mainCRTStartup`→`main`), so replaced
     with `int main(int, char**)` using `GetModuleHandle(nullptr)`.
-  - `apps/OpenSpace/CMakeLists.txt` — `/force:multiple` on the OpenSpace link (Clang only):
-    zlib is bundled in both `zlibstatic` and CDF, so `z_errmsg` etc. are defined twice;
-    MSVC's linker tolerates it via archive member selection, lld-link errors by default.
+  - `support/cmake/application_definition.cmake` — `/force:multiple` on every app's link
+    (Clang only), inside `create_new_application`: zlib is bundled in both `zlibstatic` and
+    CDF, so `z_errmsg` etc. are defined twice; MSVC's linker tolerates it via archive member
+    selection, lld-link errors by default. Applied centrally so all apps (OpenSpace, Sync,
+    DocsWriter, TaskRunner, AssetBuilder) get it — the preset only builds the `OpenSpace`
+    target, so a full `cmake --build build` is needed to catch the other apps' link errors.
 
 ### Code Generation
 OpenSpace uses a custom code generation system:
