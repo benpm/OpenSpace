@@ -1,0 +1,4 @@
+-- 360 panorama asset for tristate_control_room_pano_2
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+asset.require("./tristate_control_room_pano_2_360")

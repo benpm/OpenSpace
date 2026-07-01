@@ -1,0 +1,42 @@
+-- Create a position for other files to share
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+local earth = asset.require('scene/solarsystem/planets/earth/globe') --include earth
+local craig_station_rooftop_west_view_position = {
+  Identifier = "craig_station_rooftop_west_view_position",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+      Translation = {
+        Type = "GlobeTranslation",
+        Globe = earth.Earth.Identifier,
+        -- LATITUDE and LONGITUDE should be in degrees:
+        Latitude = 40.46421389,
+        Longitude = -107.5905667,
+        UseHeightmap = true,
+        -- Set ALTITUDE in meters so that it's above the landscape:
+        Altitude = 50.00
+      },
+      Scale = {
+        Type = "StaticScale",
+        Scale = 1.0
+      },
+      Rotation = {
+        Type = "StaticRotation",
+        Rotation = {0.00,0.00,0.00}
+      }
+  },
+  GUI = {
+    Name = "Craig Station Rooftop West View Position",
+    Path = "/DMNS/Z_Pano_Positions/Craig Station Rooftop West View",
+    Hidden = true
+  }
+}
+
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(craig_station_rooftop_west_view_position)
+end)
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(craig_station_rooftop_west_view_position)
+end)
+asset.export(craig_station_rooftop_west_view_position)

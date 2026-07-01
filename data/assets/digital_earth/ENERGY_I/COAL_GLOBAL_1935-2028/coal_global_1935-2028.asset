@@ -1,0 +1,32 @@
+-- To learn how you can include your own video, see the wiki 
+-- http://wiki.openspaceproject.com/docs/builders/assets/resources.html
+
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local Layer = {
+  Name = "Global Coal Power Plants (1935-2028)",
+  Identifier = "globalCoalPowerPlants1935_2028",
+  Enabled = true,
+  -- Type = "VideoTileLayer", -- (For 0.19.x)
+  Type = "VideoTileProvider", -- (For 0.20.x)
+  Video = asset.resource("world_coal_plants_1935-2028.mp4"),
+}
+
+asset.onInitialize(function()
+  openspace.globebrowsing.addLayer(earth.Earth.Identifier, "ColorLayers", Layer)
+end)
+
+asset.onDeinitialize(function()
+  openspace.globebrowsing.deleteLayer(earth.Earth.Identifier, "ColorLayers", Layer)
+end)
+
+asset.export("layer", Layer)
+
+asset.meta = {
+  Name = "Global Coal Power Plants (1935-2028)",
+  Version = "1.0",
+  Description = "",
+  Author = "OpenSpace Team",
+  URL = "https://openspaceproject.com",
+  License = "MIT"
+}

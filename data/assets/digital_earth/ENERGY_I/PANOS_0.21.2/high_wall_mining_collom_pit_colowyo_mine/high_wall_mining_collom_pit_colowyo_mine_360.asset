@@ -1,0 +1,51 @@
+--high_wall_mining_collom_pit_colowyo_mine_360.asset creates a 360 panorama
+local transforms = asset.require("./high_wall_mining_collom_pit_colowyo_mine_transforms") --include transforms for position
+local texture = asset.resource('data/high_wall_mining_collom_pit_colowyo_mine_1942_8K_edit.jpg'); --reference texture file
+openspace.printDebug(transforms)
+local high_wall_mining_collom_pit_colowyo_mine_pano = {
+    Identifier = "high_wall_mining_collom_pit_colowyo_mine_pano",
+    Parent = transforms.high_wall_mining_collom_pit_colowyo_mine_position.Identifier,
+    Transform = {
+        Rotation = { -- rotate in gui to proper orientation and put values here.
+            Type= "StaticRotation",
+            -- For panorama with North at center of image,
+            -- use Rotation = {r, p, h} = {0, LATITUDE, LONGITUDE}
+            Rotation = {0.00,0.702849616654087,-1.883383438348777}
+        },
+        Scale = {
+            Type = "StaticScale",
+            Scale = 1.0
+        },
+        Translation = {
+            Type = "StaticTranslation",
+            Position = {0,0,0}
+        }
+    },
+    Renderable = {
+        Type = "RenderableSphereImageLocal",
+        Size = 45,
+        Segments = 40,
+        Opacity = 1.0,
+        Texture = texture,
+        Orientation = "Inside",
+        UseAdditiveBlending = false,
+        MirrorTexture = true,
+        FadeOutThreshold = 1.00,
+        Background = true,
+        RenderBinMode = "PostDeferredTransparent",
+    },
+    GUI = {
+        Name = "High Wall Mining Collom Pit Colowyo Mine Pano",
+        Path = "/DMNS/High-Wall Mining, Collum Pit, Colowyo Mine",
+        Description = [[High Wall Mining Collom Pit Colowyo Mine Pano]],
+    }
+}
+asset.onInitialize(function()
+    openspace.addSceneGraphNode(high_wall_mining_collom_pit_colowyo_mine_pano)
+    openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.LimitZoom.MinimumAllowedDistance", 1.000000)
+end)
+
+asset.onDeinitialize(function()
+    openspace.removeSceneGraphNode(high_wall_mining_collom_pit_colowyo_mine_pano)
+end)
+asset.export(high_wall_mining_collom_pit_colowyo_mine_pano)

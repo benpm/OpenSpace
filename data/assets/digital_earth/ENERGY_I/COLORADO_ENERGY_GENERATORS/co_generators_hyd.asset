@@ -1,0 +1,383 @@
+-- Colorado Energy Generators: Hydropower seals at their locations on Earth.
+-- The seals are invisible by default, but can be enabled using shown or hidden using
+-- the exported functions `showSeals(interpolationDuration)` and `hideSeals(interpolationDuration)`.
+
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local HYD008_PublicServiceCoofColorado_CabinCreek_ClearCreek = {
+  Identifier = "HYD008_PublicServiceCoofColorado_CabinCreek_ClearCreek",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.6551,
+      Longitude = -105.7088,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/hydro-power_cocoa.bella_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/HYD",
+    Name = "HYD008 - Public Service Co of Colorado, Cabin Creek, Clear Creek"
+  }
+}
+
+local HYD057_USBureauofReclamation_BlueMesa_Gunnison = {
+  Identifier = "HYD057_USBureauofReclamation_BlueMesa_Gunnison",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.453191,
+      Longitude = -107.3375,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/hydro-power_cocoa.bella_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/HYD",
+    Name = "HYD057 - US Bureau of Reclamation, Blue Mesa, Gunnison",
+  }
+}
+
+local HYD059_USBureauofReclamation_Estes_Larimer = {
+  Identifier = "HYD059_USBureauofReclamation_Estes_Larimer",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.376771,
+      Longitude = -105.5097,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/hydro-power_cocoa.bella_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/HYD",
+    Name = "HYD059 - US Bureau of Reclamation, Estes, Larimer"
+  }
+}
+
+local HYD062_USBureauofReclamation_MorrowPoint_Montrose = {
+  Identifier = "HYD062_USBureauofReclamation_MorrowPoint_Montrose",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.451753,
+      Longitude = -107.5393,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/hydro-power_cocoa.bella_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/HYD",
+    Name = "HYD062 - US Bureau of Reclamation, Morrow Point, Montrose"
+  }
+}
+
+local HYD065_USBureauofReclamation_GreenMountain_Summit = {
+  Identifier = "HYD065_USBureauofReclamation_GreenMountain_Summit",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.878805,
+      Longitude = -106.3327,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/hydro-power_cocoa.bella_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/HYD",
+    Name = "HYD065 - US Bureau of Reclamation, Green Mountain, Summit"
+  }
+}
+
+local HYD068_USBureauofReclamation_Flatiron_Larimer = {
+  Identifier = "HYD068_USBureauofReclamation_Flatiron_Larimer",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.364996,
+      Longitude = -105.236,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/hydro-power_cocoa.bella_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/HYD",
+    Name = "HYD068 - US Bureau of Reclamation, Flatiron, Larimer"
+  }
+}
+
+local HYD071_USBureauofReclamation_PoleHill_Larimer = {
+  Identifier = "HYD071_USBureauofReclamation_PoleHill_Larimer",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.365056,
+      Longitude = -105.3251,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/hydro-power_cocoa.bella_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/HYD",
+    Name = "HYD071 - US Bureau of Reclamation, Pole Hill, Larimer"
+  }
+}
+
+local HYD085_USBureauofReclamation_Crystal_Montrose = {
+  Identifier = "HYD085_USBureauofReclamation_Crystal_Montrose",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.510573,
+      Longitude = -107.6253,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/hydro-power_cocoa.bella_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/HYD",
+    Name = "HYD085 - US Bureau of Reclamation, Crystal, Montrose"
+  }
+}
+
+local HYD089_USBureauofReclamation_MountElbert_Lake = {
+  Identifier = "HYD089_USBureauofReclamation_MountElbert_Lake",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.094197,
+      Longitude = -106.3523,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/hydro-power_cocoa.bella_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/HYD",
+    Name = "HYD089 - US Bureau of Reclamation, Mount Elbert, Lake"
+  }
+}
+
+local HYD105_CityofColoradoSpringsCO_Tesla_ElPaso = {
+  Identifier = "HYD105_CityofColoradoSpringsCO_Tesla_ElPaso",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.973655,
+      Longitude = -104.9011,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/hydro-power_cocoa.bella_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/HYD",
+    Name = "HYD105 - CityofColoradoSpringsCO, Tesla, El Paso"
+  }
+}
+
+local HYD107_USBureauofReclamation_Towaoc_Montezuma = {
+  Identifier = "HYD107_USBureauofReclamation_Towaoc_Montezuma",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 37.429538,
+      Longitude = -108.5749,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/hydro-power_cocoa.bella_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/HYD",
+    Name = "HYD107 - US Bureau of Reclamation, Towaoc, Montezuma"
+  }
+}
+
+local ShowSeals = {
+  Identifier = "os.HYD.ShowSeals",
+  Name = "Show HYD landing labels",
+  Command = [[openspace.setPropertyValue("Scene.HYD*.Renderable.Opacity", 1, 0.5)]],
+  Documentation = "Show CO HYD seals.",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+local HideSeals = {
+  Identifier = "os.HYD.HideSeals",
+  Name = "Hide HYD landing labels",
+  Command = [[openspace.setPropertyValue("Scene.HYD*.Renderable.Opacity", 0, 0.5)]],
+  Documentation = "Hide CO HYD seals",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(HYD008_PublicServiceCoofColorado_CabinCreek_ClearCreek)
+  openspace.addSceneGraphNode(HYD057_USBureauofReclamation_BlueMesa_Gunnison)
+  openspace.addSceneGraphNode(HYD059_USBureauofReclamation_Estes_Larimer)
+  openspace.addSceneGraphNode(HYD062_USBureauofReclamation_MorrowPoint_Montrose)
+  openspace.addSceneGraphNode(HYD065_USBureauofReclamation_GreenMountain_Summit)
+  openspace.addSceneGraphNode(HYD068_USBureauofReclamation_Flatiron_Larimer)
+  openspace.addSceneGraphNode(HYD071_USBureauofReclamation_PoleHill_Larimer)
+  openspace.addSceneGraphNode(HYD085_USBureauofReclamation_Crystal_Montrose)
+  openspace.addSceneGraphNode(HYD089_USBureauofReclamation_MountElbert_Lake)
+  openspace.addSceneGraphNode(HYD105_CityofColoradoSpringsCO_Tesla_ElPaso)
+  openspace.addSceneGraphNode(HYD107_USBureauofReclamation_Towaoc_Montezuma)
+  openspace.action.registerAction(ShowSeals)
+  openspace.action.registerAction(HideSeals)
+end)
+
+asset.onDeinitialize(function()
+  openspace.action.removeAction(HideSeals)
+  openspace.action.removeAction(ShowSeals)
+  openspace.removeSceneGraphNode(HYD008_PublicServiceCoofColorado_CabinCreek_ClearCreek)
+  openspace.removeSceneGraphNode(HYD057_USBureauofReclamation_BlueMesa_Gunnison)
+  openspace.removeSceneGraphNode(HYD059_USBureauofReclamation_Estes_Larimer)
+  openspace.removeSceneGraphNode(HYD062_USBureauofReclamation_MorrowPoint_Montrose)
+  openspace.removeSceneGraphNode(HYD065_USBureauofReclamation_GreenMountain_Summit)
+  openspace.removeSceneGraphNode(HYD068_USBureauofReclamation_Flatiron_Larimer)
+  openspace.removeSceneGraphNode(HYD071_USBureauofReclamation_PoleHill_Larimer)
+  openspace.removeSceneGraphNode(HYD085_USBureauofReclamation_Crystal_Montrose)
+  openspace.removeSceneGraphNode(HYD089_USBureauofReclamation_MountElbert_Lake)
+  openspace.removeSceneGraphNode(HYD105_CityofColoradoSpringsCO_Tesla_ElPaso)
+  openspace.removeSceneGraphNode(HYD107_USBureauofReclamation_Towaoc_Montezuma)
+end)
+
+asset.export(HYD008_PublicServiceCoofColorado_CabinCreek_ClearCreek)
+asset.export(HYD057_USBureauofReclamation_BlueMesa_Gunnison)
+asset.export(HYD059_USBureauofReclamation_Estes_Larimer)
+asset.export(HYD062_USBureauofReclamation_MorrowPoint_Montrose)
+asset.export(HYD065_USBureauofReclamation_GreenMountain_Summit)
+asset.export(HYD068_USBureauofReclamation_Flatiron_Larimer)
+asset.export(HYD071_USBureauofReclamation_PoleHill_Larimer)
+asset.export(HYD085_USBureauofReclamation_Crystal_Montrose)
+asset.export(HYD089_USBureauofReclamation_MountElbert_Lake)
+asset.export(HYD105_CityofColoradoSpringsCO_Tesla_ElPaso)
+asset.export(HYD107_USBureauofReclamation_Towaoc_Montezuma)
+
+asset.export("showSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.HYD*.Renderable.Opacity", 1, interpolationDuration)
+end)
+
+asset.export("hideSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.HYD*.Renderable.Opacity", 0, interpolationDuration)
+end)

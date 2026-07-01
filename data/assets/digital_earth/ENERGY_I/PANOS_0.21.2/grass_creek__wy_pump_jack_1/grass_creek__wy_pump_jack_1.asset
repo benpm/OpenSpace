@@ -1,0 +1,4 @@
+-- 360 panorama asset for grass_creek__wy_pump_jack_1
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+asset.require("./grass_creek__wy_pump_jack_1_360")

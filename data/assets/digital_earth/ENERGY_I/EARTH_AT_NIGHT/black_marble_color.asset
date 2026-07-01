@@ -1,0 +1,38 @@
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local blackMarbleSphereColor = {
+	Identifier = "blackMarble_color",
+	Parent = earth.Earth.Identifier,
+	Transform = {
+		Rotation = {
+			Type = "StaticRotation",
+			Rotation = {0.000000,0.000000,3.141592653590}
+		}
+	},
+	Renderable = {
+		Type = "RenderableSphereImageLocal",
+		Size = 6615000.0, -- Render above the Earth sphere
+		Enabled = false,
+		Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/EARTH_AT_NIGHT/color_nightlights_4096.png")
+	},
+	GUI = {
+		Name = "Black Marble Color",
+		Path = "/Earth Layers/Black Marble"
+	}
+}
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(blackMarbleSphereColor)
+end)
+
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(blackMarbleSphereColor)
+end)
+
+asset.meta = {
+  Name = "Earth At Night",
+  Description = "",
+  Author = "Ka Chun Yu",
+  URL = "https://openspaceproject.com",
+  License = "MIT"
+}

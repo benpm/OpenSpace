@@ -1,0 +1,31 @@
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local us_states = {
+  Identifier = "Lines-Example",
+  File = asset.resource("us_states_50m-admin1_no_labels.geojson"),
+  HeightOffset = 200.0,
+  DefaultProperties = {
+    LineWidth = 2.0
+  },
+  Name = "Example Lines"
+}
+
+asset.onInitialize(function()
+  openspace.globebrowsing.addGeoJson(earth.Earth.Identifier, us_states)
+end)
+
+asset.onDeinitialize(function()
+  openspace.globebrowsing.deleteGeoJson(earth.Earth.Identifier, us_states)
+end)
+
+asset.export(us_states)
+
+
+
+asset.meta = {
+  Name = "GeoJson Example - Lines",
+  Description = [[GeoJson example asset with lines]],
+  Author = "OpenSpace Team",
+  URL = "http://openspaceproject.com",
+  License = "MIT license"
+}

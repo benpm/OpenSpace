@@ -1,0 +1,66 @@
+-- Create a 360 panorama
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+local transforms = asset.require("./fort_st_vrain_generating_station__platteville_co_transforms") -- Include transforms for position
+local texture = asset.resource('data/fort_st_vrain_generating_station__platteville_co_edit.jpg'); -- Reference texture file
+openspace.printDebug(transforms)
+local fort_st_vrain_generating_station__platteville_co = {
+    Identifier = "fort_st_vrain_generating_station__platteville_co",
+    Parent = transforms.fort_st_vrain_generating_station__platteville_co_position.Identifier,
+    Transform = {
+        Rotation = { -- Rotate in gui to proper orientation.
+            Type= "StaticRotation",
+            -- If the panorama image has North at the center of image,
+            -- the horizon runs exactly through the centerline, and
+            -- Rotation = {0, LATITUDE, LONGITUDE} with angles in
+            -- radians, then the pano will appear level and properly
+            -- oriented inside OpenSpace.
+            --
+            -- The coordinates for where this pano was taken is
+            --    39°24'16.41" N 100°33'53.11" W
+            -- Converting this to decimal degrees:
+            --        39+24/60+16.41/3600  =   39.4045583333
+            --   -1*(100+33/60+53.11/3600) = -100.564752778
+            -- Next, convert degrees to radians using the conversion
+            -- (pi radians/180 deg):
+            --   39.4045583333 * 3.14159265359/180 =  0.68773928321
+            -- -100.564752778  * 3.14159265359/180 = -1.75518604743
+            Rotation = { 0.00, 0.7023671262, -1.830445364 }
+        },
+        Scale = {
+            Type = "StaticScale",
+            Scale = 1.0
+        },
+        Translation = {
+            Type = "StaticTranslation",
+            Position = {0,0,0}
+        }
+    },
+    Renderable = {
+        Type = "RenderableSphereImageLocal",
+        Size = 45,
+        Segments = 40,
+        Opacity = 1.0,
+        Texture = texture,
+        Orientation = "Inside",
+        UseAdditiveBlending = false,
+        MirrorTexture = true,
+        FadeOutThreshold = 1.00,
+        Background = true,
+        RenderBinMode = "PostDeferredTransparent",
+    },
+    GUI = {
+        Name = "Fort St Vrain Generating Station, Platteville, CO",
+        Path = "/DMNS/Fort St Vrain Generating Station, Platteville, CO",
+        Description = [[Fort St Vrain Generating Station, Platteville, CO]],
+    }
+}
+asset.onInitialize(function()
+    openspace.addSceneGraphNode(fort_st_vrain_generating_station__platteville_co)
+    openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.LimitZoom.MinimumAllowedDistance", 1.000000)
+end)
+
+asset.onDeinitialize(function()
+    openspace.removeSceneGraphNode(fort_st_vrain_generating_station__platteville_co)
+end)
+asset.export(fort_st_vrain_generating_station__platteville_co)

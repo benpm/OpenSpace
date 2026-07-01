@@ -107,7 +107,7 @@ void GeoJsonManager::deleteLayer(const std::string& layerIdentifier) {
             return;
         }
     }
-    LERROR(std::format("Could not find GeoJson layer {}", layerIdentifier));
+    LWARNING(std::format("Could not find GeoJson layer {}", layerIdentifier));
 }
 
 void GeoJsonManager::update() {

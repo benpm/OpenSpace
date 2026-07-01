@@ -1,0 +1,4 @@
+-- 360 panorama asset for burnley_mill_steam_engine_2
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+asset.require("./burnley_mill_steam_engine_2_360")

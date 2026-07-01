@@ -1,0 +1,28 @@
+-- To learn how you can include your own video, see the wiki
+-- http://wiki.openspaceproject.com/docs/builders/assets/resources.html
+
+local ScreenSpace = {
+  Identifier = "American_Whaling_Mapped",
+  Type = "ScreenSpaceVideo",
+  Name = "American Whaling Mapped",
+  Video = asset.resource("American_Whaling_Mapped.mp4")
+}
+
+asset.onInitialize(function()
+  openspace.addScreenSpaceRenderable(ScreenSpace)
+end)
+
+asset.onDeinitialize(function()
+  openspace.removeScreenSpaceRenderable(ScreenSpace)
+end)
+
+asset.export(ScreenSpace)
+
+asset.meta = {
+  Name = "American_Whaling_Mapped",
+  Version = "1.0",
+  Description = "",
+  Author = "OpenSpace Team",
+  URL = "https://openspaceproject.com",
+  License = "MIT"
+}

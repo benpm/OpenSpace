@@ -1,0 +1,4 @@
+-- 360 panorama asset for derby_dome_wy_pump_jack
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+asset.require("./derby_dome_wy_pump_jack_360")

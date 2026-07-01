@@ -1,0 +1,42 @@
+-- Create a position for other files to share
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+local earth = asset.require('scene/solarsystem/planets/earth/globe') --include earth
+local komatsu_250_ton_dump_trucks_1_position = {
+  Identifier = "komatsu_250_ton_dump_trucks_1_position",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+      Translation = {
+        Type = "GlobeTranslation",
+        Globe = earth.Earth.Identifier,
+        -- LATITUDE and LONGITUDE should be in degrees:
+        Latitude =    40.2257750556,
+        Longitude = -107.8402528,
+        UseHeightmap = true,
+        -- Set ALTITUDE in meters so that it's above the landscape:
+        Altitude = 50.00
+      },
+      Scale = {
+        Type = "StaticScale",
+        Scale = 1.0
+      },
+      Rotation = {
+        Type = "StaticRotation",
+        Rotation = {0.00,0.00,0.00}
+      }
+  },
+  GUI = {
+    Name = "Komatsu 250 Ton Dump Trucks 1 Position",
+    Path = "/DMNS/Z_Pano_Positions/Komatsu 250 Ton Dump Trucks 1",
+    Hidden = true
+  }
+}
+
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(komatsu_250_ton_dump_trucks_1_position)
+end)
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(komatsu_250_ton_dump_trucks_1_position)
+end)
+asset.export(komatsu_250_ton_dump_trucks_1_position)

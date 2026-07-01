@@ -1,0 +1,42 @@
+-- high_wall_mining_collom_pit_colowyo_mine_transforms.asset
+-- Create a postion for other files to share
+-- Version by Ka Chun Yu (DMNS) May 2024
+local earth = asset.require('scene/solarsystem/planets/earth/globe') --include earth
+local high_wall_mining_collom_pit_colowyo_mine_position = {
+  Identifier = "high_wall_mining_collom_pit_colowyo_mine_position",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+      Translation = {
+        Type = "GlobeTranslation",
+        Globe = earth.Earth.Identifier,
+        -- Adjusted position for OpenSpace
+        Latitude = 40.27031667,
+        Longitude = -107.9099222,
+        UseHeightmap = true,
+        -- Set ALTITUDE in meters so that it's above the landscape:
+        Altitude = 50.00
+      },
+      Scale = {
+        Type = "StaticScale",
+        Scale = 1.0
+      },
+      Rotation = {
+        Type = "StaticRotation",
+        Rotation = {0.00,0.00,0.00}
+      }
+  },
+  GUI = {
+    Name = "High Wall Mining Collom Pit Colowyo Mine Position",
+    Path = "/DMNS/Z_Pano_Positions/High Wall Mining Collom Pit Colowyo Mine",
+    Hidden = true
+  }
+}
+
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(high_wall_mining_collom_pit_colowyo_mine_position)
+end)
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(high_wall_mining_collom_pit_colowyo_mine_position)
+end)
+asset.export(high_wall_mining_collom_pit_colowyo_mine_position)

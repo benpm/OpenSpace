@@ -1,0 +1,73 @@
+-- Colorado Energy Generators: Nuclear seals at their locations on Earth.
+-- The seals are invisible by default, but can be enabled using shown or hidden using
+-- the exported functions `showSeals(interpolationDuration)` and `hideSeals(interpolationDuration)`.
+
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local NUC_fortStVrainCO = {
+  Identifier = "NUC_fortStVrainCO",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.24535277778,
+      Longitude = -104.8738361111,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/nuclear-power_vectors.tank_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/NUC",
+    Name = "Fort St Vrain CO"
+  }
+}
+
+local ShowSeals = {
+  Identifier = "os.NUC.ShowSeals",
+  Name = "Show NUC landing labels",
+  Command = [[openspace.setPropertyValue("Scene.NUC*.Renderable.Opacity", 1, 0.5)]],
+  Documentation = "Show CO NUC seals.",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+local HideSeals = {
+  Identifier = "os.NUC.HideSeals",
+  Name = "Hide NUC landing labels",
+  Command = [[openspace.setPropertyValue("Scene.NUC*.Renderable.Opacity", 0, 0.5)]],
+  Documentation = "Hide CO NUC seals",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(NUC_fortStVrainCO)
+  openspace.action.registerAction(ShowSeals)
+  openspace.action.registerAction(HideSeals)
+end)
+
+asset.onDeinitialize(function()
+  openspace.action.removeAction(HideSeals)
+  openspace.action.removeAction(ShowSeals)
+  openspace.removeSceneGraphNode(NUC_fortStVrainCO)
+end)
+
+asset.export(NUC_fortStVrainCO)
+
+asset.export("showSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.NUC*.Renderable.Opacity", 1, interpolationDuration)
+end)
+
+asset.export("hideSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.NUC*.Renderable.Opacity", 0, interpolationDuration)
+end)

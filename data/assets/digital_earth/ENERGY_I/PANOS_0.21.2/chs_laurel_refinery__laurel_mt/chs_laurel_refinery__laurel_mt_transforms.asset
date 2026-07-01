@@ -1,0 +1,42 @@
+-- Create a position for other files to share
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+local earth = asset.require('scene/solarsystem/planets/earth/globe') --include earth
+local chs_laurel_refinery__laurel_mt_position = {
+  Identifier = "chs_laurel_refinery__laurel_mt_position",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+      Translation = {
+        Type = "GlobeTranslation",
+        Globe = earth.Earth.Identifier,
+        -- LATITUDE and LONGITUDE should be in degrees:
+        Latitude = 45.66051667,
+        Longitude = -108.7668278,
+        UseHeightmap = true,
+        -- Set ALTITUDE in meters so that it's above the landscape:
+        Altitude = 50.00
+      },
+      Scale = {
+        Type = "StaticScale",
+        Scale = 1.0
+      },
+      Rotation = {
+        Type = "StaticRotation",
+        Rotation = {0.00,0.00,0.00}
+      }
+  },
+  GUI = {
+    Name = "CHS Laurel Refinery, Laurel, MT position",
+    Path = "/DMNS/Z_Pano_Positions/CHS laurel Refinery, Laurel, MT",
+    Hidden = true
+  }
+}
+
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(chs_laurel_refinery__laurel_mt_position)
+end)
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(chs_laurel_refinery__laurel_mt_position)
+end)
+asset.export(chs_laurel_refinery__laurel_mt_position)

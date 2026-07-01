@@ -1,0 +1,55 @@
+-- bearcreek_cemetery_360.asset creates a 360 panorama
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+local transforms = asset.require("./bearcreek_cemetery_transforms") -- Include transforms for position
+local texture = asset.resource('data/0B5A1618_bearcreek_cemetery_8K_centered.jpg'); -- Reference texture file
+openspace.printDebug(transforms)
+local bearcreek_cemetery = {
+    Identifier = "bearcreek_cemetery",
+    Parent = transforms.bearcreek_cemetery_position.Identifier,
+    Transform = {
+        Rotation = { -- Rotate in gui to proper orientation.
+            Type= "StaticRotation",
+            -- If the panorama image has North at the center of image,
+            -- the horizon runs exactly through the centerline, and
+            -- Rotation = {0, LATITUDE, LONGITUDE} with angles in
+            -- radians, then the pano will appear level and properly oriented.
+            Rotation = {0.00,0.7881519,-1.904479}
+        },
+        Scale = {
+            Type = "StaticScale",
+            Scale = 1.0
+        },
+        Translation = {
+            Type = "StaticTranslation",
+            Position = {0,0,0}
+        }
+    },
+    Renderable = {
+        Type = "RenderableSphereImageLocal",
+        Size = 45,
+        Segments = 40,
+        Opacity = 1.0,
+        Texture = texture,
+        Orientation = "Inside",
+        UseAdditiveBlending = false,
+        MirrorTexture = true,
+        FadeOutThreshold = 1.00,
+        Background = true,
+        RenderBinMode = "PostDeferredTransparent",
+    },
+    GUI = {
+        Name = "Bearcreek Cemetery",
+        Path = "/DMNS/Bearcreek Cemetery",
+        Description = [[Bearcreek Cemetery]],
+    }
+}
+asset.onInitialize(function()
+    openspace.addSceneGraphNode(bearcreek_cemetery)
+    openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.LimitZoom.MinimumAllowedDistance", 1.000000)
+end)
+
+asset.onDeinitialize(function()
+    openspace.removeSceneGraphNode(bearcreek_cemetery)
+end)
+asset.export(bearcreek_cemetery)

@@ -1,0 +1,31 @@
+-- To learn how you can include your own video, see the wiki 
+-- http://wiki.openspaceproject.com/docs/builders/assets/resources.html
+
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local Layer = {
+  Name = "EIA US BAT",
+  Identifier = "eiaBAToperatingGenerators",
+  Enabled = false,
+  Opacity = 1.0,
+  FilePath = asset.resource("power_plants_bat_2025_conus_alpha.vrt")
+}
+
+asset.onInitialize(function()
+  openspace.globebrowsing.addLayer(earth.Earth.Identifier, "ColorLayers", Layer)
+end)
+
+asset.onDeinitialize(function()
+  openspace.globebrowsing.deleteLayer(earth.Earth.Identifier, "ColorLayers", Layer)
+end)
+
+asset.export("layer", Layer)
+
+asset.meta = {
+  Name = "EIA US BAT",
+  Version = "1.0",
+  Description = "",
+  Author = "OpenSpace Team",
+  URL = "https://openspaceproject.com",
+  License = "MIT"
+}

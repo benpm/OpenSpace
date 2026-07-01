@@ -1,0 +1,42 @@
+-- Create a position for other files to share
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+local earth = asset.require('scene/solarsystem/planets/earth/globe') --include earth
+local tristate_control_room_pano_2_position = {
+  Identifier = "tristate_control_room_pano_2_position",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+      Translation = {
+        Type = "GlobeTranslation",
+        Globe = earth.Earth.Identifier,
+        -- LATITUDE and LONGITUDE should be in degrees:
+        Latitude = 39.9064861111,
+        Longitude = -105.0001833333,
+        UseHeightmap = true,
+        -- Set ALTITUDE in meters so that it's above the landscape:
+        Altitude = 50.00
+      },
+      Scale = {
+        Type = "StaticScale",
+        Scale = 1.0
+      },
+      Rotation = {
+        Type = "StaticRotation",
+        Rotation = {0.00,0.00,0.00}
+      }
+  },
+  GUI = {
+    Name = "Tri-State Control Room Pano 2 Position",
+    Path = "/DMNS/Z_Pano_Positions/Tri-State Control Room Pano 2",
+    Hidden = true
+  }
+}
+
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(tristate_control_room_pano_2_position)
+end)
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(tristate_control_room_pano_2_position)
+end)
+asset.export(tristate_control_room_pano_2_position)

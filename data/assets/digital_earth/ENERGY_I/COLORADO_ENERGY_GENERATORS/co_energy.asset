@@ -1,0 +1,32 @@
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local Node = {
+  Identifier = "ColoradoWind",
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    File = asset.resource("test.csv"),
+    Coloring = {
+      FixedColor = { 0.0, 0.5, 0.0 }
+    },
+      SizeSettings = {
+      -- We set the exponent for the scale explicitly, to a value that
+      -- gives the points a suitable size based on their world-space coordinates
+      ScaleExponent = .01,
+      ScaleFactor = .1,
+      MaxSize = 0.7,
+      EnableMaxSizeControl = true
+    }
+  },
+  GUI = {
+    Name = "RenderablePointCloud - Fixed Color and Size",
+    Path = "/DMNS"
+  }
+}
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(Node)
+end)
+
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(Node)
+end)

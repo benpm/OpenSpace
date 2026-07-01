@@ -1,0 +1,31 @@
+convert bearcreek_cemetery/data/0B5A1618_bearcreek_cemetery_8K.jpg -roll -2264+0 bearcreek_cemetery/data/0B5A1618_bearcreek_cemetery_8K_centered.jpg
+
+# # --------------------------------------------------------------------------------
+# # --------------------------------------------------------------------------------
+# wildcat_mountain_2_1270_pano_edit.jpg
+# 13084 pix x 6542 pix
+# - 36.344444444 pix/deg
+# # [LAT,LON] = 39.4122527778, -105.024386111
+# 
+# https://gml.noaa.gov/grad/solcalc/
+# Local time: 01 May 2024 2:19pm MDT (-5 UTC offset)
+# Sun Az/El: 222.5 deg, 60.07 deg
+#   --> Sun is 137.5 deg West of North --> 4997.4 pix to left of North
+#                or
+#              222.5 deg East of North --> 8086.6 pix to right of North
+# 
+# Sun position: 9080 pix x 1080 pix
+#   - Elevation above horizon: 3250 - 1080 ~ 2170 pix ~ 60 deg
+#   - Azimuth: 9080 pix - 13084/2 pix = 2538 pix (right of center)
+# 
+#   x_sun = 9080 pix
+#   AZ = 222.5 deg = 8087 pix
+#   x_north = 9080 pix - 8087 pix = 993 pix
+# 
+#   # Put North at center of image:
+#   x_n_offset = x_mid - x_north
+#            = 6542 - 993 = 5549 pix
+# 
+#   # To set image North to center:
+#     convert wildcat_mountain_2_1270_pano_edit.jpg -roll +5549+0 wildcat_mountain_2_1270_pano_centered.jpg
+# 

@@ -1,0 +1,31 @@
+-- To learn how you can include your own video, see the wiki
+-- http://wiki.openspaceproject.com/docs/builders/assets/resources.html
+
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local Layer = {
+  Name = "SOS Real-Time Fires",
+  Identifier = "RealTimeFires",
+  Enabled = true,
+  Type = "VideoTileProvider",
+  -- Video = asset.resource("suomi_npp_viirs_fire_2023-2024.mp4"),
+  Video = asset.resource("suomi_npp_viirs_fire_2024.05-2025.05.mp4"),
+}
+
+asset.onInitialize(function()
+  openspace.globebrowsing.addLayer(earth.Earth.Identifier, "ColorLayers", Layer)
+end)
+
+asset.onDeinitialize(function()
+  openspace.globebrowsing.deleteLayer(earth.Earth.Identifier, "ColorLayers", Layer)
+end)
+
+asset.export("layer", Layer)
+
+asset.meta = {
+  Name = "Fires - Real-time",
+  Description = "Fires, both natural and manmade, are plotted in this daily imagery as a function of how many fires occurred within each 500 m pixel area over the selected time period. Satellites are sensitive to infrared (heat) energy and are able to detect the thermal signature of fires. This data is not only useful for detecting wildfires in otherwise remote areas, but also for understanding how large fires spread over time. This imagery uses satellite data from NASA MODIS Terra along with Suomi NPP VIIRS for global coverage of fire activity.\n Some of the global patterns that appear in the fire maps over time are the result of natural cycles of rainfall, dryness, and lightning. For example, naturally occurring fires are common in the boreal forests of Canada and grasslands in Australia in the summer. These are seen in opposite times of the year due to seasonal differences between the northern and southern hemispheres. In other parts of the world, the patterns are the result of human activity. For example, the intense burning in the heart of South America from August-October is a result of human-triggered fires, both intentional and accidental. Across Africa, a band of widespread agricultural burning sweeps north to south over the continent as the dry season progresses each year. Agricultural burning occurs in late winter and early spring each year across Southeast Asia as well.",
+  Author = "Ka Chun Yu",
+  URL = "https://openspaceproject.com",
+  License = "MIT"
+}

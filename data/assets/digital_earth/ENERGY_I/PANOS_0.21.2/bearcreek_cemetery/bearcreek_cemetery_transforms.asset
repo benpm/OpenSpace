@@ -1,0 +1,42 @@
+-- Create a position for other files to share
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+local earth = asset.require('scene/solarsystem/planets/earth/globe') --include earth
+local bearcreek_cemetery_position = {
+  Identifier = "bearcreek_cemetery_position",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+      Translation = {
+        Type = "GlobeTranslation",
+        Globe = earth.Earth.Identifier,
+        -- LATITUDE and LONGITUDE should be in degrees:
+        Latitude = 45.1573222222,
+        Longitude = -109.1387555556,
+        UseHeightmap = true,
+        -- Set ALTITUDE in meters so that it's above the landscape:
+        Altitude = 50.00
+      },
+      Scale = {
+        Type = "StaticScale",
+        Scale = 1.0
+      },
+      Rotation = {
+        Type = "StaticRotation",
+        Rotation = {0.00,0.00,0.00}
+      }
+  },
+  GUI = {
+    Name = "Bearcreek Cemetery Position",
+    Path = "/DMNS/Z_Pano_Positions/Bearcreek Cemetery",
+    Hidden = true
+  }
+}
+
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(bearcreek_cemetery_position)
+end)
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(bearcreek_cemetery_position)
+end)
+asset.export(bearcreek_cemetery_position)

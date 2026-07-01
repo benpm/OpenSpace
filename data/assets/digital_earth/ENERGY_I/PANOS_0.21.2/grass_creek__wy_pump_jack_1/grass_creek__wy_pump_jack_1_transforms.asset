@@ -1,0 +1,42 @@
+-- Create a position for other files to share
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+local earth = asset.require('scene/solarsystem/planets/earth/globe') --include earth
+local grass_creek__wy_pump_jack_1_position = {
+  Identifier = "grass_creek__wy_pump_jack_1_position",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+      Translation = {
+        Type = "GlobeTranslation",
+        Globe = earth.Earth.Identifier,
+        -- LATITUDE and LONGITUDE should be in degrees:
+        Latitude = 43.94939444,
+        Longitude = -108.6588611,
+        UseHeightmap = true,
+        -- Set ALTITUDE in meters so that it's above the landscape:
+        Altitude = 50.00
+      },
+      Scale = {
+        Type = "StaticScale",
+        Scale = 1.0
+      },
+      Rotation = {
+        Type = "StaticRotation",
+        Rotation = {0.00,0.00,0.00}
+      }
+  },
+  GUI = {
+    Name = "Grass Creek, WY Pump Jack 1 Position",
+    Path = "/DMNS/Z_Pano_Positions/Grass Creek, WY Pump Jack 1",
+    Hidden = true
+  }
+}
+
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(grass_creek__wy_pump_jack_1_position)
+end)
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(grass_creek__wy_pump_jack_1_position)
+end)
+asset.export(grass_creek__wy_pump_jack_1_position)

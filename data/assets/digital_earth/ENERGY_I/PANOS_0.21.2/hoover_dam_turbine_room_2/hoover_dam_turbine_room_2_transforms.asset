@@ -1,0 +1,41 @@
+-- hoover_dam_turbine_room_2_transforms.asset
+-- Creates a position for other files to share
+--
+-- Version by Ka Chun Yu (DMNS) Oct 2024
+local earth = asset.require('scene/solarsystem/planets/earth/globe') -- Include earth
+local Hoover_dam_turbine_room_2_position = {
+  Identifier = "hoover_dam_turbine_room_2_position",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+      Translation = {
+        Type = "GlobeTranslation",
+        Globe = earth.Earth.Identifier,
+        -- Adjusted position for OpenSpace
+        Latitude = 36.01556904236749,
+        Longitude = -114.73882536182782,
+        UseHeightmap = true,
+        Altitude = 50.00
+      },
+      Scale = {
+        Type = "StaticScale",
+        Scale = 1.0
+      },
+      Rotation = {
+        Type = "StaticRotation",
+        Rotation = {0.00,0.00,0.00}
+      }
+  },
+  GUI = {
+    Name = "hoover_dam_turbine_room_2_position",
+    Path = "/DMNS/Z_Pano_Positions/hoover_dam_turbine_room_2"
+  }
+}
+
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(Hoover_dam_turbine_room_2_position)
+end)
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(Hoover_dam_turbine_room_2_position)
+end)
+asset.export(Hoover_dam_turbine_room_2_position)

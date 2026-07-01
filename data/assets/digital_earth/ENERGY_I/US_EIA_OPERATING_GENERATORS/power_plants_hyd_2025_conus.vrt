@@ -1,0 +1,56 @@
+<VRTDataset rasterXSize="5752" rasterYSize="3094">
+  <SRS>GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]</SRS>
+  <GeoTransform> -1.2473460723800000e+02,  1.0041252127781640e-02,  0.0000000000000000e+00,  4.9369494121499997e+01,  0.0000000000000000e+00, -8.0242230777310911e-03</GeoTransform>
+  <Metadata />
+  <Metadata domain="IMAGE_STRUCTURE">
+    <MDI key="INTERLEAVE">PIXEL</MDI>
+  </Metadata>
+  <VRTRasterBand dataType="Byte" band="1">
+    <Metadata />
+    <NoDataValue>0.00000000000000E+00</NoDataValue>
+    <ColorInterp>Red</ColorInterp>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">power_plants_hyd_2025_conus.png</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="5752" RasterYSize="3094" DataType="Byte" BlockXSize="5752" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="5752" ySize="3094" />
+      <DstRect xOff="0" yOff="0" xSize="5752" ySize="3094" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Byte" band="2">
+    <Metadata />
+    <NoDataValue>0.00000000000000E+00</NoDataValue>
+    <ColorInterp>Green</ColorInterp>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">power_plants_hyd_2025_conus.png</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="5752" RasterYSize="3094" DataType="Byte" BlockXSize="5752" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="5752" ySize="3094" />
+      <DstRect xOff="0" yOff="0" xSize="5752" ySize="3094" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Byte" band="3">
+    <Metadata />
+    <NoDataValue>0.00000000000000E+00</NoDataValue>
+    <ColorInterp>Blue</ColorInterp>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">power_plants_hyd_2025_conus.png</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="5752" RasterYSize="3094" DataType="Byte" BlockXSize="5752" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="5752" ySize="3094" />
+      <DstRect xOff="0" yOff="0" xSize="5752" ySize="3094" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Byte" band="4">
+    <Metadata />
+    <NoDataValue>0.00000000000000E+00</NoDataValue>
+    <ColorInterp>Alpha</ColorInterp>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">power_plants_hyd_2025_conus.png</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="5752" RasterYSize="3094" DataType="Byte" BlockXSize="5752" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="5752" ySize="3094" />
+      <DstRect xOff="0" yOff="0" xSize="5752" ySize="3094" />
+    </SimpleSource>
+  </VRTRasterBand>
+</VRTDataset>

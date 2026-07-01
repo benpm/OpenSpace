@@ -1,0 +1,973 @@
+-- Colorado Energy Generators: Wind seals at their locations on Earth.
+-- The seals are invisible by default, but can be enabled using shown or hidden using
+-- the exported functions `showSeals(interpolationDuration)` and `hideSeals(interpolationDuration)`.
+
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local WIN212_TerraGenOperatingCoWind_RidgeCrestWindPartners_Logan = {
+  Identifier = "WIN212_TerraGenOperatingCoWind_RidgeCrestWindPartners_Logan",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.945911,
+      Longitude = -103.162,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN212 - Terra Gen Operating Co Wind, Ridge Crest Wind Partners, Logan"
+  }
+}
+
+local WIN217_AvangridPowerLLC_ColoradoGreenHoldingsLLC_Prowers = {
+  Identifier = "WIN217_AvangridPowerLLC_ColoradoGreenHoldingsLLC_Prowers",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 37.7033,
+      Longitude = -102.6231,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN217 - Avangrid Power LLC, Colorado Green Holdings LLC, Prowers"
+  }
+}
+
+local WIN218_InvenergyServicesLLC_SpringCanyon_Logan = {
+  Identifier = "WIN218_InvenergyServicesLLC_SpringCanyon_Logan",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.983,
+      Longitude = -102.9647,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN218 - Invenergy Services LLC, Spring Canyon, Logan"
+  }
+}
+
+local WIN219_LeewardAssetManagementLLC_CedarCreekWind_Weld = {
+  Identifier = "WIN219_LeewardAssetManagementLLC_CedarCreekWind_Weld",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.8944,
+      Longitude = -104.0206,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN219 - Leeward Asset Management LLC, Cedar Creek Wind, Weld"
+  }
+}
+
+local WIN223_AvangridPowerLLC_TwinButtesWindProject_Bent = {
+  Identifier = "WIN223_AvangridPowerLLC_TwinButtesWindProject_Bent",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 37.6735,
+      Longitude = -102.8622,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN223 - Avangrid Power LLC, Twin Buttes Wind Project, Bent"
+  }
+}
+
+local WIN244_FPLPeetzTableWindEnergy_PeetzTableWindEnergy_Logan = {
+  Identifier = "WIN244_FPLPeetzTableWindEnergy_PeetzTableWindEnergy_Logan",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.986,
+      Longitude = -103.436,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN244 - FPL Peetz Table Wind Energy, Peetz Table Wind Energy, Logan"
+  }
+}
+
+local WIN245_LoganWindEnergyLLC_LoganWindEnergy_Logan = {
+  Identifier = "WIN245_LoganWindEnergyLLC_LoganWindEnergy_Logan",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.941,
+      Longitude = -103.259,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN245 - Logan Wind Energy LLC, Logan Wind Energy, Logan"
+  }
+}
+
+local WIN259_ColoradoHighlandsWindLLC_ColoradoHighlandsWind_Logan = {
+  Identifier = "WIN259_ColoradoHighlandsWindLLC_ColoradoHighlandsWind_Logan",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.756944,
+      Longitude = -102.7431,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN259 - Colorado Highlands Wind LLC, Colorado Highlands Wind, Logan"
+  }
+}
+
+local WIN261_AEPowerServicesLLC_CedarCreekII_Weld = {
+  Identifier = "WIN261_AEPowerServicesLLC_CedarCreekII_Weld",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.9475,
+      Longitude = -103.7839,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN261 - AE Power Services LLC, Cedar Creek II, Weld"
+  }
+}
+
+local WIN262_DukeEnergyRenewablesServices_KitCarsonWindpower_KitCarson = {
+  Identifier = "WIN262_DukeEnergyRenewablesServices_KitCarsonWindpower_KitCarson",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.3383,
+      Longitude = -102.3533,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN262 - Duke Energy Renewables Services, Kit Carson Windpower, Kit Carson"
+  }
+}
+
+local WIN263_NorthernColoradoWindLLC_NorthernColoradoWindLLC_Logan = {
+  Identifier = "WIN263_NorthernColoradoWindLLC_NorthernColoradoWindLLC_Logan",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.9881,
+      Longitude = -102.8969,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN263 - Northern Colorado Wind LLC, Northern Colorado Wind LLC, Logan"
+  }
+}
+
+local WIN265_CedarPointLLC_CedarPointWind_Lincoln = {
+  Identifier = "WIN265_CedarPointLLC_CedarPointWind_Lincoln",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.421787,
+      Longitude = -103.6781,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN265 - Cedar Point LLC, Cedar Point Wind, Lincoln"
+  }
+}
+
+local WIN276_BlackHillsColoradoElectricLLC_BuschRanchWindEnergyFarm_Huerfano = {
+  Identifier = "WIN276_BlackHillsColoradoElectricLLC_BuschRanchWindEnergyFarm_Huerfano",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 37.801111,
+      Longitude = -104.4919,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN276 - Black Hills Colorado Electric LLC, Busch Ranch Wind Energy Farm, Huerfano"
+  }
+}
+
+local WIN278_Limon_LimonWindI_Lincoln = {
+  Identifier = "WIN278_Limon_LimonWindI_Lincoln",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.380975,
+      Longitude = -103.5732,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN278 - Limon, Limon Wind I, Lincoln"
+  }
+}
+
+local WIN279_Limon_LimonWindII_Lincoln = {
+  Identifier = "WIN279_Limon_LimonWindII_Lincoln",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.341389,
+      Longitude = -103.5811,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN279 - Limon, Limon Wind II, Lincoln"
+  }
+}
+
+local WIN289_SpringCanyonExpansionLLC_SpringCanyonExpansionWindEnergyCtr_Logan = {
+  Identifier = "WIN289_SpringCanyonExpansionLLC_SpringCanyonExpansionWindEnergyCtr_Logan",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.964167,
+      Longitude = -103.0772,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN289 - Spring Canyon Expansion LLC, Spring Canyon Expansion Wind Energy Ctr, Logan"
+  }
+}
+
+local WIN295_Limon_LimonIIIWindLLC_Lincoln = {
+  Identifier = "WIN295_Limon_LimonIIIWindLLC_Lincoln",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.353333,
+      Longitude = -103.4742,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN295 - Limon, Limon III Wind LLC, Lincoln"
+  }
+}
+
+local WIN308_GoldenWestPowerPartnersLLC_GoldenWestPowerPartnersLLC_ElPaso = {
+  Identifier = "WIN308_GoldenWestPowerPartnersLLC_GoldenWestPowerPartnersLLC_ElPaso",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.935,
+      Longitude = -104.212,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN308 - Golden West Power Partners LLC, Golden West Power Partners LLC, El Paso"
+  }
+}
+
+local WIN309_CarouselWindFarmLLC_CarouselWindFarmLLC_KitCarson = {
+  Identifier = "WIN309_CarouselWindFarmLLC_CarouselWindFarmLLC_KitCarson",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.334,
+      Longitude = -102.173,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN309 - Carousel Wind Farm LLC, Carousel Wind Farm LLC, Kit Carson"
+  }
+}
+
+local WIN313_BlackHillsColoradoElectricLLC_PeakViewWindFarm_Huerfano = {
+  Identifier = "WIN313_BlackHillsColoradoElectricLLC_PeakViewWindFarm_Huerfano",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 37.710444,
+      Longitude = -104.5055,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN313 - Black Hills Colorado Electric LLC, Peak View Wind Farm, Huerfano"
+  }
+}
+
+local WIN322_PublicServiceCoofColorado_RushCreekWind_Elbert = {
+  Identifier = "WIN322_PublicServiceCoofColorado_RushCreekWind_Elbert",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.172111,
+      Longitude = -103.8454,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN322 - Public Service Co of Colorado, Rush Creek Wind, Elbert"
+  }
+}
+
+local WIN331_AvangridPowerLLC_TwinButtesIIWind_Prowers = {
+  Identifier = "WIN331_AvangridPowerLLC_TwinButtesIIWind_Prowers",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 37.773,
+      Longitude = -102.546,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN331 - Avangrid Power LLC, Twin Buttes II Wind, Prowers"
+  }
+}
+
+local WIN364_BlackHillsElectricGenerationLLC_BuschRanchIIWindFarm_Huerfano = {
+  Identifier = "WIN364_BlackHillsElectricGenerationLLC_BuschRanchIIWindFarm_Huerfano",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 37.766416,
+      Longitude = -104.4295,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN364 - Black Hills Electric Generation LLC, Busch Ranch II Wind Farm, Huerfano"
+  }
+}
+
+local WIN365_EDPRenewablesNorthAmericaLLC_CrossingTrailsWindPowerProjectLLC_KitCarson = {
+  Identifier = "WIN365_EDPRenewablesNorthAmericaLLC_CrossingTrailsWindPowerProjectLLC_KitCarson",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.046623,
+      Longitude = -102.8224,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN365 - EDP Renewables North America LLC, Crossing Trails Wind Power Project LLC, Kit Carson"
+  }
+}
+
+local WIN372_LeewardAssetManagementLLC_MountainBreezeWindLLC_Weld = {
+  Identifier = "WIN372_LeewardAssetManagementLLC_MountainBreezeWindLLC_Weld",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.960618,
+      Longitude = -104.0032,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN372 - Leeward Asset Management LLC, Mountain Breeze Wind LLC, Weld"
+  }
+}
+
+local WIN374_PublicServiceCoofColorado_CheyenneRidgeWindFarm_Cheyenne = {
+  Identifier = "WIN374_PublicServiceCoofColorado_CheyenneRidgeWindFarm_Cheyenne",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.016944,
+      Longitude = -102.2113,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN374 - Public Service Co of Colorado, Cheyenne Ridge Wind Farm, Cheyenne"
+  }
+}
+
+local WIN396_BroncoPlainsWindLLC_BroncoPlainsWindLLC_KitCarson = {
+  Identifier = "WIN396_BroncoPlainsWindLLC_BroncoPlainsWindLLC_KitCarson",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.088845,
+      Longitude = -103.0251,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN396 - Bronco Plains Wind LLC, Bronco Plains Wind LLC, Kit Carson"
+  }
+}
+
+local WIN426_LeewardAssetManagementLLC_PanoramaWindLLC_Weld = {
+  Identifier = "WIN426_LeewardAssetManagementLLC_PanoramaWindLLC_Weld",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.952057,
+      Longitude = -103.9076,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN426 - Leeward Asset Management LLC, Panorama Wind LLC, Weld"
+  }
+}
+
+local WIN429_NiyolWindLLC_NiyolWindLLC_Logan = {
+  Identifier = "WIN429_NiyolWindLLC_NiyolWindLLC_Logan",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.613364,
+      Longitude = -102.9526,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN429 - Niyol Wind LLC, Niyol Wind LLC, Logan"
+  }
+}
+
+local WIN442_BroncoPlainsWindIILLC_BroncoPlainsWindIILLC_KitCarson = {
+  Identifier = "WIN442_BroncoPlainsWindIILLC_BroncoPlainsWindIILLC_KitCarson",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.184,
+      Longitude = -102.97,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/wind-power_freepik_flaticon.com_edit3.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/WIND",
+    Name = "WIN442 - Bronco Plains Wind II LLC, Bronco Plains Wind II LLC, Kit Carson"
+  }
+}
+
+local ShowSeals = {
+  Identifier = "os.WIN.ShowSeals",
+  Name = "Show WIN landing labels",
+  Command = [[openspace.setPropertyValue("Scene.WIN*.Renderable.Opacity", 1, 0.5)]],
+  Documentation = "Show CO Wind seals.",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+local HideSeals = {
+  Identifier = "os.WIN.HideSeals",
+  Name = "Hide WIN landing labels",
+  Command = [[openspace.setPropertyValue("Scene.WIN*.Renderable.Opacity", 0, 0.5)]],
+  Documentation = "Hide CO Wind seals",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(WIN212_TerraGenOperatingCoWind_RidgeCrestWindPartners_Logan)
+  openspace.addSceneGraphNode(WIN217_AvangridPowerLLC_ColoradoGreenHoldingsLLC_Prowers)
+  openspace.addSceneGraphNode(WIN218_InvenergyServicesLLC_SpringCanyon_Logan)
+  openspace.addSceneGraphNode(WIN219_LeewardAssetManagementLLC_CedarCreekWind_Weld)
+  openspace.addSceneGraphNode(WIN223_AvangridPowerLLC_TwinButtesWindProject_Bent)
+  openspace.addSceneGraphNode(WIN244_FPLPeetzTableWindEnergy_PeetzTableWindEnergy_Logan)
+  openspace.addSceneGraphNode(WIN245_LoganWindEnergyLLC_LoganWindEnergy_Logan)
+  openspace.addSceneGraphNode(WIN259_ColoradoHighlandsWindLLC_ColoradoHighlandsWind_Logan)
+  openspace.addSceneGraphNode(WIN261_AEPowerServicesLLC_CedarCreekII_Weld)
+  openspace.addSceneGraphNode(WIN262_DukeEnergyRenewablesServices_KitCarsonWindpower_KitCarson)
+  openspace.addSceneGraphNode(WIN263_NorthernColoradoWindLLC_NorthernColoradoWindLLC_Logan)
+  openspace.addSceneGraphNode(WIN265_CedarPointLLC_CedarPointWind_Lincoln)
+  openspace.addSceneGraphNode(WIN276_BlackHillsColoradoElectricLLC_BuschRanchWindEnergyFarm_Huerfano)
+  openspace.addSceneGraphNode(WIN278_Limon_LimonWindI_Lincoln)
+  openspace.addSceneGraphNode(WIN279_Limon_LimonWindII_Lincoln)
+  openspace.addSceneGraphNode(WIN289_SpringCanyonExpansionLLC_SpringCanyonExpansionWindEnergyCtr_Logan)
+  openspace.addSceneGraphNode(WIN295_Limon_LimonIIIWindLLC_Lincoln)
+  openspace.addSceneGraphNode(WIN308_GoldenWestPowerPartnersLLC_GoldenWestPowerPartnersLLC_ElPaso)
+  openspace.addSceneGraphNode(WIN309_CarouselWindFarmLLC_CarouselWindFarmLLC_KitCarson)
+  openspace.addSceneGraphNode(WIN313_BlackHillsColoradoElectricLLC_PeakViewWindFarm_Huerfano)
+  openspace.addSceneGraphNode(WIN322_PublicServiceCoofColorado_RushCreekWind_Elbert)
+  openspace.addSceneGraphNode(WIN331_AvangridPowerLLC_TwinButtesIIWind_Prowers)
+  openspace.addSceneGraphNode(WIN364_BlackHillsElectricGenerationLLC_BuschRanchIIWindFarm_Huerfano)
+  openspace.addSceneGraphNode(WIN365_EDPRenewablesNorthAmericaLLC_CrossingTrailsWindPowerProjectLLC_KitCarson)
+  openspace.addSceneGraphNode(WIN372_LeewardAssetManagementLLC_MountainBreezeWindLLC_Weld)
+  openspace.addSceneGraphNode(WIN374_PublicServiceCoofColorado_CheyenneRidgeWindFarm_Cheyenne)
+  openspace.addSceneGraphNode(WIN396_BroncoPlainsWindLLC_BroncoPlainsWindLLC_KitCarson)
+  openspace.addSceneGraphNode(WIN426_LeewardAssetManagementLLC_PanoramaWindLLC_Weld)
+  openspace.addSceneGraphNode(WIN429_NiyolWindLLC_NiyolWindLLC_Logan)
+  openspace.addSceneGraphNode(WIN442_BroncoPlainsWindIILLC_BroncoPlainsWindIILLC_KitCarson)
+  openspace.action.registerAction(ShowSeals)
+  openspace.action.registerAction(HideSeals)
+end)
+
+asset.onDeinitialize(function()
+  openspace.action.removeAction(HideSeals)
+  openspace.action.removeAction(ShowSeals)
+  openspace.removeSceneGraphNode(WIN212_TerraGenOperatingCoWind_RidgeCrestWindPartners_Logan)
+  openspace.removeSceneGraphNode(WIN217_AvangridPowerLLC_ColoradoGreenHoldingsLLC_Prowers)
+  openspace.removeSceneGraphNode(WIN218_InvenergyServicesLLC_SpringCanyon_Logan)
+  openspace.removeSceneGraphNode(WIN219_LeewardAssetManagementLLC_CedarCreekWind_Weld)
+  openspace.removeSceneGraphNode(WIN223_AvangridPowerLLC_TwinButtesWindProject_Bent)
+  openspace.removeSceneGraphNode(WIN244_FPLPeetzTableWindEnergy_PeetzTableWindEnergy_Logan)
+  openspace.removeSceneGraphNode(WIN245_LoganWindEnergyLLC_LoganWindEnergy_Logan)
+  openspace.removeSceneGraphNode(WIN259_ColoradoHighlandsWindLLC_ColoradoHighlandsWind_Logan)
+  openspace.removeSceneGraphNode(WIN261_AEPowerServicesLLC_CedarCreekII_Weld)
+  openspace.removeSceneGraphNode(WIN262_DukeEnergyRenewablesServices_KitCarsonWindpower_KitCarson)
+  openspace.removeSceneGraphNode(WIN263_NorthernColoradoWindLLC_NorthernColoradoWindLLC_Logan)
+  openspace.removeSceneGraphNode(WIN265_CedarPointLLC_CedarPointWind_Lincoln)
+  openspace.removeSceneGraphNode(WIN276_BlackHillsColoradoElectricLLC_BuschRanchWindEnergyFarm_Huerfano)
+  openspace.removeSceneGraphNode(WIN278_Limon_LimonWindI_Lincoln)
+  openspace.removeSceneGraphNode(WIN279_Limon_LimonWindII_Lincoln)
+  openspace.removeSceneGraphNode(WIN289_SpringCanyonExpansionLLC_SpringCanyonExpansionWindEnergyCtr_Logan)
+  openspace.removeSceneGraphNode(WIN295_Limon_LimonIIIWindLLC_Lincoln)
+  openspace.removeSceneGraphNode(WIN308_GoldenWestPowerPartnersLLC_GoldenWestPowerPartnersLLC_ElPaso)
+  openspace.removeSceneGraphNode(WIN309_CarouselWindFarmLLC_CarouselWindFarmLLC_KitCarson)
+  openspace.removeSceneGraphNode(WIN313_BlackHillsColoradoElectricLLC_PeakViewWindFarm_Huerfano)
+  openspace.removeSceneGraphNode(WIN322_PublicServiceCoofColorado_RushCreekWind_Elbert)
+  openspace.removeSceneGraphNode(WIN331_AvangridPowerLLC_TwinButtesIIWind_Prowers)
+  openspace.removeSceneGraphNode(WIN364_BlackHillsElectricGenerationLLC_BuschRanchIIWindFarm_Huerfano)
+  openspace.removeSceneGraphNode(WIN365_EDPRenewablesNorthAmericaLLC_CrossingTrailsWindPowerProjectLLC_KitCarson)
+  openspace.removeSceneGraphNode(WIN372_LeewardAssetManagementLLC_MountainBreezeWindLLC_Weld)
+  openspace.removeSceneGraphNode(WIN374_PublicServiceCoofColorado_CheyenneRidgeWindFarm_Cheyenne)
+  openspace.removeSceneGraphNode(WIN396_BroncoPlainsWindLLC_BroncoPlainsWindLLC_KitCarson)
+  openspace.removeSceneGraphNode(WIN426_LeewardAssetManagementLLC_PanoramaWindLLC_Weld)
+  openspace.removeSceneGraphNode(WIN429_NiyolWindLLC_NiyolWindLLC_Logan)
+  openspace.removeSceneGraphNode(WIN442_BroncoPlainsWindIILLC_BroncoPlainsWindIILLC_KitCarson)
+end)
+
+asset.export(WIN212_TerraGenOperatingCoWind_RidgeCrestWindPartners_Logan)
+asset.export(WIN217_AvangridPowerLLC_ColoradoGreenHoldingsLLC_Prowers)
+asset.export(WIN218_InvenergyServicesLLC_SpringCanyon_Logan)
+asset.export(WIN219_LeewardAssetManagementLLC_CedarCreekWind_Weld)
+asset.export(WIN223_AvangridPowerLLC_TwinButtesWindProject_Bent)
+asset.export(WIN244_FPLPeetzTableWindEnergy_PeetzTableWindEnergy_Logan)
+asset.export(WIN245_LoganWindEnergyLLC_LoganWindEnergy_Logan)
+asset.export(WIN259_ColoradoHighlandsWindLLC_ColoradoHighlandsWind_Logan)
+asset.export(WIN261_AEPowerServicesLLC_CedarCreekII_Weld)
+asset.export(WIN262_DukeEnergyRenewablesServices_KitCarsonWindpower_KitCarson)
+asset.export(WIN263_NorthernColoradoWindLLC_NorthernColoradoWindLLC_Logan)
+asset.export(WIN265_CedarPointLLC_CedarPointWind_Lincoln)
+asset.export(WIN276_BlackHillsColoradoElectricLLC_BuschRanchWindEnergyFarm_Huerfano)
+asset.export(WIN278_Limon_LimonWindI_Lincoln)
+asset.export(WIN279_Limon_LimonWindII_Lincoln)
+asset.export(WIN289_SpringCanyonExpansionLLC_SpringCanyonExpansionWindEnergyCtr_Logan)
+asset.export(WIN295_Limon_LimonIIIWindLLC_Lincoln)
+asset.export(WIN308_GoldenWestPowerPartnersLLC_GoldenWestPowerPartnersLLC_ElPaso)
+asset.export(WIN309_CarouselWindFarmLLC_CarouselWindFarmLLC_KitCarson)
+asset.export(WIN313_BlackHillsColoradoElectricLLC_PeakViewWindFarm_Huerfano)
+asset.export(WIN322_PublicServiceCoofColorado_RushCreekWind_Elbert)
+asset.export(WIN331_AvangridPowerLLC_TwinButtesIIWind_Prowers)
+asset.export(WIN364_BlackHillsElectricGenerationLLC_BuschRanchIIWindFarm_Huerfano)
+asset.export(WIN365_EDPRenewablesNorthAmericaLLC_CrossingTrailsWindPowerProjectLLC_KitCarson)
+asset.export(WIN372_LeewardAssetManagementLLC_MountainBreezeWindLLC_Weld)
+asset.export(WIN374_PublicServiceCoofColorado_CheyenneRidgeWindFarm_Cheyenne)
+asset.export(WIN396_BroncoPlainsWindLLC_BroncoPlainsWindLLC_KitCarson)
+asset.export(WIN426_LeewardAssetManagementLLC_PanoramaWindLLC_Weld)
+asset.export(WIN429_NiyolWindLLC_NiyolWindLLC_Logan)
+asset.export(WIN442_BroncoPlainsWindIILLC_BroncoPlainsWindIILLC_KitCarson)
+
+
+asset.export("showSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.WIN*.Renderable.Opacity", 1, interpolationDuration)
+end)
+
+asset.export("hideSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.WIN*.Renderable.Opacity", 0, interpolationDuration)
+end)

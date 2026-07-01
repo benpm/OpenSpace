@@ -1,0 +1,49 @@
+--  hoover_dam_exterior_intake_towers_360.asset creates a 360 panorama
+local transforms = asset.require("./hoover_dam_exterior_intake_towers_transforms") -- Include transforms for position
+local texture = asset.resource('data/hoover_dam_exterior_intake_towers_IMG_0084_pano_edit.jpg'); -- Reference texture file
+openspace.printDebug(transforms)
+local hoover_dam_exterior_intake_towers = {
+    Identifier = "hoover_dam_exterior_intake_towers",
+    Parent = transforms.hoover_dam_exterior_intake_towers_position.Identifier,
+    Transform = {
+        Rotation = { -- rotate in gui to proper orientation and put values here.
+            Type= "StaticRotation",
+            Rotation = {-0.86,0.43,3.141593}
+        },
+        Scale = {
+            Type = "StaticScale",
+            Scale = 0.5
+        },
+        Translation = {
+            Type = "StaticTranslation",
+            Position = {0,0,-15}
+        }
+    },
+    Renderable = {
+        Type = "RenderableSphereImageLocal",
+        Size = 45,
+        Segments = 40,
+        Opacity = 1.0,
+        Texture = texture,
+        Orientation = "Inside",
+        UseAdditiveBlending = false,
+        MirrorTexture = true,
+        FadeOutThreshold = 1.00,
+        Background = true,
+        RenderBinMode = "PostDeferredTransparent",
+    },
+    GUI = {
+        Name = "hoover_dam_exterior_intake_towers",
+        Path = "/DMNS/Hoover_Dam_Exterior_Intake_Towers",
+        Description = [[hoover_dam_exterior_intake_towers]],
+    }
+}
+asset.onInitialize(function()
+    openspace.addSceneGraphNode(hoover_dam_exterior_intake_towers)
+    openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.LimitZoom.MinimumAllowedDistance", 1.000000)
+end)
+
+asset.onDeinitialize(function()
+    openspace.removeSceneGraphNode(hoover_dam_exterior_intake_towers)
+end)
+asset.export(hoover_dam_exterior_intake_towers)

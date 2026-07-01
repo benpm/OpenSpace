@@ -1,0 +1,38 @@
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local blackMarbleSphereEnhanced = {
+	Identifier = "blackMarbleEnhanced2012",
+	Parent = earth.Earth.Identifier,
+	Transform = {
+		Rotation = {
+			Type = "StaticRotation",
+			Rotation = {0.000000,0.000000,3.141592653590}
+		}
+	},
+	Renderable = {
+		Type = "RenderableSphereImageLocal",
+		Size = 6615000.0, -- Render above the Earth sphere
+		Enabled = false,
+		Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/EARTH_AT_NIGHT/blackmarble_2012_enhanced_4800.jpg"),
+	},
+	GUI = {
+		Name = "Black Marble 2012 - Enhanced",
+		Path = "/Earth Layers/Black Marble"
+	}
+}
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(blackMarbleSphereEnhanced)
+end)
+
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(blackMarbleSphereEnhanced)
+end)
+
+asset.meta = {
+  Name = "Earth At Night",
+  Description = "",
+  Author = "Ka Chun Yu",
+  URL = "https://openspaceproject.com",
+  License = "MIT"
+}

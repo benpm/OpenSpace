@@ -1,0 +1,817 @@
+-- Colorado Energy Generators: Gas seals at their locations on Earth.
+-- The seals are invisible by default, but can be enabled using shown or hidden using
+-- the exported functions `showSeals(interpolationDuration)` and `hideSeals(interpolationDuration)`.
+
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local GAS005_PublicServiceCoofColorado_Alamosa_Alamosa = {
+  Identifier = "GAS005_PublicServiceCoofColorado_Alamosa_Alamosa",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 37.4594,
+      Longitude = -105.8947,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS005 - Public Service Co of Colorado, Alamosa, Alamosa"
+  }
+}
+
+local GAS010_PublicServiceCoofColorado_Cherokee_Adams = {
+  Identifier = "GAS010_PublicServiceCoofColorado_Cherokee_Adams",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.807275,
+      Longitude = -104.9645,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS010 - Public Service Co of Colorado, Cherokee, Adams"
+  }
+}
+
+local GAS016_PublicServiceCoofColorado_Fruita_Mesa = {
+  Identifier = "GAS016_PublicServiceCoofColorado_Fruita_Mesa",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.1364,
+      Longitude = -108.7347,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS016 - Public Service Co of Colorado, Fruita, Mesa"
+  }
+}
+
+local GAS022_PublicServiceCoofColorado_Valmont_Boulder = {
+  Identifier = "GAS022_PublicServiceCoofColorado_Valmont_Boulder",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.0195,
+      Longitude = -105.202,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS022 - Public Service Co of Colorado, Valmont, Boulder"
+  }
+}
+
+local GAS023_CityofColoradoSpringsCO_SouthPlant_ElPaso = {
+  Identifier = "GAS023_CityofColoradoSpringsCO_SouthPlant_ElPaso",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.824444,
+      Longitude = -104.8333,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS023 - City of Colorado Springs CO, South Plant, El Paso"
+  }
+}
+
+local GAS029_CityofColoradoSpringsCO_GeorgeBirdsall_ElPaso = {
+  Identifier = "GAS029_CityofColoradoSpringsCO_GeorgeBirdsall_ElPaso",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.881389,
+      Longitude = -104.8169,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS029 - City of Colorado Springs CO, George Birdsall, El Paso"
+  }
+}
+
+local GAS079_PublicServiceCoofColorado_FortStVrain_Weld = {
+  Identifier = "GAS079_PublicServiceCoofColorado_FortStVrain_Weld",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.2461,
+      Longitude = -104.8742,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS079 - Public Service Co of Colorado, Fort St Vrain, Weld"
+  }
+}
+
+local GAS100_PlatteRiverPowerAuthority_Rawhide_Larimer = {
+  Identifier = "GAS100_PlatteRiverPowerAuthority_Rawhide_Larimer",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.860905,
+      Longitude = -105.0212,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS100 - Platte River Power Authority, Rawhide, Larimer"
+  }
+}
+
+local GAS113_PublicServiceCoofColorado_FortLupton_Weld = {
+  Identifier = "GAS113_PublicServiceCoofColorado_FortLupton_Weld",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.0922,
+      Longitude = -104.796,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS113 - Public Service Co of Colorado, Fort Lupton, Weld"
+  }
+}
+
+local GAS120_CityofColoradoSpringsCO_RayDNixon_ElPaso = {
+  Identifier = "GAS120_CityofColoradoSpringsCO_RayDNixon_ElPaso",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.633451,
+      Longitude = -104.7058,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS120 - City of Colorado Springs CO, Ray D Nixon, El Paso"
+  }
+}
+
+local GAS124_MolsonCoorsUSALLC_ColoradoEnergyNationsCompany_Jefferson = {
+  Identifier = "GAS124_MolsonCoorsUSALLC_ColoradoEnergyNationsCompany_Jefferson",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.7606,
+      Longitude = -105.215,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS124 - Molson Coors USA LLC, Colorado Energy Nations Company, Jefferson"
+  }
+}
+
+local GAS139_BrushPowerLLC_BrushGenerationFacility_Morgan = {
+  Identifier = "GAS139_BrushPowerLLC_BrushGenerationFacility_Morgan",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.2415,
+      Longitude = -103.631,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS139 - Brush Power LLC, Brush Generation Facility, Morgan"
+  }
+}
+
+local GAS152_TriStateGTAssnInc_JMShaferGeneratingStation_Weld = {
+  Identifier = "GAS152_TriStateGTAssnInc_JMShaferGeneratingStation_Weld",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.0986,
+      Longitude = -104.7736,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS152 - Tri State GT Assn Inc, JM Shafer Generating Station, Weld"
+  }
+}
+
+local GAS160_UniversityofColorado_UniversityofColorado_Boulder = {
+  Identifier = "GAS160_UniversityofColorado_UniversityofColorado_Boulder",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.00759,
+      Longitude = -105.2692,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS160 - University of Colorado, University of Colorado, Boulder"
+  }
+}
+
+local GAS170_PublicServiceCoofColorado_ManchiefElectricGeneratingStation_Morgan = {
+  Identifier = "GAS170_PublicServiceCoofColorado_ManchiefElectricGeneratingStation_Morgan",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.217143,
+      Longitude = -103.685,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS170 - Public Service Co of Colorado, Manchief Electric Generating Station, Morgan"
+  }
+}
+
+local GAS172_SWGArapahoeLLC_ArapahoeCombustionTurbineProject_Denver = {
+  Identifier = "GAS172_SWGArapahoeLLC_ArapahoeCombustionTurbineProject_Denver",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.6692,
+      Longitude = -105.0018,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS172 - SWG Arapahoe LLC, Arapahoe Combustion Turbine Project, Denver"
+  }
+}
+
+local GAS175_PublicServiceCoofColorado_ValmontCombustionTurbineProject_Boulder = {
+  Identifier = "GAS175_PublicServiceCoofColorado_ValmontCombustionTurbineProject_Boulder",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.0205,
+      Longitude = -105.2009,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS175 - Public Service Co of Colorado, Valmont Combustion Turbine Project, Boulder"
+  }
+}
+
+local GAS177_CityofColoradoSpringsCO_FrontRangePowerPlant_ElPaso = {
+  Identifier = "GAS177_CityofColoradoSpringsCO_FrontRangePowerPlant_ElPaso",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.6281,
+      Longitude = -104.7069,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS177 - City of Colorado Springs CO, Front Range Power Plant, El Paso"
+  }
+}
+
+local GAS180_FountainValleyPowerLLC_FountainValleyPowerFacility_ElPaso = {
+  Identifier = "GAS180_FountainValleyPowerLLC_FountainValleyPowerFacility_ElPaso",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.5569,
+      Longitude = -104.6875,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS180 - Fountain Valley Power LLC, Fountain Valley Power Facility, El Paso"
+  }
+}
+
+local GAS186_TriStateGTAssnInc_LimonGeneratingStation_Lincoln = {
+  Identifier = "GAS186_TriStateGTAssnInc_LimonGeneratingStation_Lincoln",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.2038,
+      Longitude = -103.7005,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS186 - Tri State GT Assn Inc, Limon Generating Station, Lincoln"
+  }
+}
+
+local GAS188_TriStateGTAssnInc_FrankKnutson_Adams = {
+  Identifier = "GAS188_TriStateGTAssnInc_FrankKnutson_Adams",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.941129,
+      Longitude = -104.682,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS188 - Tri State GT Assn Inc, Frank Knutson, Adams"
+  }
+}
+
+local GAS190_PublicServiceCoofColorado_BlueSpruceEnergyCenter_Adams = {
+  Identifier = "GAS190_PublicServiceCoofColorado_BlueSpruceEnergyCenter_Adams",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.747875,
+      Longitude = -104.6814,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS190 - Public Service Co of Colorado, Blue Spruce Energy Center, Adams"
+  }
+}
+
+local GAS213_PublicServiceCoofColorado_RockyMountainEnergyCenter_Weld = {
+  Identifier = "GAS213_PublicServiceCoofColorado_RockyMountainEnergyCenter_Weld",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.0908,
+      Longitude = -104.5953,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS213 - Public Service Co of Colorado, Rocky Mountain Energy Center, Weld"
+  }
+}
+
+local GAS221_InvenergyServicesLLC_SpindleHillEnergyCenter_Weld = {
+  Identifier = "GAS221_InvenergyServicesLLC_SpindleHillEnergyCenter_Weld",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.092192,
+      Longitude = -104.8878,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS221 - Invenergy Services LLC, Spindle Hill Energy Center, Weld"
+  }
+}
+
+local GAS249_BlackHillsServiceCompanyLLC_PuebloAirportGeneratingStation_Pueblo = {
+  Identifier = "GAS249_BlackHillsServiceCompanyLLC_PuebloAirportGeneratingStation_Pueblo",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.320833,
+      Longitude = -104.5264,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/natural-gas_freepik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/GAS",
+    Name = "GAS249 - Black Hills Service Company LLC, Pueblo Airport Generating Station, Pueblo"
+  }
+}
+
+local ShowSeals = {
+  Identifier = "os.GAS.ShowSeals",
+  Name = "Show GAS landing labels",
+  Command = [[openspace.setPropertyValue("Scene.GAS*.Renderable.Opacity", 1, 0.5)]],
+  Documentation = "Show CO GAS seals.",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+local HideSeals = {
+  Identifier = "os.GAS.HideSeals",
+  Name = "Hide GAS landing labels",
+  Command = [[openspace.setPropertyValue("Scene.GAS*.Renderable.Opacity", 0, 0.5)]],
+  Documentation = "Hide CO GAS seals",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(GAS005_PublicServiceCoofColorado_Alamosa_Alamosa)
+  openspace.addSceneGraphNode(GAS010_PublicServiceCoofColorado_Cherokee_Adams)
+  openspace.addSceneGraphNode(GAS016_PublicServiceCoofColorado_Fruita_Mesa)
+  openspace.addSceneGraphNode(GAS022_PublicServiceCoofColorado_Valmont_Boulder)
+  openspace.addSceneGraphNode(GAS023_CityofColoradoSpringsCO_SouthPlant_ElPaso)
+  openspace.addSceneGraphNode(GAS029_CityofColoradoSpringsCO_GeorgeBirdsall_ElPaso)
+  openspace.addSceneGraphNode(GAS079_PublicServiceCoofColorado_FortStVrain_Weld)
+  openspace.addSceneGraphNode(GAS100_PlatteRiverPowerAuthority_Rawhide_Larimer)
+  openspace.addSceneGraphNode(GAS113_PublicServiceCoofColorado_FortLupton_Weld)
+  openspace.addSceneGraphNode(GAS120_CityofColoradoSpringsCO_RayDNixon_ElPaso)
+  openspace.addSceneGraphNode(GAS124_MolsonCoorsUSALLC_ColoradoEnergyNationsCompany_Jefferson)
+  openspace.addSceneGraphNode(GAS139_BrushPowerLLC_BrushGenerationFacility_Morgan)
+  openspace.addSceneGraphNode(GAS152_TriStateGTAssnInc_JMShaferGeneratingStation_Weld)
+  openspace.addSceneGraphNode(GAS160_UniversityofColorado_UniversityofColorado_Boulder)
+  openspace.addSceneGraphNode(GAS170_PublicServiceCoofColorado_ManchiefElectricGeneratingStation_Morgan)
+  openspace.addSceneGraphNode(GAS172_SWGArapahoeLLC_ArapahoeCombustionTurbineProject_Denver)
+  openspace.addSceneGraphNode(GAS175_PublicServiceCoofColorado_ValmontCombustionTurbineProject_Boulder)
+  openspace.addSceneGraphNode(GAS177_CityofColoradoSpringsCO_FrontRangePowerPlant_ElPaso)
+  openspace.addSceneGraphNode(GAS180_FountainValleyPowerLLC_FountainValleyPowerFacility_ElPaso)
+  openspace.addSceneGraphNode(GAS186_TriStateGTAssnInc_LimonGeneratingStation_Lincoln)
+  openspace.addSceneGraphNode(GAS188_TriStateGTAssnInc_FrankKnutson_Adams)
+  openspace.addSceneGraphNode(GAS190_PublicServiceCoofColorado_BlueSpruceEnergyCenter_Adams)
+  openspace.addSceneGraphNode(GAS213_PublicServiceCoofColorado_RockyMountainEnergyCenter_Weld)
+  openspace.addSceneGraphNode(GAS221_InvenergyServicesLLC_SpindleHillEnergyCenter_Weld)
+  openspace.addSceneGraphNode(GAS249_BlackHillsServiceCompanyLLC_PuebloAirportGeneratingStation_Pueblo)
+  openspace.action.registerAction(ShowSeals)
+  openspace.action.registerAction(HideSeals)
+end)
+
+asset.onDeinitialize(function()
+  openspace.action.removeAction(HideSeals)
+  openspace.action.removeAction(ShowSeals)
+  openspace.removeSceneGraphNode(GAS005_PublicServiceCoofColorado_Alamosa_Alamosa)
+  openspace.removeSceneGraphNode(GAS010_PublicServiceCoofColorado_Cherokee_Adams)
+  openspace.removeSceneGraphNode(GAS016_PublicServiceCoofColorado_Fruita_Mesa)
+  openspace.removeSceneGraphNode(GAS022_PublicServiceCoofColorado_Valmont_Boulder)
+  openspace.removeSceneGraphNode(GAS023_CityofColoradoSpringsCO_SouthPlant_ElPaso)
+  openspace.removeSceneGraphNode(GAS029_CityofColoradoSpringsCO_GeorgeBirdsall_ElPaso)
+  openspace.removeSceneGraphNode(GAS079_PublicServiceCoofColorado_FortStVrain_Weld)
+  openspace.removeSceneGraphNode(GAS100_PlatteRiverPowerAuthority_Rawhide_Larimer)
+  openspace.removeSceneGraphNode(GAS113_PublicServiceCoofColorado_FortLupton_Weld)
+  openspace.removeSceneGraphNode(GAS120_CityofColoradoSpringsCO_RayDNixon_ElPaso)
+  openspace.removeSceneGraphNode(GAS124_MolsonCoorsUSALLC_ColoradoEnergyNationsCompany_Jefferson)
+  openspace.removeSceneGraphNode(GAS139_BrushPowerLLC_BrushGenerationFacility_Morgan)
+  openspace.removeSceneGraphNode(GAS152_TriStateGTAssnInc_JMShaferGeneratingStation_Weld)
+  openspace.removeSceneGraphNode(GAS160_UniversityofColorado_UniversityofColorado_Boulder)
+  openspace.removeSceneGraphNode(GAS170_PublicServiceCoofColorado_ManchiefElectricGeneratingStation_Morgan)
+  openspace.removeSceneGraphNode(GAS172_SWGArapahoeLLC_ArapahoeCombustionTurbineProject_Denver)
+  openspace.removeSceneGraphNode(GAS175_PublicServiceCoofColorado_ValmontCombustionTurbineProject_Boulder)
+  openspace.removeSceneGraphNode(GAS177_CityofColoradoSpringsCO_FrontRangePowerPlant_ElPaso)
+  openspace.removeSceneGraphNode(GAS180_FountainValleyPowerLLC_FountainValleyPowerFacility_ElPaso)
+  openspace.removeSceneGraphNode(GAS186_TriStateGTAssnInc_LimonGeneratingStation_Lincoln)
+  openspace.removeSceneGraphNode(GAS188_TriStateGTAssnInc_FrankKnutson_Adams)
+  openspace.removeSceneGraphNode(GAS190_PublicServiceCoofColorado_BlueSpruceEnergyCenter_Adams)
+  openspace.removeSceneGraphNode(GAS213_PublicServiceCoofColorado_RockyMountainEnergyCenter_Weld)
+  openspace.removeSceneGraphNode(GAS221_InvenergyServicesLLC_SpindleHillEnergyCenter_Weld)
+  openspace.removeSceneGraphNode(GAS249_BlackHillsServiceCompanyLLC_PuebloAirportGeneratingStation_Pueblo)
+end)
+
+asset.export(GAS005_PublicServiceCoofColorado_Alamosa_Alamosa)
+asset.export(GAS010_PublicServiceCoofColorado_Cherokee_Adams)
+asset.export(GAS016_PublicServiceCoofColorado_Fruita_Mesa)
+asset.export(GAS022_PublicServiceCoofColorado_Valmont_Boulder)
+asset.export(GAS023_CityofColoradoSpringsCO_SouthPlant_ElPaso)
+asset.export(GAS029_CityofColoradoSpringsCO_GeorgeBirdsall_ElPaso)
+asset.export(GAS079_PublicServiceCoofColorado_FortStVrain_Weld)
+asset.export(GAS100_PlatteRiverPowerAuthority_Rawhide_Larimer)
+asset.export(GAS113_PublicServiceCoofColorado_FortLupton_Weld)
+asset.export(GAS120_CityofColoradoSpringsCO_RayDNixon_ElPaso)
+asset.export(GAS124_MolsonCoorsUSALLC_ColoradoEnergyNationsCompany_Jefferson)
+asset.export(GAS139_BrushPowerLLC_BrushGenerationFacility_Morgan)
+asset.export(GAS152_TriStateGTAssnInc_JMShaferGeneratingStation_Weld)
+asset.export(GAS160_UniversityofColorado_UniversityofColorado_Boulder)
+asset.export(GAS170_PublicServiceCoofColorado_ManchiefElectricGeneratingStation_Morgan)
+asset.export(GAS172_SWGArapahoeLLC_ArapahoeCombustionTurbineProject_Denver)
+asset.export(GAS175_PublicServiceCoofColorado_ValmontCombustionTurbineProject_Boulder)
+asset.export(GAS177_CityofColoradoSpringsCO_FrontRangePowerPlant_ElPaso)
+asset.export(GAS180_FountainValleyPowerLLC_FountainValleyPowerFacility_ElPaso)
+asset.export(GAS186_TriStateGTAssnInc_LimonGeneratingStation_Lincoln)
+asset.export(GAS188_TriStateGTAssnInc_FrankKnutson_Adams)
+asset.export(GAS190_PublicServiceCoofColorado_BlueSpruceEnergyCenter_Adams)
+asset.export(GAS213_PublicServiceCoofColorado_RockyMountainEnergyCenter_Weld)
+asset.export(GAS221_InvenergyServicesLLC_SpindleHillEnergyCenter_Weld)
+asset.export(GAS249_BlackHillsServiceCompanyLLC_PuebloAirportGeneratingStation_Pueblo)
+
+asset.export("showSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.QQQ*.Renderable.Opacity", 1, interpolationDuration)
+end)
+
+asset.export("hideSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.QQQ*.Renderable.Opacity", 0, interpolationDuration)
+end)

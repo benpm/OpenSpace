@@ -1,0 +1,4 @@
+-- 360 panorama asset for komatsu_250_ton_dump_trucks_2
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+asset.require("./komatsu_250_ton_dump_trucks_2_360")

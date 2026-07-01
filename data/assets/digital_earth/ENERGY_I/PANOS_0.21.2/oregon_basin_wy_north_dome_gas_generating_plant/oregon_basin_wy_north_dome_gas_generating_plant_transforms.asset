@@ -1,0 +1,42 @@
+-- Create a position for other files to share
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+local earth = asset.require('scene/solarsystem/planets/earth/globe') --include earth
+local oregon_basin_wy_north_dome_gas_generating_plant_position = {
+  Identifier = "oregon_basin_wy_north_dome_gas_generating_plant_position",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+      Translation = {
+        Type = "GlobeTranslation",
+        Globe = earth.Earth.Identifier,
+        -- LATITUDE and LONGITUDE should be in degrees:
+        Latitude = 44.41048611,
+        Longitude = -108.9173306,
+        UseHeightmap = true,
+        -- Set ALTITUDE in meters so that it's above the landscape:
+        Altitude = 50.00
+      },
+      Scale = {
+        Type = "StaticScale",
+        Scale = 1.0
+      },
+      Rotation = {
+        Type = "StaticRotation",
+        Rotation = {0.00,0.00,0.00}
+      }
+  },
+  GUI = {
+    Name = "Oregon Basin WY North Dome Gas Generating Plant Position",
+    Path = "/DMNS/Z_Pano_Positions/Oregon Basin WY North Dome Gas Generating Plant",
+    Hidden = true
+  }
+}
+
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(oregon_basin_wy_north_dome_gas_generating_plant_position)
+end)
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(oregon_basin_wy_north_dome_gas_generating_plant_position)
+end)
+asset.export(oregon_basin_wy_north_dome_gas_generating_plant_position)

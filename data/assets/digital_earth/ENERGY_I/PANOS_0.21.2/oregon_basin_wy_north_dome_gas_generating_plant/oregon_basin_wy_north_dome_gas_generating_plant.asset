@@ -1,0 +1,4 @@
+-- 360 panorama asset for oregon_basin_wy_north_dome_gas_generating_plant
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+asset.require("./oregon_basin_wy_north_dome_gas_generating_plant_360")

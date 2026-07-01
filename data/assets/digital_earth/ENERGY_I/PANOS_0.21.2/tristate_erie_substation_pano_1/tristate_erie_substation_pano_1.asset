@@ -1,0 +1,4 @@
+-- 360 panorama asset for tristate_erie_substation_pano_1
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+asset.require("./tristate_erie_substation_pano_1_360")

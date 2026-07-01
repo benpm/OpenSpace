@@ -1,0 +1,19 @@
+--high_wall_mining_collom_pit_colowyo_mine_models.asset
+local assetHelper = asset.require('util/asset_helper') --include asset helper
+local transforms = asset.require("./high_wall_mining_collom_pit_colowyo_mine_transforms") --include transforms for position
+local sun_transforms = asset.require('scene/solarsystem/sun/transforms') --sun transforms for lights
+
+local modelHolder = {
+    Identifier = "high_wall_mining_collom_pit_colowyo_mineModelHolder",
+    Parent = transforms.high_wall_mining_collom_pit_colowyo_mine_position.Identifier,
+    Transform = {
+        Rotation = { -- rotate in gui to proper orientation and put values here.
+            Type = "StaticRotation",
+            Rotation  = { 0.00, 0.00, 0 }
+        }
+    }
+}
+
+assetHelper.registerSceneGraphNodesAndExport(asset, {
+    modelHolder
+})

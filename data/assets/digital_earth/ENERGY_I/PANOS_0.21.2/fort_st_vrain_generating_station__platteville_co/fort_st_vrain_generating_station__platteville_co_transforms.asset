@@ -1,0 +1,42 @@
+-- Create a position for other files to share
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+local earth = asset.require('scene/solarsystem/planets/earth/globe') --include earth
+local fort_st_vrain_generating_station__platteville_co_position = {
+  Identifier = "fort_st_vrain_generating_station__platteville_co_position",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+      Translation = {
+        Type = "GlobeTranslation",
+        Globe = earth.Earth.Identifier,
+        -- LATITUDE and LONGITUDE should be in degrees:
+        Latitude = 40.242672,
+        Longitude = -104.876794,
+        UseHeightmap = true,
+        -- Set ALTITUDE in meters so that it's above the landscape:
+        Altitude = 50.00
+      },
+      Scale = {
+        Type = "StaticScale",
+        Scale = 1.0
+      },
+      Rotation = {
+        Type = "StaticRotation",
+        Rotation = {0.00,0.00,0.00}
+      }
+  },
+  GUI = {
+    Name = "Fort St Vrain Generating Station, Platteville, CO Position",
+    Path = "/DMNS/Z_Pano_Positions/Fort St Vrain Generating Station, Platteville, CO",
+    Hidden = true
+  }
+}
+
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(fort_st_vrain_generating_station__platteville_co_position)
+end)
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(fort_st_vrain_generating_station__platteville_co_position)
+end)
+asset.export(fort_st_vrain_generating_station__platteville_co_position)

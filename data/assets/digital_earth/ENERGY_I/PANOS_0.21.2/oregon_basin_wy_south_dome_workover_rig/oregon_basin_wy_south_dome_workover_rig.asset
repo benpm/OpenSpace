@@ -1,0 +1,4 @@
+-- 360 panorama asset for oregon_basin_wy_south_dome_workover_rig
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+asset.require("./oregon_basin_wy_south_dome_workover_rig_360")
