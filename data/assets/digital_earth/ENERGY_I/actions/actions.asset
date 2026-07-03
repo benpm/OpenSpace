@@ -1,0 +1,27 @@
+-- Master asset for the Digital Earth Energy I in-app action buttons. Requiring this
+-- asset registers every show control in the Actions panel under "/Digital Earth",
+-- replacing (and coexisting with) the HTML control panel at data/de_energy_0.21.html.
+
+asset.require("./setup")
+asset.require("./songs_sailing")
+asset.require("./fires")
+asset.require("./whaling")
+asset.require("./whale_slides")
+asset.require("./coal")
+asset.require("./oil")
+asset.require("./electricity")
+asset.require("./high_voltage")
+asset.require("./gdal_layers")
+asset.require("./supply_demand_slides")
+asset.require("./gas_pipelines")
+asset.require("./credits")
+asset.require("./songs_oil")
+
+asset.meta = {
+  Name = "Digital Earth Energy I Actions",
+  Description = [[All in-app action buttons for the Digital Earth Energy I show,
+    organized in the Actions panel under "/Digital Earth"]],
+  Author = "Digital Earth / DMNS",
+  URL = "https://openspaceproject.com",
+  License = "MIT license"
+}

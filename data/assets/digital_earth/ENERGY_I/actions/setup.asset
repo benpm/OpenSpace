@@ -1,0 +1,525 @@
+-- Actions for the "Digital Earth: Energy Setup" card of the Digital Earth Energy I show.
+-- Generated from data/de_energy_0.21.html; these appear in the in-app
+-- Actions panel under "/Digital Earth/00 Setup".
+
+local actions = {
+  {
+    Identifier = "de.energy.setup.de_basic_setup_ctrl_f12",
+    Name = "DE Basic SETUP (CTRL+F12)",
+    Command = [[
+      openspace.setPropertyValue("Scene.*Trail.Renderable.Opacity", 0)
+      openspace.setPropertyValueSingle("RenderEngine.GlobalRotation", {-0.523583,0.000000,0.000000})
+      openspace.setPropertyValueSingle("RenderEngine.MasterRotation", {0.523583,0.000000,0.000000})
+      openspace.setPropertyValueSingle("OpenSpaceEngine.PropertyVisibility", 5.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.ESRI_VIIRS_Combo.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.ESRI_World_Imagery.Enabled", true)
+      openspace.sessionRecording.startPlayback(openspace.absPath("${DATA}/recordings/01.North.America.START.osrectxt"))
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.HeightLayers.Terrain_tileset.Enabled", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.HeightLayers.BlendTileLevels", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.TargetLodScaleFactor", 16.00)
+      openspace.setPropertyValueSingle("Scene.MercuryTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.VenusTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.EarthTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.MarsTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.JupiterTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.SaturnTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.UranusTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.NeptuneTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.MoonTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.IoTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.EuropaTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.GanymedeTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.CallistoTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.PhobosTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.DeimosTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.DioneTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.EnceladusTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.IapetusTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.MimasTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.RheaTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.TethysTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.TitanTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.HyperionTrail.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.SunGlare.Renderable.Fade", 0.550000)
+      openspace.setPropertyValueSingle("Scene.SunGlare.Scale.Scale", 0.500000)
+      openspace.setPropertyValueSingle("Scene.VenusTrail.Renderable.Appearance.Color", {1.000000,0.000000,1.000000})
+      openspace.setPropertyValueSingle("Scene.EarthTrail.Renderable.Appearance.Color", {0.250000,0.250000,1.000000})
+      openspace.setPropertyValueSingle("Scene.MarsTrail.Renderable.Appearance.Color", {1.000000,0.250000,0.250000})
+      openspace.setPropertyValueSingle("Scene.JupiterTrail.Renderable.Appearance.Color", {1.000000,0.750000,0.000000})
+      openspace.setPropertyValueSingle("Scene.SaturnTrail.Renderable.Appearance.Color", {1.000000,1.000000,0.000000})
+      openspace.setPropertyValueSingle("Scene.UranusTrail.Renderable.Appearance.Color", {0.750000,1.000000,1.000000})
+      openspace.setPropertyValueSingle("Scene.NeptuneTrail.Renderable.Appearance.Color", {0.250000,0.410000,1.000000})
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.RealTimeFires.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.RealTimeFires.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.WhalingVoyagesAOL.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.WhalingVoyagesAOL.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.WhalingPortNantucketMASeal.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.WhalingPortNantucketMASeal.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.WhalingPortNewBedfordMASeal.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.WhalingPortNewBedfordMASeal.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.WhalingPortNewLondonCTSeal.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.WhalingPortNewLondonCTSeal.Renderable.Enabled",false)
+      openspace.setPropertyValueSingle("Scene.WhalingPortProvincetownMASeal.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.WhalingPortProvincetownMASeal.Renderable.Enabled",false)
+      openspace.setPropertyValueSingle("Scene.WhalingPortSagHarborNYSeal.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.WhalingPortSagHarborNYSeal.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.WhalingPortSanFranciscoCASeal.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.WhalingPortSanFranciscoCASeal.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.globalCoalPowerPlants1935_2028.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.globalCoalPowerPlants1935_2028.Enabled",false)
+      openspace.setPropertyValueSingle("Dashboard.Date.Enabled", true)
+      openspace.setPropertyValueSingle("Dashboard.Distance.Enabled", true)
+      openspace.setPropertyValueSingle("Dashboard.Framerate.Enabled", true)
+      openspace.setPropertyValueSingle("Dashboard.GlobeLocation.Enabled", true)
+      openspace.setPropertyValueSingle("Dashboard.ParallelConnection.Enabled", true)
+      openspace.setPropertyValueSingle("Dashboard.Date.FontSize", 10.000000)
+      openspace.setPropertyValueSingle("Dashboard.Date.TimeFormat", "YYYY/MM/DD")
+      openspace.setPropertyValueSingle("Scene.bearcreek_cemetery.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.bearcreek_cemetery.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.chs_laurel_refinery__laurel_mt.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.chs_laurel_refinery__laurel_mt.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.craig_station_rooftop_west_view.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.craig_station_rooftop_west_view.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.derby_dome_wy_pump_jack.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.derby_dome_wy_pump_jack.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.fort_st_vrain_generating_station__platteville_co.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.fort_st_vrain_generating_station__platteville_co.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.grass_creek__wy_pump_jack_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.grass_creek__wy_pump_jack_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.high_wall_mining_collom_pit_colowyo_mine_pano.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.high_wall_mining_collom_pit_colowyo_mine_pano.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.oregon_basin_wy_south_dome_workover_rig.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.oregon_basin_wy_south_dome_workover_rig.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.smith_mine_montana.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.smith_mine_montana.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.tristate_control_room_pano_1.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.tristate_control_room_pano_1.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.tristate_erie_substation_pano_5.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.tristate_erie_substation_pano_5.Renderable.Enabled", false)
+    ]],
+    Documentation = "DE Basic SETUP (CTRL+F12) (Digital Earth: Energy Setup)",
+    GuiPath = "/Digital Earth/00 Setup",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.setup.movies_setup",
+    Name = "Movies SETUP",
+    Command = [[
+      -- OilDrillingSongsVideo / SailingSongsVideo are no longer ScreenSpace videos:
+      -- their assets now play the audio directly via openspace.audio on load, so
+      -- only the GridStatus LMP animation needs configuring here.
+      openspace.setPropertyValueSingle("ScreenSpace.GridStatus_LMP_Animation_2025-08-15.UseRadiusAzimuthElevation", true)
+      openspace.setPropertyValueSingle("ScreenSpace.GridStatus_LMP_Animation_2025-08-15.RadiusAzimuthElevation", {0.750000,0.000000,-0.500000})
+      openspace.setPropertyValueSingle("ScreenSpace.GridStatus_LMP_Animation_2025-08-15.Opacity", 1.000000)
+      openspace.setPropertyValueSingle("ScreenSpace.GridStatus_LMP_Animation_2025-08-15.VideoPlayer.LoopVideo", true)
+      openspace.setPropertyValue("ScreenSpace.GridStatus_LMP_Animation_2025-08-15.Enabled", false)
+    ]],
+    Documentation = "Movies SETUP (Digital Earth: Energy Setup)",
+    GuiPath = "/Digital Earth/00 Setup",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.setup.50_us_states_load_setup",
+    Name = "50 US States LOAD & SETUP",
+    Command = [[
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.US_STATES_50m-admin1_no_labels.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/US_STATES_50m-admin1_no_labels.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.US_STATES_50m-admin1_no_labels.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.US_STATES_50m-admin1_no_labels.Enabled",false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.US_STATES_50m-admin1_no_labels.DefaultProperties.FillOpacity",0)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.US_STATES_50m-admin1_no_labels.DefaultProperties.AltitudeMode",1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.US_STATES_50m-admin1_no_labels.DefaultProperties.LineWidth",4)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.US_STATES_50m-admin1_no_labels.HeightOffset",500)
+    ]],
+    Documentation = "50 US States LOAD & SETUP (Digital Earth: Energy Setup)",
+    GuiPath = "/Digital Earth/00 Setup",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.setup.co_generators_setup",
+    Name = "CO Generators SETUP",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.BAT390_NeptuneEnergyCenterLLC_NeptuneEnergyCenterHybrid_Pueblo.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.BAT394_ThunderWolfEnergyCenterLLC_ThunderWolfEnergyCenterHybrid_Pueblo.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.BAT459_UnitedPowerInc_RattlesnakeRidgeBatteryStorage_Weld.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.BAT463_UnitedPowerInc_DavisBatteryStorage_Weld.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.BAT464_UnitedPowerInc_BromleyBatteryStorage_Adams.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.BAT465_UnitedPowerInc_KeenesburgBatteryStorage_Weld.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.BAT467_AESCleanEnergy_HighMesaCO_Garfield.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.BAT480_WhetstonePowerOperationsLLC_PrairieCenterEnergyLLC_Adams.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.COA014_PublicServiceCoofColorado_ComancheCO_Pueblo.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.COA074_PublicServiceCoofColorado_Hayden_Routt.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.COA076_TriStateGTAssnInc_CraigCO_Moffat.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.COA091_PublicServiceCoofColorado_Pawnee_Morgan.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.COA099_PlatteRiverPowerAuthority_Rawhide_Larimer.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.COA119_CityofColoradoSpringsCO_RayDNixon_ElPaso.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS005_PublicServiceCoofColorado_Alamosa_Alamosa.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS010_PublicServiceCoofColorado_Cherokee_Adams.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS016_PublicServiceCoofColorado_Fruita_Mesa.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS022_PublicServiceCoofColorado_Valmont_Boulder.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS023_CityofColoradoSpringsCO_SouthPlant_ElPaso.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS029_CityofColoradoSpringsCO_GeorgeBirdsall_ElPaso.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS079_PublicServiceCoofColorado_FortStVrain_Weld.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS100_PlatteRiverPowerAuthority_Rawhide_Larimer.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS113_PublicServiceCoofColorado_FortLupton_Weld.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS120_CityofColoradoSpringsCO_RayDNixon_ElPaso.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS124_MolsonCoorsUSALLC_ColoradoEnergyNationsCompany_Jefferson.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS139_BrushPowerLLC_BrushGenerationFacility_Morgan.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS152_TriStateGTAssnInc_JMShaferGeneratingStation_Weld.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS160_UniversityofColorado_UniversityofColorado_Boulder.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS170_PublicServiceCoofColorado_ManchiefElectricGeneratingStation_Morgan.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS172_SWGArapahoeLLC_ArapahoeCombustionTurbineProject_Denver.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS175_PublicServiceCoofColorado_ValmontCombustionTurbineProject_Boulder.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS177_CityofColoradoSpringsCO_FrontRangePowerPlant_ElPaso.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS180_FountainValleyPowerLLC_FountainValleyPowerFacility_ElPaso.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS186_TriStateGTAssnInc_LimonGeneratingStation_Lincoln.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS188_TriStateGTAssnInc_FrankKnutson_Adams.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS190_PublicServiceCoofColorado_BlueSpruceEnergyCenter_Adams.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS213_PublicServiceCoofColorado_RockyMountainEnergyCenter_Weld.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS221_InvenergyServicesLLC_SpindleHillEnergyCenter_Weld.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.GAS249_BlackHillsServiceCompanyLLC_PuebloAirportGeneratingStation_Pueblo.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.HYD008_PublicServiceCoofColorado_CabinCreek_ClearCreek.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.HYD057_USBureauofReclamation_BlueMesa_Gunnison.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.HYD059_USBureauofReclamation_Estes_Larimer.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.HYD062_USBureauofReclamation_MorrowPoint_Montrose.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.HYD065_USBureauofReclamation_GreenMountain_Summit.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.HYD068_USBureauofReclamation_Flatiron_Larimer.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.HYD071_USBureauofReclamation_PoleHill_Larimer.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.HYD085_USBureauofReclamation_Crystal_Montrose.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.HYD089_USBureauofReclamation_MountElbert_Lake.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.HYD105_CityofColoradoSpringsCO_Tesla_ElPaso.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.HYD107_USBureauofReclamation_Towaoc_Montezuma.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.NUC_fortStVrainCO.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN266_AvangridPowerLLC_SanLuisValleySolarRanch_Alamosa.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN267_SolarofAlamosaLLC_AlamosaSolar_Alamosa.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN268_GreaterSandhillILLC_GreaterSandhillI_Alamosa.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN302_OnwardEnergy_ComancheSolar_Pueblo.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN310_SolarStarColoradoIIILLC_HooperSolar_Alamosa.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN311_SRJenkinsLLC_SRJenkinsFtLupton_Weld.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN317_SanIsabelSolarLLC_SanIsabelSolarLLC_LasAnimas.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN319_BisonSolarLLC_BisonSolarLLC_Larimer.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN321_DGColoradoSolarLLC_ClearSpringRanchPVProject_ElPaso.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN329_DukeEnergyRenewablesServices_VictorySolarLLC_Adams.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN338_SRPlatteLLC_SRPlatteSolarFarm_Weld.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN346_TitanSolarLLC_TitanSolar_Arapahoe.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN348_PioneerSolarCOLLC_PioneerSolarCOLLC_Adams.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN362_GrazingYakSolarLLC_GrazingYakSolar_ElPaso.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN363_SpanishPeaksSolarLLC_SpanishPeaksSolar_LasAnimas.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN366_DukeEnergyRenewablesServices_PalmerSolar_ElPaso.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN389_GreenbackerRenewableEnergyCorporation_RawhidePrairieSolarHybrid_Larimer.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN391_NeptuneEnergyCenterLLC_NeptuneEnergyCenterHybrid_Pueblo.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN393_LightsourceRenewableEnergyAssetManagementLLC_BighornSolar1_Pueblo.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN395_ThunderWolfEnergyCenterLLC_ThunderWolfEnergyCenterHybrid_Pueblo.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN405_DukeEnergyRenewablesServices_PikeSolarHybrid_ElPaso.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN428_LightsourceRenewableEnergyAssetManagementLLC_SunMountainSolar1_Pueblo.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN432_HunterSolarLLC_HunterSolarLLCCO_Arapahoe.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN468_AESCleanEnergy_HighMesaCO_Garfield.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN472_CSWindAmericaInc_CSWINDAmericaInc_Pueblo.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.SUN479_GreenbackerRenewableEnergyCorporation_Overland_Weld.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN212_TerraGenOperatingCoWind_RidgeCrestWindPartners_Logan.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN217_AvangridPowerLLC_ColoradoGreenHoldingsLLC_Prowers.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN218_InvenergyServicesLLC_SpringCanyon_Logan.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN219_LeewardAssetManagementLLC_CedarCreekWind_Weld.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN223_AvangridPowerLLC_TwinButtesWindProject_Bent.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN244_FPLPeetzTableWindEnergy_PeetzTableWindEnergy_Logan.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN245_LoganWindEnergyLLC_LoganWindEnergy_Logan.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN259_ColoradoHighlandsWindLLC_ColoradoHighlandsWind_Logan.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN261_AEPowerServicesLLC_CedarCreekII_Weld.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN262_DukeEnergyRenewablesServices_KitCarsonWindpower_KitCarson.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN263_NorthernColoradoWindLLC_NorthernColoradoWindLLC_Logan.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN265_CedarPointLLC_CedarPointWind_Lincoln.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN276_BlackHillsColoradoElectricLLC_BuschRanchWindEnergyFarm_Huerfano.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN278_Limon_LimonWindI_Lincoln.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN279_Limon_LimonWindII_Lincoln.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN289_SpringCanyonExpansionLLC_SpringCanyonExpansionWindEnergyCtr_Logan.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN295_Limon_LimonIIIWindLLC_Lincoln.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN308_GoldenWestPowerPartnersLLC_GoldenWestPowerPartnersLLC_ElPaso.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN309_CarouselWindFarmLLC_CarouselWindFarmLLC_KitCarson.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN313_BlackHillsColoradoElectricLLC_PeakViewWindFarm_Huerfano.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN322_PublicServiceCoofColorado_RushCreekWind_Elbert.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN331_AvangridPowerLLC_TwinButtesIIWind_Prowers.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN364_BlackHillsElectricGenerationLLC_BuschRanchIIWindFarm_Huerfano.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN365_EDPRenewablesNorthAmericaLLC_CrossingTrailsWindPowerProjectLLC_KitCarson.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN372_LeewardAssetManagementLLC_MountainBreezeWindLLC_Weld.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN374_PublicServiceCoofColorado_CheyenneRidgeWindFarm_Cheyenne.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN396_BroncoPlainsWindLLC_BroncoPlainsWindLLC_KitCarson.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN426_LeewardAssetManagementLLC_PanoramaWindLLC_Weld.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN429_NiyolWindLLC_NiyolWindLLC_Logan.Renderable.Opacity",1.0)
+      openspace.setPropertyValueSingle("Scene.WIN442_BroncoPlainsWindIILLC_BroncoPlainsWindIILLC_KitCarson.Renderable.Opacity",1.0)
+    ]],
+    Documentation = "CO Generators SETUP (Digital Earth: Energy Setup)",
+    GuiPath = "/Digital Earth/00 Setup",
+    Color = { 0.8, 0.25, 0.25, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.setup.us_coal_fields_load_setup",
+    Name = "US Coal Fields LOAD & SETUP",
+    Command = [[
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.US_Coal_Fields_Simplified.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/COAL_FIELDS__US_EIA/US_Coal_Fields_Simplified.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.US_Coal_Fields_Simplified.DefaultProperties.FillColor", {0.862745,0.474510,0.129412})
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.US_Coal_Fields_Simplified.DefaultProperties.AltitudeMode", 1.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.US_Coal_Fields_Simplified.HeightOffset", 500.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.US_Coal_Fields_Simplified.Fade", 0.350000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.US_Coal_Fields_Simplified.HeightOffset", 900.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.US_Coal_Fields_Simplified.Enabled", false)
+    ]],
+    Documentation = "US Coal Fields LOAD & SETUP (Digital Earth: Energy Setup)",
+    GuiPath = "/Digital Earth/00 Setup",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.setup.co_transmission_load_setup",
+    Name = "CO Transmission LOAD & SETUP",
+    Command = [[
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.public_service_co_transmission.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/TRANSMISSION_LINES/public_service_co_transmission.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.public_service_co_transmission.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.public_service_co_transmission.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.public_service_co_transmission.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.public_service_co_transmission.DefaultProperties.AltitudeMode", 1.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.public_service_co_transmission.DefaultProperties.Color", {0.172549,1.000000,0.019608})
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.wapa_transmission.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/TRANSMISSION_LINES/wapa_transmission.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.wapa_transmission.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.wapa_transmission.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.wapa_transmission.DefaultProperties.AltitudeMode", 1.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.wapa_transmission.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.wapa_transmission.DefaultProperties.Color", {0.250980,0.878431,0.815686})
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.tristate_transmission.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/TRANSMISSION_LINES/tristate_transmission.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.tristate_transmission.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.tristate_transmission.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.tristate_transmission.DefaultProperties.AltitudeMode", 1.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.tristate_transmission.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.tristate_transmission.DefaultProperties.Color", {0.800000,1.000000,0.000000})
+    ]],
+    Documentation = "CO Transmission LOAD & SETUP (Digital Earth: Energy Setup)",
+    GuiPath = "/Digital Earth/00 Setup",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.setup.eastern_western_ercot_load_setup",
+    Name = "Eastern+Western+ERCOT LOAD & SETUP",
+    Command = [[
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.eastern_interconnect.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/US_POWER_GRID_INTERCONNECTS/eastern_interconnect.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.eastern_interconnect.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.eastern_interconnect.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.eastern_interconnect.DefaultProperties.AltitudeMode", 1.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.eastern_interconnect.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.eastern_interconnect.DefaultProperties.FillColor", {1.000000,0.950000,0.100000})
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.western_interconnect.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/US_POWER_GRID_INTERCONNECTS/western_interconnect.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_interconnect.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_interconnect.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_interconnect.DefaultProperties.AltitudeMode", 1.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_interconnect.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_interconnect.DefaultProperties.FillColor", {0.150000,0.450000,1.000000})
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.ERCOT.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/US_POWER_GRID_INTERCONNECTS/ERCOT.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.ERCOT.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.ERCOT.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.ERCOT.DefaultProperties.AltitudeMode", 1.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.ERCOT.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.ERCOT.DefaultProperties.FillColor", {0.000000,0.950000,0.250000})
+    ]],
+    Documentation = "Eastern+Western+ERCOT LOAD & SETUP (Digital Earth: Energy Setup)",
+    GuiPath = "/Digital Earth/00 Setup",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.setup.western_transmission_load_setup",
+    Name = "Western Transmission LOAD & SETUP",
+    Command = [[
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.western_500kV.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/TRANSMISSION_LINES/western_500kV.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_500kV.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_500kV.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_500kV.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_500kV.DefaultProperties.LineWidth", 4.0)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_500kV.DefaultProperties.AltitudeMode", 1.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_500kV.DefaultProperties.Color", {1.000000,1.000000,0.000000})
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.western_345kV.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/TRANSMISSION_LINES/western_345kV.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_345kV.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_345kV.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_345kV.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_345kV.DefaultProperties.LineWidth", 2.0)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_345kV.DefaultProperties.AltitudeMode", 1.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_345kV.DefaultProperties.Color", {1.000000,1.000000,0.000000})
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.western_220-287kV.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/TRANSMISSION_LINES/western_220-287kV.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_220-287kV.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_220-287kV.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_220-287kV.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_220-287kV.DefaultProperties.LineWidth", 1.0)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_220-287kV.DefaultProperties.AltitudeMode", 1.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.western_220-287kV.DefaultProperties.Color", {1.000000,1.000000,0.000000})
+    ]],
+    Documentation = "Western Transmission LOAD & SETUP (Digital Earth: Energy Setup)",
+    GuiPath = "/Digital Earth/00 Setup",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.setup.oil_pipelines_load_setup",
+    Name = "Oil Pipelines LOAD & SETUP",
+    Command = [[
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.oil_pipelines_us.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/EIA_CRUDE_OIL_PIPELINES/oil_pipelines_us.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.oil_pipelines_us.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.oil_pipelines_us.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.oil_pipelines_us.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.oil_pipelines_us.DefaultProperties.Color", {0.803922,0.400000,0.360784})
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.oil_pipelines_us.DefaultProperties.LineWidth", 5.460000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.oil_pipelines_us.DefaultProperties.Extrude", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.oil_pipelines_us.DefaultProperties.PerformShading", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.oil_pipelines_us.DefaultProperties.AltitudeMode", 1.000000)
+    ]],
+    Documentation = "Oil Pipelines LOAD & SETUP (Digital Earth: Energy Setup)",
+    GuiPath = "/Digital Earth/00 Setup",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.setup.flat_slide_setup",
+    Name = "Flat Slide SETUP",
+    Command = [[
+      openspace.setPropertyValueSingle("ScreenSpace.deck00_digital_earth_energy_I1.RadiusAzimuthElevation",{0.7,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck01_beale39_boats_attack_whales1.RadiusAzimuthElevation",{0.7,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck01_beale39_boats_attack_whales1.Rotation",{0.0,0.0,0.0})
+      openspace.setPropertyValueSingle("ScreenSpace.deck02_hamtilton46_greenland_whale_plate41.RadiusAzimuthElevation",{0.7,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck02_hamtilton46_greenland_whale_plate41.Rotation",{0.00,0.00,0.00})
+      openspace.setPropertyValueSingle("ScreenSpace.deck03_charles_sidney_raleigh__all_in_a_days_work_bark_gazelle1.RadiusAzimuthElevation",{0.7,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck04_destruction_of_the_larboard_boat_of_the_ann_alexander_by_a_sperm_whale1.RadiusAzimuthElevation",{0.7,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck05_capturing_a_sperm_whale1.RadiusAzimuthElevation",{0.7,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck05_capturing_a_sperm_whale1.Rotation",{0.00,0.00,0.00})
+      openspace.setPropertyValueSingle("ScreenSpace.deck10_deck_of_whaler_try_works1.RadiusAzimuthElevation",{0.7,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck11_davis74_trying_out1.RadiusAzimuthElevation",{3.0,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck11_davis74_trying_out1.Rotation",{0.0,0.0,0.0})
+      openspace.setPropertyValueSingle("ScreenSpace.deck12_casks_whale_oil_new_bedord_waterfront1.RadiusAzimuthElevation",{1.5,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck12_casks_whale_oil_new_bedord_waterfront1.Rotation",{0.0,0.0,0.0})
+      openspace.setPropertyValueSingle("ScreenSpace.deck13_spermaceti_candle_and_oil1.RadiusAzimuthElevation",{1.0,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck13_spermaceti_candle_and_oil1.Rotation",{0.0,0.0,0.0})
+      openspace.setPropertyValueSingle("ScreenSpace.deck14_sperm_oil_bottle_and_can1.RadiusAzimuthElevation",{1.3,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck14_sperm_oil_bottle_and_can1.Rotation",{0.0,0.0,0.0})
+      openspace.setPropertyValueSingle("ScreenSpace.deck15_whale_oil_by_barrels_animated_gif1.RadiusAzimuthElevation",{1.7,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck16_whale_oil_barrels1.RadiusAzimuthElevation",{1.7,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck17_whale_oil_value1.RadiusAzimuthElevation",{1.7,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck18_global_coal_plants_2025__usa1.RadiusAzimuthElevation",{1.2,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck19_coal_transp_20251.RadiusAzimuthElevation",{1.2,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck20_ercot_fuel_mix_2024_10_24_11.RadiusAzimuthElevation",{1.3,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck21_ercot_fuel_mix_2024_10_24_21.RadiusAzimuthElevation",{1.3,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck22_ercot_fuel_mix_2024_10_24_31.RadiusAzimuthElevation",{1.3,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck23_ercot_fuel_mix_2024_10_24_41.RadiusAzimuthElevation",{1.3,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck24_ercot_fuel_mix_2024_10_24_51.RadiusAzimuthElevation",{1.3,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck25_ercot_fuel_mix_2024_10_24_61.RadiusAzimuthElevation",{1.3,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck26_caiso_fuel_mix_2025_08_121.RadiusAzimuthElevation",{1.3,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck27_gridcarbon_2025_08_131.RadiusAzimuthElevation",{4.0,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck28_power_plants_wwsg_nuc_2025_conus1.RadiusAzimuthElevation",{1.2,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck29_power_plants_coa_2025_conus1.RadiusAzimuthElevation",{1.2,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck30_power_plants_gas_2025_conus1.RadiusAzimuthElevation",{1.2,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck31_power_plants_oil_2025_conus1.RadiusAzimuthElevation",{1.2,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck40_de_energy_credits1.RadiusAzimuthElevation",{1.2,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.GridStatus_LMP_Animation_2025-08-15.RadiusAzimuthElevation",{0.550000,0.000000,-0.500000})
+    ]],
+    Documentation = "Flat Slide SETUP (Digital Earth: Energy Setup)",
+    GuiPath = "/Digital Earth/00 Setup",
+    Color = { 0.35, 0.85, 0.35, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.setup.dome_slide_setup",
+    Name = "Dome Slide SETUP",
+    Command = [[
+      openspace.setPropertyValueSingle("ScreenSpace.deck00_digital_earth_energy_I1.RadiusAzimuthElevation",{1.0,0.0,-0.85})
+      openspace.setPropertyValueSingle("ScreenSpace.deck01_beale39_boats_attack_whales1.RadiusAzimuthElevation",{1.35,-0.62,-0.65})
+      openspace.setPropertyValueSingle("ScreenSpace.deck02_hamtilton46_greenland_whale_plate41.RadiusAzimuthElevation",{1.1,-1.0,-0.90})
+      openspace.setPropertyValueSingle("ScreenSpace.deck02_hamtilton46_greenland_whale_plate41.Rotation",{-0.90,0.00,0.00})
+      openspace.setPropertyValueSingle("ScreenSpace.deck03_charles_sidney_raleigh__all_in_a_days_work_bark_gazelle1.RadiusAzimuthElevation",{1.1,0.05,-1.15})
+      openspace.setPropertyValueSingle("ScreenSpace.deck04_destruction_of_the_larboard_boat_of_the_ann_alexander_by_a_sperm_whale1.RadiusAzimuthElevation",{1.2,0.05,-0.80})
+      openspace.setPropertyValueSingle("ScreenSpace.deck05_capturing_a_sperm_whale1.RadiusAzimuthElevation",{1.3,0.90,-0.70})
+      openspace.setPropertyValueSingle("ScreenSpace.deck05_capturing_a_sperm_whale1.Rotation",{0.75,0.00,0.00})
+      openspace.setPropertyValueSingle("ScreenSpace.deck10_deck_of_whaler_try_works1.RadiusAzimuthElevation",{1.5,0.0,0.00})
+      openspace.setPropertyValueSingle("ScreenSpace.deck11_davis74_trying_out1.RadiusAzimuthElevation",{2.7,-0.60,-0.85})
+      openspace.setPropertyValueSingle("ScreenSpace.deck11_davis74_trying_out1.Rotation",{-0.5,0.0,0.0})
+      openspace.setPropertyValueSingle("ScreenSpace.deck12_casks_whale_oil_new_bedord_waterfront1.RadiusAzimuthElevation",{1.4,0.62,-0.78})
+      openspace.setPropertyValueSingle("ScreenSpace.deck12_casks_whale_oil_new_bedord_waterfront1.Rotation",{0.7,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck13_spermaceti_candle_and_oil1.RadiusAzimuthElevation",{1.4,-0.60,-1.00})
+      openspace.setPropertyValueSingle("ScreenSpace.deck13_spermaceti_candle_and_oil1.Rotation",{-0.5,0.0,0.0})
+      openspace.setPropertyValueSingle("ScreenSpace.deck14_sperm_oil_bottle_and_can1.RadiusAzimuthElevation",{1.6,0.6,-1.0})
+      openspace.setPropertyValueSingle("ScreenSpace.deck14_sperm_oil_bottle_and_can1.Rotation",{0.7,0.0,-0.5})
+      openspace.setPropertyValueSingle("ScreenSpace.deck15_whale_oil_by_barrels_animated_gif1.RadiusAzimuthElevation",{0.95,0.0,-0.90})
+      openspace.setPropertyValueSingle("ScreenSpace.deck16_whale_oil_barrels1.RadiusAzimuthElevation",{0.95,0.0,-0.90})
+      openspace.setPropertyValueSingle("ScreenSpace.deck17_whale_oil_value1.RadiusAzimuthElevation",{0.95,0.0,-0.90})
+      openspace.setPropertyValueSingle("ScreenSpace.deck18_global_coal_plants_2025__usa1.RadiusAzimuthElevation",{0.8,0.0,-0.85})
+      openspace.setPropertyValueSingle("ScreenSpace.deck19_coal_transp_20251.RadiusAzimuthElevation",{0.8,0.0,-0.85})
+      openspace.setPropertyValueSingle("ScreenSpace.deck20_ercot_fuel_mix_2024_10_24_11.RadiusAzimuthElevation",{1.1,0.0,-0.85})
+      openspace.setPropertyValueSingle("ScreenSpace.deck21_ercot_fuel_mix_2024_10_24_21.RadiusAzimuthElevation",{1.1,0.0,-0.85})
+      openspace.setPropertyValueSingle("ScreenSpace.deck22_ercot_fuel_mix_2024_10_24_31.RadiusAzimuthElevation",{1.1,0.0,-0.85})
+      openspace.setPropertyValueSingle("ScreenSpace.deck23_ercot_fuel_mix_2024_10_24_41.RadiusAzimuthElevation",{1.1,0.0,-0.85})
+      openspace.setPropertyValueSingle("ScreenSpace.deck24_ercot_fuel_mix_2024_10_24_51.RadiusAzimuthElevation",{1.1,0.0,-0.85})
+      openspace.setPropertyValueSingle("ScreenSpace.deck25_ercot_fuel_mix_2024_10_24_61.RadiusAzimuthElevation",{1.1,0.0,-0.85})
+      openspace.setPropertyValueSingle("ScreenSpace.deck26_caiso_fuel_mix_2025_08_121.RadiusAzimuthElevation",{1.3,0.0,-1.00})
+      openspace.setPropertyValueSingle("ScreenSpace.deck27_gridcarbon_2025_08_131.RadiusAzimuthElevation",{2.25,0.0,-0.90})
+      openspace.setPropertyValueSingle("ScreenSpace.deck28_power_plants_wwsg_nuc_2025_conus1.RadiusAzimuthElevation",{0.70,0.0,-0.75})
+      openspace.setPropertyValueSingle("ScreenSpace.deck29_power_plants_coa_2025_conus1.RadiusAzimuthElevation",{0.70,0.0,-0.75})
+      openspace.setPropertyValueSingle("ScreenSpace.deck30_power_plants_gas_2025_conus1.RadiusAzimuthElevation",{0.70,0.0,-0.75})
+      openspace.setPropertyValueSingle("ScreenSpace.deck31_power_plants_oil_2025_conus1.RadiusAzimuthElevation",{0.70,0.0,-0.75})
+      openspace.setPropertyValueSingle("ScreenSpace.deck40_de_energy_credits1.RadiusAzimuthElevation",{1.0,0,-0.95})
+      openspace.setPropertyValueSingle("ScreenSpace.GridStatus_LMP_Animation_2025-08-15.RadiusAzimuthElevation",{0.550000,0.000000,-0.7500000})
+    ]],
+    Documentation = "Dome Slide SETUP (Digital Earth: Energy Setup)",
+    GuiPath = "/Digital Earth/00 Setup",
+    Color = { 0.35, 0.85, 0.35, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.setup.reload_scene_tree_f5",
+    Name = "Reload Scene Tree (F5)",
+    Command = [[
+      openspace.setPropertyValueSingle("Modules.CefWebGui.Reload", nil)
+    ]],
+    Documentation = "Reload Scene Tree (F5) (Digital Earth: Energy Setup)",
+    GuiPath = "/Digital Earth/00 Setup",
+    IsLocal = false
+  },
+}
+
+asset.onInitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.registerAction(a)
+  end
+end)
+
+asset.onDeinitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.removeAction(a.Identifier)
+  end
+end)
+
+asset.meta = {
+  Name = "Digital Earth Energy I Actions - Digital Earth: Energy Setup",
+  Description = "In-app action buttons for the Digital Earth: Energy Setup section of the Energy I show",
+  Author = "Digital Earth / DMNS",
+  URL = "https://openspaceproject.com",
+  License = "MIT license"
+}

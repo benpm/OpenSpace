@@ -1,0 +1,140 @@
+-- Actions for the "7. High Voltage Lines" card of the Digital Earth Energy I show.
+-- Generated from data/de_energy_0.21.html; these appear in the in-app
+-- Actions panel under "/Digital Earth/08 High Voltage Lines".
+
+local actions = {
+  {
+    Identifier = "de.energy.high_voltage.high_voltage_735_500_kv_load_setup",
+    Name = "High Voltage: 735/500 kV LOAD & SETUP",
+    Command = [[
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.transmission_735kV-.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/TRANSMISSION_LINES/transmission_735kV+.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_735kV-.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_735kV-.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_735kV-.DefaultProperties.AltitudeMode", 1.0000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_735kV-.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_735kV-.DefaultProperties.Color", {1.000000,0.950000,0.10000})
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_735kV-.DefaultProperties.LineWidth", 8.0)
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.transmission_500kV.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/TRANSMISSION_LINES/transmission_500kV.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_500kV.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_500kV.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_500kV.DefaultProperties.AltitudeMode", 1.0000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_500kV.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_500kV.DefaultProperties.Color", {1.000000,0.950000,0.10000})
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_500kV.DefaultProperties.LineWidth", 4.0)
+    ]],
+    Documentation = "High Voltage: 735/500 kV LOAD & SETUP (7. High Voltage Lines)",
+    GuiPath = "/Digital Earth/08 High Voltage Lines",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.high_voltage.high_voltage_345_kv_load_setup",
+    Name = "High Voltage: 345 kV LOAD & SETUP",
+    Command = [[
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.transmission_345kV.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/TRANSMISSION_LINES/transmission_345kV.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_345kV.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_345kV.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_345kV.DefaultProperties.AltitudeMode", 1.0000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_345kV.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_345kV.DefaultProperties.Color", {1.000000,0.950000,0.10000})
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_345kV.DefaultProperties.LineWidth", 2.0)
+    ]],
+    Documentation = "High Voltage: 345 kV LOAD & SETUP (7. High Voltage Lines)",
+    GuiPath = "/Digital Earth/08 High Voltage Lines",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.high_voltage.high_voltage_220_287_kv_load_setup",
+    Name = "High Voltage: 220-287 kV LOAD & SETUP",
+    Command = [[
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.transmission_220-287kV.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/TRANSMISSION_LINES/transmission_220-287kV.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_220-287kV.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_220-287kV.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_220-287kV.DefaultProperties.AltitudeMode", 1.0000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_220-287kV.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_220-287kV.DefaultProperties.Color", {1.000000,0.950000,0.10000})
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_220-287kV.DefaultProperties.LineWidth", 1.0)
+    ]],
+    Documentation = "High Voltage: 220-287 kV LOAD & SETUP (7. High Voltage Lines)",
+    GuiPath = "/Digital Earth/08 High Voltage Lines",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.high_voltage.high_voltage_735_kv_toggle",
+    Name = "High Voltage: 735 kV+ TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.GeographicOverlays.transmission_735kV-",1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_735kV-.Fade", 1.000000)
+    ]],
+    Documentation = "High Voltage: 735 kV+ TOGGLE (7. High Voltage Lines)",
+    GuiPath = "/Digital Earth/08 High Voltage Lines",
+    Color = { 0.75, 0.75, 0.78, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.high_voltage.high_voltage_500_kv_toggle",
+    Name = "High Voltage: 500 kV TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.GeographicOverlays.transmission_500kV",1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_500kV.Fade", 1.000000)
+    ]],
+    Documentation = "High Voltage: 500 kV TOGGLE (7. High Voltage Lines)",
+    GuiPath = "/Digital Earth/08 High Voltage Lines",
+    Color = { 0.75, 0.75, 0.78, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.high_voltage.high_voltage_345_kv_toggle",
+    Name = "High Voltage: 345 kV TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.GeographicOverlays.transmission_345kV",1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_345kV.Fade", 1.000000)
+    ]],
+    Documentation = "High Voltage: 345 kV TOGGLE (7. High Voltage Lines)",
+    GuiPath = "/Digital Earth/08 High Voltage Lines",
+    Color = { 0.75, 0.75, 0.78, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.high_voltage.high_voltage_220_287_kv_toggle",
+    Name = "High Voltage: 220-287 kV TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.GeographicOverlays.transmission_220-287kV",1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.transmission_220-287kV.Fade", 1.000000)
+    ]],
+    Documentation = "High Voltage: 220-287 kV TOGGLE (7. High Voltage Lines)",
+    GuiPath = "/Digital Earth/08 High Voltage Lines",
+    Color = { 0.75, 0.75, 0.78, 1.0 },
+    IsLocal = false
+  },
+}
+
+asset.onInitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.registerAction(a)
+  end
+end)
+
+asset.onDeinitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.removeAction(a.Identifier)
+  end
+end)
+
+asset.meta = {
+  Name = "Digital Earth Energy I Actions - 7. High Voltage Lines",
+  Description = "In-app action buttons for the 7. High Voltage Lines section of the Energy I show",
+  Author = "Digital Earth / DMNS",
+  URL = "https://openspaceproject.com",
+  License = "MIT license"
+}

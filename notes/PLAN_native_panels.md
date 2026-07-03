@@ -1,6 +1,12 @@
 # Plan: port `data/de_energy_0.21.html` to OpenSpace-native in-app panels
 
-Drafted 2026-07-03. Status: proposed (not implemented).
+Drafted 2026-07-03. Status: **implemented 2026-07-03** — all 164 buttons ported to
+`data/assets/digital_earth/ENERGY_I/actions/*.asset` (14 section assets + master),
+`mission.asset` added, profile updated. Verified live: all actions registered, mission
+timeline renders with era phases and icon imagery (served over the panels HTTP endpoint,
+since the GUI loads mission images as URLs), zero errors on a clean profile load.
+Deviations from the plan noted inline below; two broken JS-syntax actions found in the
+profile were also fixed along the way.
 
 ## The native mechanisms (verified in source + docs)
 

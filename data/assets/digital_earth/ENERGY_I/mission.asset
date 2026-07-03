@@ -1,0 +1,173 @@
+-- Digital Earth: Energy I as an in-app Mission. Loading this asset adds the show to
+-- the Missions panel: a timeline of the show's narrative "energy eras", each phase
+-- exposing that section's action buttons (registered by actions/actions.asset, which
+-- this asset requires). Clicking a phase jumps simulation time to its era.
+
+asset.require("./actions/actions")
+
+-- The GUI (a web frontend) loads mission images over HTTP, so local icons are
+-- served through the WebGui static server (see ModuleConfigurations.WebGui in
+-- openspace.cfg, which serves ${DATA} at the "panels" endpoint)
+local function icon(name)
+  local ok, address = pcall(openspace.propertyValue, "Modules.WebGui.Address")
+  local ok2, port = pcall(openspace.propertyValue, "Modules.WebGui.Port")
+  if not (ok and ok2) then
+    return ""
+  end
+  return "http://" .. address .. ":" .. port ..
+    "/panels/assets/digital_earth/ENERGY_I/energy_1_slides/ICONS/" .. name
+end
+
+local function makeMission()
+  return {
+  Identifier = "DigitalEarthEnergyI",
+  Name = "Digital Earth: Energy I",
+  TimeRange = { Start = "1835 JAN 01 00:00:00", End = "2028 DEC 31 23:59:59" },
+  Image = icon("00.icon.jpg"),
+  Description = [[The story of how humanity has powered itself: from whale oil hunted
+    across the world's oceans, through coal and petroleum, to the modern electric grid
+    and its transmission networks. Produced for the Digital Earth program at the Denver
+    Museum of Nature & Science.]],
+  Phases = {
+    {
+      Name = "The Age of Whale Oil",
+      TimeRange = { Start = "1835 JAN 01 00:00:00", End = "1861 JAN 01 00:00:00" },
+      Image = icon("01.icon.jpg"),
+      Description = [[Before petroleum, homes and streets were lit by whale oil.
+        American whaling voyages of 1835 fan out across the globe from New England
+        ports, hunting the sperm whale for the oil in its head and blubber.]],
+      Actions = {
+        "de.energy.songs_sailing.play_from_start",
+        "de.energy.songs_sailing.stop",
+        "de.energy.whaling.whaling_ports_toggle",
+        "de.energy.whaling.american_whaling_voyages_on",
+        "de.energy.whaling.play",
+        "de.energy.whaling.pause",
+        "de.energy.whaling.american_whaling_voyages_off",
+        "de.energy.whale_slides.17_whale_oil_value"
+      },
+      Milestones = {
+        {
+          Name = "Whaling voyages of 1835",
+          Date = "1835 MAY 01 00:00:00",
+          Description = "American offshore whaling logs, voyages of 1835-1836"
+        },
+        {
+          Name = "Drake Well: petroleum era begins",
+          Date = "1859 AUG 27 00:00:00",
+          Description = [[The first commercial oil well in Titusville, Pennsylvania
+            marks the beginning of the end for whale oil]]
+        }
+      }
+    },
+    {
+      Name = "The Age of Coal",
+      TimeRange = { Start = "1861 JAN 01 00:00:00", End = "1935 JAN 01 00:00:00" },
+      Image = icon("globalcoalplants_icon.jpg"),
+      Description = [[Coal fires the industrial revolution: steam engines, railroads,
+        and eventually the first power plants. Explore US coal fields, global coal
+        plant construction from 1935 to 2028, and panoramas from working and
+        abandoned mines.]],
+      Actions = {
+        "de.energy.setup.us_coal_fields_load_setup",
+        "de.energy.coal.coal_fields",
+        "de.energy.coal.global_coal_plants_on",
+        "de.energy.coal.play",
+        "de.energy.coal.pause",
+        "de.energy.coal.global_coal_plants_off",
+        "de.energy.coal.smith_mine_mt_pano_anchor",
+        "de.energy.coal.bearcreek_cemetery_pano_anchor"
+      },
+      Milestones = {
+        {
+          Name = "Burnley Mill steam engine",
+          Date = "1861 JAN 01 00:00:00",
+          Description = "Steam power drives the industrial textile mills"
+        }
+      }
+    },
+    {
+      Name = "Oil and Gas",
+      TimeRange = { Start = "1935 JAN 01 00:00:00", End = "1970 JAN 01 00:00:00" },
+      Image = icon("oilpipelines_icon.jpg"),
+      Description = [[Petroleum and natural gas take over transportation and heating.
+        Crude oil and natural gas pipeline networks span the continent, fed by fields
+        from Wyoming to the Gulf.]],
+      Actions = {
+        "de.energy.songs_oil.play_from_start",
+        "de.energy.songs_oil.stop",
+        "de.energy.setup.oil_pipelines_load_setup",
+        "de.energy.oil.oil_pipelines_toggle",
+        "de.energy.oil.oregon_basin_workover_rig_pano_anchor",
+        "de.energy.oil.chs_laurel_refinery_pano_anchor",
+        "de.energy.gas_pipelines.gas_pipeline_load",
+        "de.energy.gas_pipelines.gas_pipelines_co_toggle"
+      }
+    },
+    {
+      Name = "The Era of Electricity",
+      TimeRange = { Start = "1970 JAN 01 00:00:00", End = "2023 JAN 01 00:00:00" },
+      Image = icon("hooverdamturbine_icon.jpg"),
+      Description = [[The grid ties it all together. Colorado's generators - coal,
+        gas, hydro, nuclear, wind, solar, and batteries - feed high-voltage
+        transmission lines that link the Western, Eastern, and Texas
+        interconnections.]],
+      Actions = {
+        "de.energy.setup.co_generators_setup",
+        "de.energy.setup.co_transmission_load_setup",
+        "de.energy.setup.eastern_western_ercot_load_setup",
+        "de.energy.setup.western_transmission_load_setup",
+        "de.energy.electricity.hoover_dam_exterior_intakes_pano_anchor",
+        "de.energy.electricity.eastern_interconnect_toggle",
+        "de.energy.electricity.western_interconnect_toggle",
+        "de.energy.electricity.ercot_toggle"
+      },
+      Milestones = {
+        {
+          Name = "Hoover Dam generates power",
+          Date = "1970 JAN 01 00:00:00",
+          Description = "Hydroelectric power at continental scale"
+        }
+      }
+    },
+    {
+      Name = "The Grid Today",
+      TimeRange = { Start = "2023 JAN 01 00:00:00", End = "2028 DEC 31 23:59:59" },
+      Image = icon("lmp_icon.jpg"),
+      Description = [[Live views of the modern energy system: real-time wildfire
+        detections from Suomi NPP, locational marginal prices across the grid, and
+        the 2025 fleet of US generating plants by fuel type.]],
+      Actions = {
+        "de.energy.fires.on",
+        "de.energy.fires.play",
+        "de.energy.fires.off",
+        "de.energy.electricity.gridstatus_lmp_on",
+        "de.energy.electricity.lmp_play",
+        "de.energy.electricity.gridstatus_lmp_off",
+        "de.energy.credits.2012_enhanced_toggle",
+        "de.energy.credits.40_credits_toggle"
+      }
+    }
+  }
+}
+end
+
+asset.onInitialize(function()
+  -- Built at initialization time so the WebGui address/port properties are available
+  -- for the phase image URLs
+  openspace.loadMission(makeMission())
+end)
+
+asset.onDeinitialize(function()
+  openspace.unloadMission("DigitalEarthEnergyI")
+end)
+
+asset.export("Mission", "DigitalEarthEnergyI")
+
+asset.meta = {
+  Name = "Digital Earth Energy I Mission",
+  Description = "Missions-panel timeline for the Digital Earth Energy I show",
+  Author = "Digital Earth / DMNS",
+  URL = "https://openspaceproject.com",
+  License = "MIT license"
+}

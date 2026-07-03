@@ -1,0 +1,116 @@
+-- Actions for the "9. Electricity Supply & Demand Slides" card of the Digital Earth Energy I show.
+-- Generated from data/de_energy_0.21.html; these appear in the in-app
+-- Actions panel under "/Digital Earth/10 Supply and Demand Slides".
+
+local actions = {
+  {
+    Identifier = "de.energy.supply_demand_slides.20_ercot_1",
+    Name = "20. ERCOT 1",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck20_ercot_fuel_mix_2024_10_24_11",1)
+    ]],
+    Documentation = "20. ERCOT 1 (9. Electricity Supply & Demand Slides)",
+    GuiPath = "/Digital Earth/10 Supply and Demand Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.supply_demand_slides.21_ercot_2",
+    Name = "21. ERCOT 2",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck21_ercot_fuel_mix_2024_10_24_21",1)
+    ]],
+    Documentation = "21. ERCOT 2 (9. Electricity Supply & Demand Slides)",
+    GuiPath = "/Digital Earth/10 Supply and Demand Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.supply_demand_slides.22_ercot_3",
+    Name = "22. ERCOT 3",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck22_ercot_fuel_mix_2024_10_24_31",1)
+    ]],
+    Documentation = "22. ERCOT 3 (9. Electricity Supply & Demand Slides)",
+    GuiPath = "/Digital Earth/10 Supply and Demand Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.supply_demand_slides.23_ercot_4",
+    Name = "23. ERCOT 4",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck23_ercot_fuel_mix_2024_10_24_41",1)
+    ]],
+    Documentation = "23. ERCOT 4 (9. Electricity Supply & Demand Slides)",
+    GuiPath = "/Digital Earth/10 Supply and Demand Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.supply_demand_slides.24_ercot_5",
+    Name = "24. ERCOT 5",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck24_ercot_fuel_mix_2024_10_24_51",1)
+    ]],
+    Documentation = "24. ERCOT 5 (9. Electricity Supply & Demand Slides)",
+    GuiPath = "/Digital Earth/10 Supply and Demand Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.supply_demand_slides.25_ercot_6",
+    Name = "25. ERCOT 6",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck25_ercot_fuel_mix_2024_10_24_61",1)
+    ]],
+    Documentation = "25. ERCOT 6 (9. Electricity Supply & Demand Slides)",
+    GuiPath = "/Digital Earth/10 Supply and Demand Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.supply_demand_slides.26_caiso",
+    Name = "26. CAISO",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck26_caiso_fuel_mix_2025_08_121",1)
+    ]],
+    Documentation = "26. CAISO (9. Electricity Supply & Demand Slides)",
+    GuiPath = "/Digital Earth/10 Supply and Demand Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.supply_demand_slides.27_gridcarbon",
+    Name = "27. GridCarbon",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck27_gridcarbon_2025_08_131",1)
+    ]],
+    Documentation = "27. GridCarbon (9. Electricity Supply & Demand Slides)",
+    GuiPath = "/Digital Earth/10 Supply and Demand Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.supply_demand_slides.28_wwsg_n_2025",
+    Name = "28. WWSG+N 2025",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck28_power_plants_wwsg_nuc_2025_conus1",1)
+    ]],
+    Documentation = "28. WWSG+N 2025 (9. Electricity Supply & Demand Slides)",
+    GuiPath = "/Digital Earth/10 Supply and Demand Slides",
+    IsLocal = false
+  },
+}
+
+asset.onInitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.registerAction(a)
+  end
+end)
+
+asset.onDeinitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.removeAction(a.Identifier)
+  end
+end)
+
+asset.meta = {
+  Name = "Digital Earth Energy I Actions - 9. Electricity Supply & Demand Slides",
+  Description = "In-app action buttons for the 9. Electricity Supply & Demand Slides section of the Energy I show",
+  Author = "Digital Earth / DMNS",
+  URL = "https://openspaceproject.com",
+  License = "MIT license"
+}

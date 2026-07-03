@@ -1,0 +1,146 @@
+-- Actions for the "3. Whale Slides" card of the Digital Earth Energy I show.
+-- Generated from data/de_energy_0.21.html; these appear in the in-app
+-- Actions panel under "/Digital Earth/04 Whale Slides".
+
+local actions = {
+  {
+    Identifier = "de.energy.whale_slides.01_boats_attack_whale",
+    Name = "01. Boats Attack Whale",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck01_beale39_boats_attack_whales1",1)
+    ]],
+    Documentation = "01. Boats Attack Whale (3. Whale Slides)",
+    GuiPath = "/Digital Earth/04 Whale Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.whale_slides.02_greenland_whale",
+    Name = "02. Greenland Whale",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck02_hamtilton46_greenland_whale_plate41",1)
+    ]],
+    Documentation = "02. Greenland Whale (3. Whale Slides)",
+    GuiPath = "/Digital Earth/04 Whale Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.whale_slides.03_all_in_a_days_work",
+    Name = "03. All in A Days Work",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck03_charles_sidney_raleigh__all_in_a_days_work_bark_gazelle1",1)
+    ]],
+    Documentation = "03. All in A Days Work (3. Whale Slides)",
+    GuiPath = "/Digital Earth/04 Whale Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.whale_slides.04_destruction_of_the_larboard_boat",
+    Name = "04. Destruction of the Larboard Boat",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck04_destruction_of_the_larboard_boat_of_the_ann_alexander_by_a_sperm_whale1",1)
+    ]],
+    Documentation = "04. Destruction of the Larboard Boat (3. Whale Slides)",
+    GuiPath = "/Digital Earth/04 Whale Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.whale_slides.05_capturing_a_sperm_whale",
+    Name = "05. Capturing a Sperm Whale",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck05_capturing_a_sperm_whale1",1)
+    ]],
+    Documentation = "05. Capturing a Sperm Whale (3. Whale Slides)",
+    GuiPath = "/Digital Earth/04 Whale Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.whale_slides.10_deck_of_whaler_try_works",
+    Name = "10. Deck of Whaler Try Works",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck10_deck_of_whaler_try_works1",1)
+    ]],
+    Documentation = "10. Deck of Whaler Try Works (3. Whale Slides)",
+    GuiPath = "/Digital Earth/04 Whale Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.whale_slides.11_trying_out",
+    Name = "11. Trying Out",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck11_davis74_trying_out1",1)
+    ]],
+    Documentation = "11. Trying Out (3. Whale Slides)",
+    GuiPath = "/Digital Earth/04 Whale Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.whale_slides.12_casks_newbedford",
+    Name = "12. Casks, NewBedford",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck12_casks_whale_oil_new_bedord_waterfront1",1)
+    ]],
+    Documentation = "12. Casks, NewBedford (3. Whale Slides)",
+    GuiPath = "/Digital Earth/04 Whale Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.whale_slides.13_spermaceti_candle_and_oil",
+    Name = "13. Spermaceti, Candle, and Oil",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck13_spermaceti_candle_and_oil1",1)
+    ]],
+    Documentation = "13. Spermaceti, Candle, and Oil (3. Whale Slides)",
+    GuiPath = "/Digital Earth/04 Whale Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.whale_slides.14_sperm_oil_cans",
+    Name = "14. Sperm Oil Cans",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck14_sperm_oil_bottle_and_can1",1)
+    ]],
+    Documentation = "14. Sperm Oil Cans (3. Whale Slides)",
+    GuiPath = "/Digital Earth/04 Whale Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.whale_slides.16_whale_oil_barrels",
+    Name = "16. Whale Oil Barrels",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck16_whale_oil_barrels1",1)
+    ]],
+    Documentation = "16. Whale Oil Barrels (3. Whale Slides)",
+    GuiPath = "/Digital Earth/04 Whale Slides",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.whale_slides.17_whale_oil_value",
+    Name = "17. Whale Oil Value",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck17_whale_oil_value1",1)
+    ]],
+    Documentation = "17. Whale Oil Value (3. Whale Slides)",
+    GuiPath = "/Digital Earth/04 Whale Slides",
+    IsLocal = false
+  },
+}
+
+asset.onInitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.registerAction(a)
+  end
+end)
+
+asset.onDeinitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.removeAction(a.Identifier)
+  end
+end)
+
+asset.meta = {
+  Name = "Digital Earth Energy I Actions - 3. Whale Slides",
+  Description = "In-app action buttons for the 3. Whale Slides section of the Energy I show",
+  Author = "Digital Earth / DMNS",
+  URL = "https://openspaceproject.com",
+  License = "MIT license"
+}

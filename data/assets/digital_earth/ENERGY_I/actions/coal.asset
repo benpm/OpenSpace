@@ -1,0 +1,408 @@
+-- Actions for the "4. Coal" card of the Digital Earth Energy I show.
+-- Generated from data/de_energy_0.21.html; these appear in the in-app
+-- Actions panel under "/Digital Earth/05 Coal".
+
+local actions = {
+  {
+    Identifier = "de.energy.coal.burnley_mill_steam_engine_2_pano_anchor",
+    Name = "Burnley Mill Steam Engine 2 PANO ANCHOR",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_1.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_1.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_2.Renderable.Enabled", true)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_2.Renderable.Fade",1,1)
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.Anchor", "burnley_mill_steam_engine_2")
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.Aim", "")
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.RetargetAnchor", nil)
+      openspace.setPropertyValueSingle("Scene.bearcreek_cemetery.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.bearcreek_cemetery.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.chs_laurel_refinery__laurel_mt.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.chs_laurel_refinery__laurel_mt.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.craig_station_rooftop_west_view.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.craig_station_rooftop_west_view.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.derby_dome_wy_pump_jack.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.derby_dome_wy_pump_jack.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.fort_st_vrain_generating_station__platteville_co.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.fort_st_vrain_generating_station__platteville_co.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.grass_creek__wy_pump_jack_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.grass_creek__wy_pump_jack_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.high_wall_mining_collom_pit_colowyo_mine_pano.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.high_wall_mining_collom_pit_colowyo_mine_pano.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_exterior_intake_towers.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_exterior_intake_towers.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_turbine_room_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_turbine_room_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.oregon_basin_wy_south_dome_workover_rig.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.oregon_basin_wy_south_dome_workover_rig.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.smith_mine_montana.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.smith_mine_montana.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.tristate_control_room_pano_1.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.tristate_control_room_pano_1.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.tristate_erie_substation_pano_5.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.tristate_erie_substation_pano_5.Renderable.Enabled", false)
+    ]],
+    Documentation = "Burnley Mill Steam Engine 2 PANO ANCHOR (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.burnley_mill_steam_engine_1_pano_anchor",
+    Name = "Burnley Mill Steam Engine 1 PANO ANCHOR",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_1.Renderable.Enabled", true)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_1.Renderable.Fade",1,1)
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.Anchor", "burnley_mill_steam_engine_1")
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.Aim", "")
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.RetargetAnchor", nil)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.bearcreek_cemetery.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.bearcreek_cemetery.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.chs_laurel_refinery__laurel_mt.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.chs_laurel_refinery__laurel_mt.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.craig_station_rooftop_west_view.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.craig_station_rooftop_west_view.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.derby_dome_wy_pump_jack.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.derby_dome_wy_pump_jack.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.fort_st_vrain_generating_station__platteville_co.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.fort_st_vrain_generating_station__platteville_co.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.grass_creek__wy_pump_jack_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.grass_creek__wy_pump_jack_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.high_wall_mining_collom_pit_colowyo_mine_pano.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.high_wall_mining_collom_pit_colowyo_mine_pano.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_exterior_intake_towers.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_exterior_intake_towers.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_turbine_room_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_turbine_room_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.oregon_basin_wy_south_dome_workover_rig.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.oregon_basin_wy_south_dome_workover_rig.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.smith_mine_montana.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.smith_mine_montana.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.tristate_control_room_pano_1.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.tristate_control_room_pano_1.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.tristate_erie_substation_pano_5.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.tristate_erie_substation_pano_5.Renderable.Enabled", false)
+    ]],
+    Documentation = "Burnley Mill Steam Engine 1 PANO ANCHOR (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.50_us_states_load",
+    Name = "50 US States LOAD",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.GeographicOverlays.US_STATES_50m-admin1_no_labels",1)
+    ]],
+    Documentation = "50 US States LOAD (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.coal_fields",
+    Name = "Coal Fields",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.GeographicOverlays.US_Coal_Fields_Simplified",1)
+    ]],
+    Documentation = "Coal Fields (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.global_coal_plants_on",
+    Name = "Global Coal Plants ON",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.globalCoalPowerPlants1935_2028.Enabled", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.globalCoalPowerPlants1935_2028.Fade",1,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.NightLayers.Earth_at_Night_2012.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.EarthAtmosphere.Renderable.Enabled", false)
+    ]],
+    Documentation = "Global Coal Plants ON (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    Color = { 0.85, 0.85, 0.2, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.play",
+    Name = "Play",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.globalCoalPowerPlants1935_2028.TileProvider.VideoPlayer.Play", nil)
+    ]],
+    Documentation = "Play (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.pause",
+    Name = "Pause",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.globalCoalPowerPlants1935_2028.TileProvider.VideoPlayer.Pause", nil)
+    ]],
+    Documentation = "Pause (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.go_to_start",
+    Name = "Go to Start",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.globalCoalPowerPlants1935_2028.TileProvider.VideoPlayer.GoToStart", nil)
+    ]],
+    Documentation = "Go to Start (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.loop_on",
+    Name = "LOOP ON",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.globalCoalPowerPlants1935_2028.TileProvider.VideoPlayer.LoopVideo", true)
+    ]],
+    Documentation = "LOOP ON (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    Color = { 0.85, 0.85, 0.2, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.loop_off",
+    Name = "LOOP OFF",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.globalCoalPowerPlants1935_2028.TileProvider.VideoPlayer.LoopVideo", false)
+    ]],
+    Documentation = "LOOP OFF (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    Color = { 0.8, 0.25, 0.25, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.global_coal_plants_off",
+    Name = "Global Coal Plants OFF",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.globalCoalPowerPlants1935_2028.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.globalCoalPowerPlants1935_2028.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.NightLayers.Earth_at_Night_2012.Enabled", true)
+      openspace.setPropertyValueSingle("Scene.EarthAtmosphere.Renderable.Enabled", true)
+    ]],
+    Documentation = "Global Coal Plants OFF (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    Color = { 0.8, 0.25, 0.25, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.18_global_coal_usa_2025",
+    Name = "18. Global Coal USA (2025)",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck18_global_coal_plants_2025__usa1",1)
+    ]],
+    Documentation = "18. Global Coal USA (2025) (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.smith_mine_mt_pano_anchor",
+    Name = "Smith Mine, MT PANO ANCHOR",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_1.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_1.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.bearcreek_cemetery.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.bearcreek_cemetery.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.chs_laurel_refinery__laurel_mt.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.chs_laurel_refinery__laurel_mt.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.craig_station_rooftop_west_view.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.craig_station_rooftop_west_view.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.derby_dome_wy_pump_jack.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.derby_dome_wy_pump_jack.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.fort_st_vrain_generating_station__platteville_co.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.fort_st_vrain_generating_station__platteville_co.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.grass_creek__wy_pump_jack_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.grass_creek__wy_pump_jack_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.high_wall_mining_collom_pit_colowyo_mine_pano.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.high_wall_mining_collom_pit_colowyo_mine_pano.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_exterior_intake_towers.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_exterior_intake_towers.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_turbine_room_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_turbine_room_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.oregon_basin_wy_south_dome_workover_rig.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.oregon_basin_wy_south_dome_workover_rig.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.smith_mine_montana.Renderable.Enabled", true)
+      openspace.setPropertyValueSingle("Scene.smith_mine_montana.Renderable.Fade",1,1)
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.Anchor", "smith_mine_montana")
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.Aim", "")
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.RetargetAnchor", nil)
+      openspace.setPropertyValueSingle("Scene.tristate_control_room_pano_1.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.tristate_control_room_pano_1.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.tristate_erie_substation_pano_5.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.tristate_erie_substation_pano_5.Renderable.Enabled", false)
+    ]],
+    Documentation = "Smith Mine, MT PANO ANCHOR (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.bearcreek_cemetery_pano_anchor",
+    Name = "Bearcreek Cemetery PANO ANCHOR",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_1.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_1.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.bearcreek_cemetery.Renderable.Enabled", true)
+      openspace.setPropertyValueSingle("Scene.bearcreek_cemetery.Renderable.Fade",1,1)
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.Anchor", "bearcreek_cemetery")
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.Aim", "")
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.RetargetAnchor", nil)
+      openspace.setPropertyValueSingle("Scene.chs_laurel_refinery__laurel_mt.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.chs_laurel_refinery__laurel_mt.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.craig_station_rooftop_west_view.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.craig_station_rooftop_west_view.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.derby_dome_wy_pump_jack.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.derby_dome_wy_pump_jack.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.fort_st_vrain_generating_station__platteville_co.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.fort_st_vrain_generating_station__platteville_co.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.grass_creek__wy_pump_jack_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.grass_creek__wy_pump_jack_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.high_wall_mining_collom_pit_colowyo_mine_pano.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.high_wall_mining_collom_pit_colowyo_mine_pano.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_exterior_intake_towers.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_exterior_intake_towers.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_turbine_room_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_turbine_room_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.oregon_basin_wy_south_dome_workover_rig.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.oregon_basin_wy_south_dome_workover_rig.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.smith_mine_montana.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.smith_mine_montana.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.tristate_control_room_pano_1.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.tristate_control_room_pano_1.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.tristate_erie_substation_pano_5.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.tristate_erie_substation_pano_5.Renderable.Enabled", false)
+    ]],
+    Documentation = "Bearcreek Cemetery PANO ANCHOR (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.high_wall_mining_colowyo_mine_pano_anchor",
+    Name = "High-Wall Mining, Colowyo Mine PANO ANCHOR",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_1.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_1.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.bearcreek_cemetery.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.bearcreek_cemetery.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.chs_laurel_refinery__laurel_mt.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.chs_laurel_refinery__laurel_mt.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.craig_station_rooftop_west_view.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.craig_station_rooftop_west_view.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.derby_dome_wy_pump_jack.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.derby_dome_wy_pump_jack.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.fort_st_vrain_generating_station__platteville_co.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.fort_st_vrain_generating_station__platteville_co.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.grass_creek__wy_pump_jack_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.grass_creek__wy_pump_jack_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.high_wall_mining_collom_pit_colowyo_mine_pano.Renderable.Enabled", true)
+      openspace.setPropertyValueSingle("Scene.high_wall_mining_collom_pit_colowyo_mine_pano.Renderable.Fade",1,1)
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.Anchor", "high_wall_mining_collom_pit_colowyo_mine_pano")
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.Aim", "")
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.RetargetAnchor", nil)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_exterior_intake_towers.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_exterior_intake_towers.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_turbine_room_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_turbine_room_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.oregon_basin_wy_south_dome_workover_rig.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.oregon_basin_wy_south_dome_workover_rig.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.smith_mine_montana.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.smith_mine_montana.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.tristate_control_room_pano_1.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.tristate_control_room_pano_1.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.tristate_erie_substation_pano_5.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.tristate_erie_substation_pano_5.Renderable.Enabled", false)
+    ]],
+    Documentation = "High-Wall Mining, Colowyo Mine PANO ANCHOR (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.craig_plant_steam_stacks_pano_anchor",
+    Name = "Craig Plant Steam Stacks PANO ANCHOR",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_1.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_1.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.burnley_mill_steam_engine_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.bearcreek_cemetery.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.bearcreek_cemetery.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.chs_laurel_refinery__laurel_mt.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.chs_laurel_refinery__laurel_mt.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.craig_station_rooftop_west_view.Renderable.Enabled", true)
+      openspace.setPropertyValueSingle("Scene.craig_station_rooftop_west_view.Renderable.Fade",1,1)
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.Anchor", "craig_station_rooftop_west_view")
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.Aim", "")
+      openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.RetargetAnchor", nil)
+      openspace.setPropertyValueSingle("Scene.derby_dome_wy_pump_jack.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.derby_dome_wy_pump_jack.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.fort_st_vrain_generating_station__platteville_co.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.fort_st_vrain_generating_station__platteville_co.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.grass_creek__wy_pump_jack_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.grass_creek__wy_pump_jack_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.high_wall_mining_collom_pit_colowyo_mine_pano.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.high_wall_mining_collom_pit_colowyo_mine_pano.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_exterior_intake_towers.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_exterior_intake_towers.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_turbine_room_2.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.hoover_dam_turbine_room_2.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.oregon_basin_wy_south_dome_workover_rig.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.oregon_basin_wy_south_dome_workover_rig.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.smith_mine_montana.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.smith_mine_montana.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.tristate_control_room_pano_1.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.tristate_control_room_pano_1.Renderable.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.tristate_erie_substation_pano_5.Renderable.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.tristate_erie_substation_pano_5.Renderable.Enabled", false)
+    ]],
+    Documentation = "Craig Plant Steam Stacks PANO ANCHOR (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.18_us_coal_2025",
+    Name = "18. US Coal 2025",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck18_global_coal_plants_2025__usa1",1)
+    ]],
+    Documentation = "18. US Coal 2025 (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.coal.19_coal_transp_2025",
+    Name = "19. Coal Transp 2025",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck19_coal_transp_20251",1)
+    ]],
+    Documentation = "19. Coal Transp 2025 (4. Coal)",
+    GuiPath = "/Digital Earth/05 Coal",
+    IsLocal = false
+  },
+}
+
+asset.onInitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.registerAction(a)
+  end
+end)
+
+asset.onDeinitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.removeAction(a.Identifier)
+  end
+end)
+
+asset.meta = {
+  Name = "Digital Earth Energy I Actions - 4. Coal",
+  Description = "In-app action buttons for the 4. Coal section of the Energy I show",
+  Author = "Digital Earth / DMNS",
+  URL = "https://openspaceproject.com",
+  License = "MIT license"
+}

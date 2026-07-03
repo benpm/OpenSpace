@@ -3,6 +3,30 @@
 All notable changes made on the `project/geojson_perf` branch (relative to `master`).
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — 2026-07-03
+
+### Added
+- **Native in-app show controls** — the entire `de_energy_0.21.html` dashboard (14
+  cards, 164 buttons) ported to OpenSpace actions:
+  `data/assets/digital_earth/ENERGY_I/actions/*.asset` register everything in the
+  Actions panel under `/Digital Earth/<NN Section>` folders (with the panel's color
+  coding as `Color` hints and `IsLocal = false` for cluster/parallel sync), and
+  `mission.asset` adds a "Digital Earth: Energy I" entry to the Missions panel — five
+  narrative energy-era phases (whale oil → coal → oil & gas → electricity → the grid
+  today) with per-phase action buttons, era time ranges, milestones, and slide-icon
+  imagery. LOAD actions got idempotency guards (`hasProperty` before
+  `addGeoJsonFromFile`) the HTML buttons lacked. The profile loads `mission` (which
+  requires the actions) and binds CTRL+F12 to the ported basic-setup action. The HTML
+  panel remains fully functional in parallel at `/panels`.
+
+### Fixed
+- **Broken JS-syntax profile actions** — `de_energy_0.21.profile` contained two actions
+  whose "Lua" scripts were pasted JavaScript (`var`/`await`/JS arrays):
+  `key.f12.dmns.setup` (CTRL+F12, superseded by the ported
+  `de.energy.setup.de_basic_setup_ctrl_f12`) and
+  `key.alt.x.earth.earthatm.stars.sun.toggle` (rewritten in Lua; its
+  `boolean[1] > 0.1` condition was broken even as JS).
+
 ## [Unreleased] — 2026-07-02
 
 ### Fixed
