@@ -122,7 +122,43 @@ to mp3 and use the audio module (`modules/audio/audiomodule_lua.inl`):
 - `openspace.sessionRecording.startPlayback(file, loop=false, shouldWaitForTiles=true,
   screenshotFps?)` — errors if the file doesn't exist.
 
-## 9. Debugging workflow
+## 9. Hosting panels over HTTP (this branch)
+
+The single WebGui static server hosts the panels as an extra endpoint. This branch adds a
+`Directories` key to the module's `openspace.cfg` configuration (endpoint/directory
+pairs) that seeds `Modules.WebGui.Directories`; `util/webgui.asset` later *appends* its
+own endpoints (gui, webpanels, showcomposer, maps) to that property, so config-seeded
+entries survive:
+
+```lua
+ModuleConfigurations = {
+  WebGui = {
+    Address = "localhost",
+    HttpPort = 4690,                          -- the ONE http port, GUI included
+    WebSocketInterface = "DefaultWebSocketInterface",
+    Directories = { "panels", "${DATA}" }     -- endpoint/directory pairs
+  }
+}
+```
+
+- Panel URL: `http://localhost:4690/panels/` → `data/index.html` redirects to
+  `de_energy_0.21.html` (the Express-based backend answers "Cannot GET /<ep>/" for a
+  directory without an `index.html`, so keep that file). The whole `${DATA}` dir is
+  served, so the panel's relative `openspace-api.js` / `main2.css` includes resolve.
+- The WebGui frontend lives on the same port at `/gui` (and `/` redirects there via the
+  `DefaultEndpoint` that `webgui.asset` sets); the in-app CEF GUI follows
+  `WebGuiModule::port()` automatically.
+- The server is the Node `backend.js` that `data/assets/util/static_server.asset` syncs
+  and assigns to `Modules.WebGui.ServerProcessEntryPoint` — nothing is served until that
+  asset initializes. No entry point (profile without the webgui asset) → no server.
+- The served page still opens its WebSocket to port 4682 directly; the HTTP origin does
+  not matter for `ws://` connections.
+- Panel-authoring gotcha: `<img>` labels cannot use `file:///` (filesystem) paths when
+  the page is served over HTTP — browsers block local resources from an http origin. The
+  panel's `mapButtons` emits page-relative URLs for labels when `location.protocol` is
+  http, and filesystem paths inside the scripts sent to OpenSpace.
+
+## 10. Debugging workflow
 
 - Server-side symptoms land in `logs/log.html` (rotated: `log-1/2/3.html`) — grep the
   `log-message` cells. `(E) property_setValue ... Property with URI '...' was not found`

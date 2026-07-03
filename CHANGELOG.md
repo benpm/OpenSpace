@@ -3,6 +3,36 @@
 All notable changes made on the `project/geojson_perf` branch (relative to `master`).
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — 2026-07-02
+
+### Fixed
+- **GeoJSON per-feature property parsing (KML-derived files)** — loading
+  `us_states_50m-admin1_no_labels.geojson` errored with `Error reading GeoJson property
+  'extrude'/'tessellate'. Value has wrong type`: KML→GeoJSON conversions encode booleans
+  as numbers (`1`, `-1`, `0`) and include `null` properties, but `propsFromGeoJson`
+  (`geojsonproperties.cpp`) used strict `getBoolean()`/`getNumber()`. Boolean-typed
+  properties now accept numbers (non-zero = true) and strings ("true"/"1"/"-1");
+  number-typed properties accept numeric strings; `null` values are skipped as absent.
+  Error reporting now includes the feature index, file name, and the offending value
+  with its actual type (context threaded from `GeoJsonComponent::parseSingleFeature`),
+  and `colorValue` no longer throws `std::out_of_range` on malformed color arrays.
+  Audited all 40+ geojson files used by the control panel: only the us_states file
+  carried these KML-style properties; the rest only use string `name`s.
+
+### Added
+- **Web panel hosting** — `WebGuiModule` now accepts a `Directories` key in its
+  `openspace.cfg` configuration (endpoint/directory pairs) that seeds
+  `Modules.WebGui.Directories` before `util/webgui.asset` appends its own endpoints, so
+  static content can be added to the (single) WebGui http server from the config file.
+  The default config serves `${DATA}` at the `panels` endpoint with `HttpPort = 4690`,
+  hosting the control panel at `http://localhost:4690/panels/` while OpenSpace runs (no
+  more `file://`); the GUI lives on the same port at `/gui`. `data/index.html` redirects
+  the endpoint root to `de_energy_0.21.html` (the backend otherwise answers
+  "Cannot GET /panels/" for directories without an index). The panel's `mapButtons` now
+  emits page-relative URLs for button-label images when served over HTTP (browsers block
+  `file:///` loads from an http origin) while keeping filesystem paths in the scripts
+  sent to OpenSpace.
+
 ## [Unreleased] — 2026-06-22 → 2026-07-01
 
 Digital Earth "Energy I" show content moved into the repo, its web control panel repaired

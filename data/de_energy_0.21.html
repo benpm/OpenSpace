@@ -1,7 +1,6 @@
 <html>
 <head>
 	<title>Digital Earth: Energy I Controls</title>
-	<link rel='icon' href='openspace128.ico' type='image/x-icon'/ >
 	<link rel="stylesheet" type="text/css" href="main2.css">
 	<script type="text/javascript" src="openspace-api.js?v=20260625"></script>
 	<script type="text/javascript">
@@ -2410,39 +2409,24 @@
 
 	var buttonGroups = [StartupSetupButtons, SailingSongsVideoButtons, sosRealTimeFiresButtons, americanOffshoreLogsAllWhalingVoyagesButtons, whaleSlideButtons, globalCoal1935_2028Buttons, oilPipelineButtons, electricityButtons, highVoltageLineButtons, gdalSetupButtons, electricitySupplyDemandSlides, gasPipelineButtons, creditsButtons, oilDrillingSongsVideoButtons ];
 
-	// Helper function to map the buttons to HTML
-	function mapButtons(openspace) {
-		const mainDiv = document.getElementById('main');
-		mainDiv.innerHTML = "";
-		buttonGroups.map((action) => {
-			var cardHTML = "<div class='card'><h2>" + action.title + "</h2>";
-			// THE SMART CHECK:
-			// If getButtons exists, execute it. Otherwise, fallback to the standard 'buttons' object.
-			const currentButtons = action.getButtons ? action.getButtons() : action.buttons;
-			if (currentButtons) {
-				Object.keys(currentButtons).map(buttonLabel => {
-					const fn = currentButtons[buttonLabel];
-					// Inject the drive letter ONLY if the placeholder ROOT/ is found
-					let finalLabel = buttonLabel.replace(/ROOT\//g, openSpaceRoot);
-					cardHTML += "<button onClick=\"(" + fn + ")(event)\">" + finalLabel + "</button>";
-				});
-			}
-			cardHTML += "</div>";
-			mainDiv.innerHTML += cardHTML;
-		});
-	}
-
+// Helper function to map the buttons to HTML
 function mapButtons(openspace) {
     const mainDiv = document.getElementById('main');
     mainDiv.innerHTML = "";
+    // When served over HTTP the panel's endpoint maps to the data/ directory, so label
+    // images (ROOT/data/...) must become page-relative URLs; browsers block file://
+    // loads from an http origin. Scripts always get filesystem paths, since those are
+    // consumed by OpenSpace itself.
+    const isHttp = window.location.protocol.startsWith('http');
     buttonGroups.map((action) => {
         var cardHTML = "<div class='card'><h2>" + action.title + "</h2>";
         const currentButtons = action.getButtons ? action.getButtons() : action.buttons;
         if (currentButtons) {
             Object.keys(currentButtons).map(buttonLabel => {
                 let fn = currentButtons[buttonLabel].toString(); // Convert function code to string
-                // Inject the actual hard drive path into both the label AND the script string
-                let finalLabel = buttonLabel.replace(/ROOT\//g, openSpaceRoot);
+                let finalLabel = isHttp
+                    ? buttonLabel.replace(/ROOT\/data\//g, '')
+                    : buttonLabel.replace(/ROOT\//g, openSpaceRoot);
                 let finalFn = fn.replace(/ROOT\//g, openSpaceRoot);
                 cardHTML += "<button onClick=\"(" + finalFn + ")(event)\">" + finalLabel + "</button>";
             });

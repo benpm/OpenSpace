@@ -34,6 +34,7 @@
 #include <scn/scan.h>
 #include <algorithm>
 #include <array>
+#include <cctype>
 #include <filesystem>
 
 namespace {
@@ -67,6 +68,62 @@ namespace {
         return keyMatches(key, array, propInfo);
     }
 
+    std::string_view geoJsonTypeName(const geos::io::GeoJSONValue& value) {
+        if (value.isString()) { return "string"; }
+        if (value.isNumber()) { return "number"; }
+        if (value.isBoolean()) { return "boolean"; }
+        if (value.isNull()) { return "null"; }
+        if (value.isArray()) { return "array"; }
+        if (value.isObject()) { return "object"; }
+        return "unknown";
+    }
+
+    std::string geoJsonValueToString(const geos::io::GeoJSONValue& value) {
+        if (value.isString()) { return value.getString(); }
+        if (value.isNumber()) { return std::format("{}", value.getNumber()); }
+        if (value.isBoolean()) { return value.getBoolean() ? "true" : "false"; }
+        return std::string(geoJsonTypeName(value));
+    }
+
+    // Tolerant readers for property values. GeoJSON files converted from KML commonly
+    // encode booleans as numbers (0 = false, 1 or -1 = true) or strings, and numbers
+    // as strings. Unconvertible values still throw GeoJSONTypeError, which is reported
+    // by the caller
+
+    bool boolValue(const geos::io::GeoJSONValue& value) {
+        if (value.isBoolean()) {
+            return value.getBoolean();
+        }
+        if (value.isNumber()) {
+            return value.getNumber() != 0.0;
+        }
+        if (value.isString()) {
+            std::string s = value.getString();
+            std::transform(
+                s.begin(), s.end(), s.begin(),
+                [](unsigned char c) { return static_cast<char>(std::tolower(c)); }
+            );
+            if (s == "true" || s == "1" || s == "-1") {
+                return true;
+            }
+            if (s == "false" || s == "0") {
+                return false;
+            }
+        }
+        return value.getBoolean();
+    }
+
+    double numberValue(const geos::io::GeoJSONValue& value) {
+        if (value.isString()) {
+            const std::string& s = value.getString();
+            auto ret = scn::scan<double>(s, "{}");
+            if (ret && ret->range().empty()) {
+                return ret->value();
+            }
+        }
+        return value.getNumber();
+    }
+
     std::optional<glm::vec3> hexToRgb(std::string_view hexColor) {
         // The string is supposed to have 7 characters:  #rrggbb
         if (hexColor.size() != 7) {
@@ -92,28 +149,27 @@ namespace {
         }
     }
 
-    glm::vec3 colorValue(const geos::io::GeoJSONValue& value) {
+    glm::vec3 colorValue(const geos::io::GeoJSONValue& value, std::string_view context) {
         // Default garish color used for when the color loading fails
         glm::vec3 color = glm::vec3(1.f, 0.f, 1.f);
         if (value.isArray()) {
             const std::vector<geos::io::GeoJSONValue>& val = value.getArray();
             if (val.size() != 3) {
-                // @TODO:
-                // Should add some more information on which file the reading failed for
                 LERRORC(
                     "GeoJson",
                     std::format(
-                        "Failed reading color property. Expected 3 values, got {}",
-                        val.size()
+                        "Failed reading color property for {}. Expected 3 values, got {}",
+                        context, val.size()
                     )
                 );
+                return color;
             }
             // @TODO Use verifiers to verify color values
             // @TODO Parse values given in RGB in ranges 0-255?
             color = glm::vec3(
-                static_cast<float>(val.at(0).getNumber()),
-                static_cast<float>(val.at(1).getNumber()),
-                static_cast<float>(val.at(2).getNumber())
+                static_cast<float>(numberValue(val.at(0))),
+                static_cast<float>(numberValue(val.at(1))),
+                static_cast<float>(numberValue(val.at(2)))
             );
         }
         else if (value.isString()) {
@@ -123,14 +179,24 @@ namespace {
                 LERRORC(
                     "GeoJson",
                     std::format(
-                        "Failed reading color property. Did not find a hex color, got {}",
-                        hex
+                        "Failed reading color property for {}. Did not find a hex "
+                        "color, got '{}'", context, hex
                     )
                 );
             }
             else {
                 color = *c;
             }
+        }
+        else {
+            LERRORC(
+                "GeoJson",
+                std::format(
+                    "Failed reading color property for {}. Expected an array of 3 "
+                    "values or a hex color string, got {}",
+                    context, geoJsonTypeName(value)
+                )
+            );
         }
         return color;
     }
@@ -498,12 +564,14 @@ GeoJsonProperties::PointTextureAnchor GeoJsonProperties::pointTextureAnchor() co
     return static_cast<GeoJsonProperties::PointTextureAnchor>(pointAnchorOption.value());
 }
 
-GeoJsonOverrideProperties propsFromGeoJson(const geos::io::GeoJSONFeature& feature) {
+GeoJsonOverrideProperties propsFromGeoJson(const geos::io::GeoJSONFeature& feature,
+                                           std::string_view context)
+{
     const std::map<std::string, geos::io::GeoJSONValue>& props = feature.getProperties();
     GeoJsonOverrideProperties result;
 
-    auto parseProperty = [&result](const std::string_view key,
-                                   const geos::io::GeoJSONValue& value)
+    auto parseProperty = [&result, context](const std::string_view key,
+                                            const geos::io::GeoJSONValue& value)
     {
         using namespace geojson;
 
@@ -511,22 +579,22 @@ GeoJsonOverrideProperties propsFromGeoJson(const geos::io::GeoJSONFeature& featu
             result.name = value.getString();
         }
         else if (keyMatches(key, propertykeys::Opacity, OpacityInfo)) {
-            result.opacity = static_cast<float>(value.getNumber());
+            result.opacity = static_cast<float>(numberValue(value));
         }
         else if (keyMatches(key, propertykeys::Color, ColorInfo)) {
-            result.color = colorValue(value);
+            result.color = colorValue(value, context);
         }
         else if (keyMatches(key, propertykeys::FillOpacity, FillOpacityInfo)) {
-            result.fillOpacity = static_cast<float>(value.getNumber());
+            result.fillOpacity = static_cast<float>(numberValue(value));
         }
         else if (keyMatches(key, propertykeys::FillColor, FillColorInfo)) {
-            result.fillColor = colorValue(value);
+            result.fillColor = colorValue(value, context);
         }
         else if (keyMatches(key, propertykeys::LineWidth, LineWidthInfo)) {
-            result.lineWidth = static_cast<float>(value.getNumber());
+            result.lineWidth = static_cast<float>(numberValue(value));
         }
         else if (keyMatches(key, propertykeys::PointSize, PointSizeInfo)) {
-            result.pointSize = static_cast<float>(value.getNumber());
+            result.pointSize = static_cast<float>(numberValue(value));
         }
         else if (keyMatches(key, propertykeys::Texture, PointTextureInfo)) {
             std::string texture = value.getString();
@@ -549,7 +617,7 @@ GeoJsonOverrideProperties propsFromGeoJson(const geos::io::GeoJSONFeature& featu
             }
         }
         else if (keyMatches(key, propertykeys::Extrude, ExtrudeInfo)) {
-            result.extrude = value.getBoolean();
+            result.extrude = boolValue(value);
         }
         else if (keyMatches(key, propertykeys::AltitudeMode, AltitudeModeInfo)) {
             std::string mode = value.getString();
@@ -571,15 +639,15 @@ GeoJsonOverrideProperties propsFromGeoJson(const geos::io::GeoJSONFeature& featu
             }
         }
         else if (keyMatches(key, propertykeys::PerformShading, PerformShadingInfo)) {
-            result.performShading = value.getBoolean();
+            result.performShading = boolValue(value);
         }
         else if (keyMatches(key, propertykeys::Tessellate, TessellationEnabledInfo)) {
-            result.tessellationEnabled = value.getBoolean();
+            result.tessellationEnabled = boolValue(value);
         }
         else if (keyMatches(key, propertykeys::TessellationLevel, TessellationLevelInfo))
         {
             result.useTessellationLevel = true;
-            result.tessellationLevel = static_cast<int>(value.getNumber());
+            result.tessellationLevel = static_cast<int>(numberValue(value));
         }
         else if (
             keyMatches(
@@ -588,18 +656,24 @@ GeoJsonOverrideProperties propsFromGeoJson(const geos::io::GeoJSONFeature& featu
                 TessellationDistanceInfo
             ))
         {
-            result.tessellationDistance = static_cast<float>(value.getNumber());
+            result.tessellationDistance = static_cast<float>(numberValue(value));
         }
     };
 
     for (auto const& [key, value] : props) {
+        // Null values are common in converted GeoJSON files (e.g. from KML) and are
+        // treated the same as if the property was not provided at all
+        if (value.isNull()) {
+            continue;
+        }
         try {
             parseProperty(key, value);
         }
         catch (const geos::io::GeoJSONValue::GeoJSONTypeError&) {
-            // @TODO: Should add some more information on which file the reading failed
             LERRORC("GeoJson", std::format(
-                "Error reading GeoJson property '{}'. Value has wrong type", key
+                "Error reading property '{}' for {}: the {} value '{}' cannot be "
+                "interpreted as the type expected by that property",
+                key, context, geoJsonTypeName(value), geoJsonValueToString(value)
             ));
         }
     }

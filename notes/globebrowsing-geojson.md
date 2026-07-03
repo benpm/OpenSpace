@@ -185,6 +185,17 @@ lift features clear of terrain — this is the single most common "my GeoJSON is
 - `addGeoJsonFromFile` derives the identifier via `makeIdentifier(stem)`, which maps
   punctuation (except `-`/`_`) to `-`: `transmission_735kV+.geojson` →
   `transmission_735kV-`.
+- **KML-derived GeoJSON property types** (fixed on this branch,
+  `geojsonproperties.cpp`): KML→GeoJSON converters emit booleans as numbers
+  (`"extrude": 1`, `"tessellate": -1`) and pad features with `null` properties
+  (`"timestamp": null`). The per-feature property parser (`propsFromGeoJson`) used
+  strict `getBoolean()`/`getNumber()`, throwing `GeoJSONTypeError` → logged as
+  `Error reading GeoJson property '<key>'. Value has wrong type`. Now: `boolValue()`
+  accepts bool/number (non-zero = true, incl. KML's -1)/string ("true"/"1"/"-1"),
+  `numberValue()` accepts numeric strings, `null` values are skipped as absent, and
+  error messages include the feature index, file name, and the offending value + its
+  actual type (context threaded from `GeoJsonComponent::parseSingleFeature`).
+  `colorValue` also no longer throws `std::out_of_range` on arrays shorter than 3.
 - `GeoJsonComponent : PropertyOwner, Fadeable` → per-layer `Enabled`, `Fade`, `Opacity`
   exist in addition to `HeightOffset` and `DefaultProperties.*`; the per-globe owner is
   `Scene.<Globe>.Renderable.GeographicOverlays`.

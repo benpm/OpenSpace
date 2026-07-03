@@ -115,6 +115,9 @@ namespace {
 
         // [[codegen::verbatim(WebSocketInterfaceInfo.description)]]
         std::optional<std::string> webSocketInterface;
+
+        // [[codegen::verbatim(DirectoriesInfo.description)]]
+        std::optional<std::vector<std::string>> directories;
     };
 } // namespace
 #include "webguimodule_codegen.cpp"
@@ -179,6 +182,10 @@ void WebGuiModule::internalInitialize(const ghoul::Dictionary& configuration) {
     _port = p.port.value_or(_port);
     _address = p.address;
     _webSocketInterface = p.webSocketInterface.value_or(_webSocketInterface);
+    // Endpoint/directory pairs from the configuration file. Assets that add their own
+    // endpoints later (e.g. util/webgui.asset) read and append to this property, so
+    // entries seeded here survive
+    _directories = p.directories.value_or(_directories);
 
     auto startOrStop = [this]() {
         if (_enabled && !_entryPoint.value().empty()) {

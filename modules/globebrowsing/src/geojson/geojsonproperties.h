@@ -35,6 +35,7 @@
 #include <openspace/properties/vector/vec3property.h>
 #include <ghoul/glm.h>
 #include <optional>
+#include <string_view>
 
 namespace geos::io { class GeoJSONFeature; }
 
@@ -121,7 +122,16 @@ struct GeoJsonOverrideProperties {
     std::optional<float> tessellationDistance;
 };
 
-GeoJsonOverrideProperties propsFromGeoJson(const geos::io::GeoJSONFeature& feature);
+/**
+ * Read the style properties out of a GeoJSON feature's `properties` object.
+ *
+ * \param feature The feature whose properties should be read
+ * \param context A human-readable description of where the feature comes from (e.g.
+ *        feature index and file name), used to give error messages enough information
+ *        to locate the offending value
+ */
+GeoJsonOverrideProperties propsFromGeoJson(const geos::io::GeoJSONFeature& feature,
+    std::string_view context = "GeoJson feature");
 
 struct PropertySet {
     /// This value set should be a reference to the main component's PropertyOwner

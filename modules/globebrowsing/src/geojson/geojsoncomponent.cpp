@@ -661,7 +661,10 @@ void GeoJsonComponent::parseSingleFeature(const geos::io::GeoJSONFeature& featur
     std::unique_ptr<geos::geom::Geometry> geom = makeValid.build(nonValidatedGeometry);
 
     // Read the properties
-    GeoJsonOverrideProperties propsFromFile = propsFromGeoJson(feature);
+    GeoJsonOverrideProperties propsFromFile = propsFromGeoJson(
+        feature,
+        std::format("feature {} in GeoJson file '{}'", indexInFile, _geoJsonFile.value())
+    );
 
     std::vector<const geos::geom::Geometry*> geomsToAdd;
     if (!geom) {
