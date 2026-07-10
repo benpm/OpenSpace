@@ -28,9 +28,16 @@
 #include <openspace/properties/propertyowner.h>
 
 #include <modules/globebrowsing/src/geojson/geojsoncomponent.h>
+#include <openspace/rendering/multidrawbatch.h>
+#include <ghoul/opengl/bufferbinding.h>
+#include <map>
 #include <memory>
 
 namespace ghoul { class Dictionary; }
+namespace ghoul::opengl {
+    class ProgramObject;
+    class Texture;
+} // namespace ghoul::opengl
 
 namespace openspace {
 
@@ -57,8 +64,34 @@ public:
     void render(const RenderData& data);
 
 private:
+    using SsboBinding = ghoul::opengl::BufferBinding<
+        ghoul::opengl::bufferbinding::Buffer::ShaderStorage
+    >;
+
+    /// Create the shared shader programs and batches. Called lazily when the first
+    /// layer is added, since that is when a GL context is guaranteed
+    void initializeGLResources();
+
+    void renderBatchedLines(const RenderData& data);
+    void renderBatchedPoints(const RenderData& data);
+
     std::vector<std::unique_ptr<GeoJsonComponent>> _geoJsonObjects;
     RenderableGlobe* _parentGlobe = nullptr;
+
+    // All points and lines of all components on the globe are batched into these and
+    // rendered with a few multidraw calls, with per-draw data in an SSBO. Polygons are
+    // still rendered per feature, by the components
+    rendering::MultiDrawBatch _pointsBatch;
+    rendering::MultiDrawBatch _linesBatch;
+    std::unique_ptr<SsboBinding> _pointsSsboBinding;
+    std::unique_ptr<SsboBinding> _linesSsboBinding;
+
+    std::unique_ptr<ghoul::opengl::ProgramObject> _polygonsProgram;
+    std::unique_ptr<ghoul::opengl::ProgramObject> _linesProgram;
+    std::unique_ptr<ghoul::opengl::ProgramObject> _pointsProgram;
+
+    /// Textures used by this frame's point draws, keyed by draw group key
+    std::map<int64_t, ghoul::opengl::Texture*> _pointTextures;
 };
 
 } // namespace openspace

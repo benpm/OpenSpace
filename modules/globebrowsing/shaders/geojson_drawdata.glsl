@@ -22,26 +22,25 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#version __CONTEXT__
+// Per-draw data for batched GeoJson rendering. Must be kept in sync with the
+// GeoJsonDrawRecord struct in globegeometryfeature.h (std430, 32 bytes)
+struct DrawElement {
+  vec4 color;               // rgb + final opacity
+  float heightOffset;       // meters
+  float sizeOrWidth;        // point size (world units) or line width (pixels)
+  float textureWidthFactor; // points only
+  uint flags;
+};
 
-layout(location = 0) in vec3 in_position;
-layout(location = 1) in vec3 in_normal;
-layout(location = 2) in float in_height;
+layout(std430) buffer DrawData {
+  DrawElement drawElements[];
+};
 
-// gl_DrawID is only available in the vertex stage, so resolve the per-draw record
-// index here and pass it on to the geometry shader
+// Offset of the current multidraw group's first record in drawElements. Shaders index
+// records with drawElements[baseDrawId + gl_DrawID]
 uniform int baseDrawId;
 
-out Data {
-  vec3 normal;
-  float dynamicHeight;
-  flat int drawIndex;
-} out_data;
-
-
-void main() {
-  gl_Position = vec4(in_position, 1.0);
-  out_data.normal = in_normal;
-  out_data.dynamicHeight = in_height;
-  out_data.drawIndex = baseDrawId + gl_DrawID;
-}
+const uint FlagUseHeightMap = 1u;
+const uint FlagBottomAnchor = 2u;
+const uint FlagsRenderModeShift = 2u;
+const uint FlagsRenderModeMask = 12u; // bits 2-3

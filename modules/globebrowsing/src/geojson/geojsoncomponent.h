@@ -38,15 +38,18 @@
 #include <openspace/properties/vector/vec2property.h>
 #include <openspace/properties/vector/vec4property.h>
 #include <openspace/rendering/helper.h>
+#include <chrono>
 #include <memory>
 #include <optional>
 
-namespace geos {
-    namespace geom { class Geometry; }
-    namespace io { class GeoJSONFeature; }
-} // namespace geos
+namespace geos::geom { class Geometry; }
+
+namespace openspace::geojson { struct GeoJsonCacheFile; }
 namespace ghoul {
-    namespace opengl { class ProgramObject; }
+    namespace opengl {
+        class ProgramObject;
+        class Texture;
+    } // namespace opengl
     class Dictionary;
 } // namespace ghoul
 
@@ -67,14 +70,24 @@ public:
     ~GeoJsonComponent() override;
 
     void initialize();
-    void initializeGL();
+    void initializeGL(ghoul::opengl::ProgramObject* polygonsProgram,
+        rendering::MultiDrawBatch* pointsBatch, rendering::MultiDrawBatch* linesBatch);
     void deinitializeGL();
 
     bool isReady() const;
     bool enabled() const;
 
+    /// Renders the polygon features. Points and lines are rendered batched by the
+    /// owning GeoJsonManager, fed through emitBatchedDraws
     void render(const RenderData& data);
-    void update();
+
+    /// Queue this component's points and lines draws into the shared batches for the
+    /// current frame (see GlobeGeometryFeature::emitBatchedDraws)
+    void emitBatchedDraws(std::map<int64_t, ghoul::opengl::Texture*>& pointTextures);
+
+    /// Returns true if any feature's geometry was rebuilt, so that the owner knows to
+    /// re-commit the shared batches
+    bool update();
 
     static openspace::Documentation Documentation();
 
@@ -95,8 +108,24 @@ private:
         float boundingBoxDiagonal = 0.f;
     };
 
+    /// Accumulated load phase durations, for the load-time summary log
+    struct LoadStats {
+        std::chrono::steady_clock::duration parse{};
+        std::chrono::steady_clock::duration validate{};
+        std::chrono::steady_clock::duration derive{};
+        std::chrono::steady_clock::duration registration{};
+    };
+
     void readFile();
-    void parseSingleFeature(const geos::io::GeoJSONFeature& feature, int indexInFile);
+    void parseSingleFeature(const geojson::ParsedFeature& feature, int indexInFile,
+        LoadStats& stats, geojson::GeoJsonCacheFile& cacheOut);
+
+    /// Construct all features from a load cache, skipping JSON parsing and GEOS work
+    void loadFromCache(const geojson::GeoJsonCacheFile& cache);
+
+    /// Compute the bounding box diagonal from the feature's boundingboxLatLong. Depends
+    /// on the globe's ellipsoid, which is why it is not part of the load cache
+    void computeFeatureDiagonal(SubFeatureProps& feature) const;
 
     /**
      * Add meta properties to the feature, to allow things like flying to it, identifying
@@ -157,8 +186,10 @@ private:
     PropertyOwner _featuresPropertyOwner;
     std::vector<std::unique_ptr<SubFeatureProps>> _features;
 
-    std::unique_ptr<ghoul::opengl::ProgramObject> _linesAndPolygonsProgram = nullptr;
-    std::unique_ptr<ghoul::opengl::ProgramObject> _pointsProgram = nullptr;
+    // Owned by the GeoJsonManager and shared between all components on the globe
+    ghoul::opengl::ProgramObject* _polygonsProgram = nullptr;
+    rendering::MultiDrawBatch* _pointsBatch = nullptr;
+    rendering::MultiDrawBatch* _linesBatch = nullptr;
 };
 
 } // namespace openspace

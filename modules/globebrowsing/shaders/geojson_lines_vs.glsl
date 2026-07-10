@@ -24,24 +24,36 @@
 
 #version __CONTEXT__
 
+#include "geojson_drawdata.glsl"
+
 layout(location = 0) in vec3 in_position;
-layout(location = 1) in vec3 in_normal;
 layout(location = 2) in float in_height;
 
-// gl_DrawID is only available in the vertex stage, so resolve the per-draw record
-// index here and pass it on to the geometry shader
-uniform int baseDrawId;
-
 out Data {
-  vec3 normal;
-  float dynamicHeight;
+  vec4 positionViewSpace;
   flat int drawIndex;
 } out_data;
 
+uniform dmat4 modelTransform;
+uniform dmat4 viewTransform;
+
 
 void main() {
-  gl_Position = vec4(in_position, 1.0);
-  out_data.normal = in_normal;
-  out_data.dynamicHeight = in_height;
-  out_data.drawIndex = baseDrawId + gl_DrawID;
+  int drawIndex = baseDrawId + gl_DrawID;
+  DrawElement element = drawElements[drawIndex];
+
+  dvec4 modelPos = dvec4(in_position, 1.0);
+
+  // Offset model pos based on height info
+  if (length(in_position) > 0.0) {
+    dvec3 outDirection = normalize(dvec3(in_position));
+    bool useHeightMapData = (element.flags & FlagUseHeightMap) != 0u;
+    double height = useHeightMapData ?
+      in_height + element.heightOffset :
+      element.heightOffset;
+    modelPos += dvec4(outDirection * height, 0.0);
+  }
+
+  out_data.positionViewSpace = vec4(viewTransform * modelTransform * modelPos);
+  out_data.drawIndex = drawIndex;
 }

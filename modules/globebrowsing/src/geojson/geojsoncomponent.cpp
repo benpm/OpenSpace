@@ -34,6 +34,7 @@
 #include <openspace/util/ellipsoid.h>
 #include <openspace/util/geodetic.h>
 #include <openspace/util/updatestructures.h>
+#include <ghoul/filesystem/cachemanager.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
@@ -46,6 +47,7 @@
 #include <geos/geom/Point.h>
 #include <geos/util/GEOSException.h>
 #include <algorithm>
+#include <chrono>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -53,10 +55,9 @@
 #include <iterator>
 #include <utility>
 
-namespace geos_nlohmann = nlohmann;
+#include <modules/globebrowsing/src/geojson/geojsoncache.h>
+#include <modules/globebrowsing/src/geojson/geojsonparser.h>
 #include <geos/geom/Geometry.h>
-#include <geos/io/GeoJSON.h>
-#include <geos/io/GeoJSONReader.h>
 #include <geos/operation/valid/MakeValid.h>
 
 namespace {
@@ -467,24 +468,18 @@ void GeoJsonComponent::initialize() {
     }
 }
 
-void GeoJsonComponent::initializeGL() {
+void GeoJsonComponent::initializeGL(ghoul::opengl::ProgramObject* polygonsProgram,
+                                    rendering::MultiDrawBatch* pointsBatch,
+                                    rendering::MultiDrawBatch* linesBatch)
+{
     ZoneScoped;
 
-    _linesAndPolygonsProgram = global::renderEngine->buildRenderProgram(
-        "GeoLinesAndPolygonProgram",
-        absPath("${MODULE_GLOBEBROWSING}/shaders/geojson_vs.glsl"),
-        absPath("${MODULE_GLOBEBROWSING}/shaders/geojson_fs.glsl")
-    );
-
-    _pointsProgram = global::renderEngine->buildRenderProgram(
-        "GeoPointsProgram",
-        absPath("${MODULE_GLOBEBROWSING}/shaders/geojson_points_vs.glsl"),
-        absPath("${MODULE_GLOBEBROWSING}/shaders/geojson_points_fs.glsl"),
-        absPath("${MODULE_GLOBEBROWSING}/shaders/geojson_points_gs.glsl")
-    );
+    _polygonsProgram = polygonsProgram;
+    _pointsBatch = pointsBatch;
+    _linesBatch = linesBatch;
 
     for (GlobeGeometryFeature& g : _geometryFeatures) {
-        g.initializeGL(_pointsProgram.get(), _linesAndPolygonsProgram.get());
+        g.initializeGL(_polygonsProgram, _pointsBatch, _linesBatch);
     }
 }
 
@@ -493,11 +488,9 @@ void GeoJsonComponent::deinitializeGL() {
         g.deinitializeGL();
     }
 
-    global::renderEngine->removeRenderProgram(_linesAndPolygonsProgram.get());
-    _linesAndPolygonsProgram = nullptr;
-
-    global::renderEngine->removeRenderProgram(_pointsProgram.get());
-    _pointsProgram = nullptr;
+    _polygonsProgram = nullptr;
+    _pointsBatch = nullptr;
+    _linesBatch = nullptr;
 }
 
 bool GeoJsonComponent::isReady() const {
@@ -506,7 +499,7 @@ bool GeoJsonComponent::isReady() const {
         _geometryFeatures.cend(),
         std::mem_fn(&GlobeGeometryFeature::isReady)
     );
-    return isReady && _linesAndPolygonsProgram && _pointsProgram;
+    return isReady && _polygonsProgram;
 }
 
 void GeoJsonComponent::render(const RenderData& data) {
@@ -564,19 +557,48 @@ void GeoJsonComponent::render(const RenderData& data) {
     global::renderEngine->openglStateCache().resetLineState();
 }
 
-void GeoJsonComponent::update() {
+void GeoJsonComponent::emitBatchedDraws(
+                                 std::map<int64_t, ghoul::opengl::Texture*>& pointTextures)
+{
     if (!_enabled || !isVisible()) {
         return;
     }
 
-    const glm::vec3 offsets = glm::vec3(_latLongOffset.value(), _heightOffset.value());
+    using PointRenderMode = GlobeGeometryFeature::PointRenderMode;
+    PointRenderMode pointRenderMode =
+        static_cast<PointRenderMode>(_pointRenderModeOption.value());
+
+    const GlobeGeometryFeature::ExtraRenderData extraRenderdata = {
+        _pointSizeScale,
+        _lineWidthScale,
+        pointRenderMode,
+        _lightsourceRenderData
+    };
 
     for (size_t i = 0; i < _geometryFeatures.size(); i++) {
-        if (!_features[i]->enabled) {
-            continue;
+        if (_features[i]->enabled && _features[i]->isVisible()) {
+            _geometryFeatures[i].emitBatchedDraws(
+                opacity() * _features[i]->opacity(),
+                extraRenderdata,
+                _drawWireframe,
+                pointTextures
+            );
         }
-        GlobeGeometryFeature& g = _geometryFeatures[i];
+    }
+}
 
+bool GeoJsonComponent::update() {
+    if (!_enabled || !isVisible()) {
+        return false;
+    }
+
+    const glm::vec3 offsets = glm::vec3(_latLongOffset.value(), _heightOffset.value());
+
+    bool geometryChanged = false;
+
+    // Note that geometry is updated even for disabled sub-features, so that their draws
+    // exist in the shared batches and they can be enabled or faded in without a rebuild
+    for (GlobeGeometryFeature& g : _geometryFeatures) {
         if (_dataIsDirty || _heightOffsetIsDirty) [[unlikely]] {
             g.setOffsets(offsets);
         }
@@ -585,23 +607,70 @@ void GeoJsonComponent::update() {
             g.updateTexture();
         }
 
-        g.update(_dataIsDirty, _preventUpdatesFromHeightMap);
+        geometryChanged |= g.update(_dataIsDirty, _preventUpdatesFromHeightMap);
     }
 
     _textureIsDirty = false;
     _dataIsDirty = false;
+    return geometryChanged;
 }
 
 void GeoJsonComponent::readFile() {
-    std::ifstream file = std::ifstream(_geoJsonFile);
+    ZoneScoped;
 
-    if (!file.good()) {
+    const std::filesystem::path source = absPath(_geoJsonFile.value());
+    if (!std::filesystem::is_regular_file(source)) {
         LERROR(std::format("Failed to open GeoJSON file: {}", _geoJsonFile.value()));
         return;
     }
 
     _geometryFeatures.clear();
 
+    using Clock = std::chrono::steady_clock;
+    const auto secs = [](Clock::duration d) {
+        return std::chrono::duration<double>(d).count();
+    };
+    const Clock::time_point startTime = Clock::now();
+
+    // Look for a load cache with the fully derived feature data, keyed on the cache
+    // version, the ignore-heights flag (it changes the derived coordinates) and the
+    // source file's last write time (providing an information string disables the
+    // CacheManager's own modification-time keying)
+    std::filesystem::path cacheFile;
+    std::string cacheInfo;
+    if (FileSys.cacheManager()) {
+        const auto lastWrite =
+            std::filesystem::last_write_time(source).time_since_epoch().count();
+        cacheInfo = std::format(
+            "geojson|v{}|ih{}|{}",
+            geojson::CacheVersion, _ignoreHeightsFromFile ? 1 : 0, lastWrite
+        );
+        cacheFile = FileSys.cacheManager()->cachedFilename(source, cacheInfo);
+
+        if (std::filesystem::is_regular_file(cacheFile)) {
+            std::optional<geojson::GeoJsonCacheFile> cached =
+                geojson::loadGeoJsonCache(cacheFile);
+            if (cached && cached->version == geojson::CacheVersion &&
+                cached->ignoreHeights == _ignoreHeightsFromFile)
+            {
+                loadFromCache(*cached);
+                computeMainFeatureMetaPropeties();
+                LINFO(std::format(
+                    "Loaded '{}' from cache: {} features in {:.2f} s",
+                    _geoJsonFile.value(), _geometryFeatures.size(),
+                    secs(Clock::now() - startTime)
+                ));
+                return;
+            }
+            FileSys.cacheManager()->removeCacheFile(source, cacheInfo);
+        }
+    }
+
+    std::ifstream file = std::ifstream(source);
+    if (!file.good()) {
+        LERROR(std::format("Failed to open GeoJSON file: {}", _geoJsonFile.value()));
+        return;
+    }
     const std::string content = std::string(
         std::istreambuf_iterator<char>(file),
         std::istreambuf_iterator<char>()
@@ -615,15 +684,20 @@ void GeoJsonComponent::readFile() {
     std::filesystem::current_path(jsonDir);
     defer { std::filesystem::current_path(cwd); };
 
+    LoadStats stats;
+    int count = 0;
+    geojson::GeoJsonCacheFile cacheOut;
+    cacheOut.ignoreHeights = _ignoreHeightsFromFile;
+
     // Parse GeoJSON string into GeoJSON objects
     try {
-        const geos::io::GeoJSONReader reader;
-        const geos::io::GeoJSONFeatureCollection fc = reader.readFeatures(content);
+        const Clock::time_point parseStart = Clock::now();
+        const geojson::ParsedGeoJson parsed = geojson::parseGeoJson(content);
+        stats.parse = Clock::now() - parseStart;
 
-        int count = 1;
-        for (const geos::io::GeoJSONFeature& feature : fc.getFeatures()) {
-            parseSingleFeature(feature, count);
+        for (const geojson::ParsedFeature& feature : parsed.features) {
             count++;
+            parseSingleFeature(feature, count, stats, cacheOut);
         }
 
         if (_geometryFeatures.empty()) {
@@ -634,6 +708,12 @@ void GeoJsonComponent::readFile() {
             _enabled = false;
         }
     }
+    catch (const ghoul::RuntimeError& e) {
+        LERROR(std::format(
+            "Error creating GeoJson layer with identifier '{}'. Problem reading "
+            "GeoJson file '{}'. Error: {}", identifier(), _geoJsonFile.value(), e.message
+        ));
+    }
     catch (const geos::util::GEOSException& e) {
         LERROR(std::format(
             "Error creating GeoJson layer with identifier '{}'. Problem reading "
@@ -642,27 +722,54 @@ void GeoJsonComponent::readFile() {
     }
 
     computeMainFeatureMetaPropeties();
+
+    Clock::duration cacheWrite{};
+    if (FileSys.cacheManager() && !_geometryFeatures.empty()) {
+        const Clock::time_point cacheStart = Clock::now();
+        geojson::saveGeoJsonCache(cacheOut, cacheFile);
+        cacheWrite = Clock::now() - cacheStart;
+    }
+
+    LINFO(std::format(
+        "Loaded '{}': {} features ({} rendered) in {:.2f} s (parse {:.2f} s, validate "
+        "{:.2f} s, derive {:.2f} s, register {:.2f} s, cache write {:.2f} s)",
+        _geoJsonFile.value(), count, _geometryFeatures.size(),
+        secs(Clock::now() - startTime), secs(stats.parse), secs(stats.validate),
+        secs(stats.derive), secs(stats.registration), secs(cacheWrite)
+    ));
 }
 
-void GeoJsonComponent::parseSingleFeature(const geos::io::GeoJSONFeature& feature,
-                                          int indexInFile
-) {
-    const geos::geom::Geometry* nonValidatedGeometry = feature.getGeometry();
+void GeoJsonComponent::parseSingleFeature(const geojson::ParsedFeature& feature,
+                                          int indexInFile, LoadStats& stats,
+                                          geojson::GeoJsonCacheFile& cacheOut)
+{
+    using Clock = std::chrono::steady_clock;
 
-    if (!nonValidatedGeometry->isValid()) {
+    const Clock::time_point validateStart = Clock::now();
+    std::unique_ptr<geos::geom::Geometry> ownedGeom;
+    if (feature.geometry.kind != geojson::GeometryKind::None) {
+        ownedGeom = geojson::buildGeosGeometry(feature.geometry);
+    }
+    const geos::geom::Geometry* geom = ownedGeom.get();
+
+    // Only repair geometry that is actually invalid; MakeValid is expensive and the
+    // vast majority of features are valid
+    if (geom && !geom->isValid()) {
         LWARNING(std::format(
             "Feature {} in GeoJson file '{}' has invalid geometry (for example due to "
             "self-intersections or other non-simple geometry). If possible, the feature "
             "will be split into separate features with valid geometry. However, note "
             "that this may introduce artifacts", indexInFile, _geoJsonFile.value()
         ));
+        geos::operation::valid::MakeValid makeValid;
+        ownedGeom = makeValid.build(geom);
+        geom = ownedGeom.get();
     }
-    geos::operation::valid::MakeValid makeValid;
-    std::unique_ptr<geos::geom::Geometry> geom = makeValid.build(nonValidatedGeometry);
+    stats.validate += Clock::now() - validateStart;
 
     // Read the properties
     GeoJsonOverrideProperties propsFromFile = propsFromGeoJson(
-        feature,
+        feature.properties,
         std::format("feature {} in GeoJson file '{}'", indexInFile, _geoJsonFile.value())
     );
 
@@ -677,7 +784,7 @@ void GeoJsonComponent::parseSingleFeature(const geos::io::GeoJSONFeature& featur
     }
     else if (geom->isPuntal()) {
         // If points, handle all point features as one feature, even multi-points
-        geomsToAdd = { geom.get()};
+        geomsToAdd = { geom };
     }
     else {
         const size_t nGeom = geom->getNumGeometries();
@@ -690,23 +797,30 @@ void GeoJsonComponent::parseSingleFeature(const geos::io::GeoJSONFeature& featur
         }
     }
 
+    geojson::CachedSourceFeature cachedFeature;
+    cachedFeature.overrides = geojson::toCached(propsFromFile);
+
     // Split other collection features into multiple individual rendered components
 
     for (const geos::geom::Geometry* geometry : geomsToAdd) {
         const int index = static_cast<int>(_geometryFeatures.size());
         try {
+            const Clock::time_point deriveStart = Clock::now();
             GlobeGeometryFeature g(_globeNode, _defaultProperties, propsFromFile);
             g.createFromSingleGeosGeometry(geometry, index, _ignoreHeightsFromFile);
-            g.initializeGL(_pointsProgram.get(), _linesAndPolygonsProgram.get());
+            g.initializeGL(_polygonsProgram, _pointsBatch, _linesBatch);
             _geometryFeatures.push_back(std::move(g));
+            stats.derive += Clock::now() - deriveStart;
 
             std::string name = _geometryFeatures.back().key();
             std::string identifier = makeIdentifier(name);
 
+            const Clock::time_point registerStart = Clock::now();
+
             // If there is already an owner with that name as an identifier, make a unique
             // one
             if (_featuresPropertyOwner.hasPropertySubOwner(identifier)) {
-                identifier = std::format("Feature{}-", index, identifier);
+                identifier = std::format("Feature{}-{}", index, identifier);
             }
 
             const PropertyOwner::PropertyOwnerInfo info = {
@@ -719,6 +833,28 @@ void GeoJsonComponent::parseSingleFeature(const geos::io::GeoJSONFeature& featur
             addMetaPropertiesToFeature(*_features.back(), index, geometry);
 
             _featuresPropertyOwner.addPropertySubOwner(_features.back().get());
+            stats.registration += Clock::now() - registerStart;
+
+            // Record the derived data for the load cache
+            const GlobeGeometryFeature& gf = _geometryFeatures.back();
+            const SubFeatureProps& props = *_features.back();
+            geojson::CachedRenderedFeature cached;
+            cached.geometryType = static_cast<int32_t>(gf.type());
+            cached.geoCoordinates.reserve(gf.geoCoordinates().size());
+            for (const std::vector<Geodetic3>& ring : gf.geoCoordinates()) {
+                cached.geoCoordinates.push_back(geojson::toCached(ring));
+            }
+            cached.triangleCoordinates = geojson::toCached(gf.triangleCoordinates());
+            cached.heightUpdateReferencePoints =
+                geojson::toCached(gf.heightUpdateReferencePoints());
+            cached.key = gf.key();
+            const glm::vec2 centroid = props.centroidLatLong;
+            cached.centroidLatLong = { centroid.x, centroid.y };
+            const glm::vec4 bbox = props.boundingboxLatLong;
+            cached.boundingboxLatLong = { bbox.x, bbox.y, bbox.z, bbox.w };
+            cached.identifier = props.identifier();
+            cached.name = props.guiName();
+            cachedFeature.rendered.push_back(std::move(cached));
         }
         catch (const ghoul::RuntimeError& error) {
             LERROR(std::format(
@@ -728,6 +864,56 @@ void GeoJsonComponent::parseSingleFeature(const geos::io::GeoJSONFeature& featur
             ));
             LERRORC(error.component, error.message);
             // Do nothing
+        }
+    }
+
+    // Features that failed and were skipped are simply absent from the cache, so warm
+    // loads reproduce the surviving set (without repeating the cold-path warnings)
+    if (!cachedFeature.rendered.empty()) {
+        cacheOut.features.push_back(std::move(cachedFeature));
+    }
+}
+
+void GeoJsonComponent::loadFromCache(const geojson::GeoJsonCacheFile& cache) {
+    for (const geojson::CachedSourceFeature& source : cache.features) {
+        GeoJsonOverrideProperties props = geojson::fromCached(source.overrides);
+
+        for (const geojson::CachedRenderedFeature& r : source.rendered) {
+            const int index = static_cast<int>(_geometryFeatures.size());
+
+            GlobeGeometryFeature g(_globeNode, _defaultProperties, props);
+            std::vector<std::vector<Geodetic3>> geoCoords;
+            geoCoords.reserve(r.geoCoordinates.size());
+            for (const std::vector<geojson::CachedGeodetic3>& ring : r.geoCoordinates) {
+                geoCoords.push_back(geojson::fromCached(ring));
+            }
+            g.setFromCachedData(
+                static_cast<GlobeGeometryFeature::GeometryType>(r.geometryType),
+                std::move(geoCoords),
+                geojson::fromCached(r.triangleCoordinates),
+                geojson::fromCached(r.heightUpdateReferencePoints),
+                r.key
+            );
+            g.initializeGL(_polygonsProgram, _pointsBatch, _linesBatch);
+            _geometryFeatures.push_back(std::move(g));
+
+            // Identifiers were de-duplicated on the cold path and are replayed
+            // verbatim, in the same order, so the GUI listing is identical
+            const PropertyOwner::PropertyOwnerInfo info = { r.identifier, r.name };
+            _features.push_back(std::make_unique<SubFeatureProps>(info));
+            SubFeatureProps& f = *_features.back();
+            f.centroidLatLong =
+                glm::vec2(r.centroidLatLong[0], r.centroidLatLong[1]);
+            f.boundingboxLatLong = glm::vec4(
+                r.boundingboxLatLong[0],
+                r.boundingboxLatLong[1],
+                r.boundingboxLatLong[2],
+                r.boundingboxLatLong[3]
+            );
+            computeFeatureDiagonal(f);
+            f.flyToFeature.onChange([this, index]() { flyToFeature(index); });
+
+            _featuresPropertyOwner.addPropertySubOwner(_features.back().get());
         }
     }
 }
@@ -765,6 +951,13 @@ void GeoJsonComponent::addMetaPropertiesToFeature(SubFeatureProps& feature, int 
     }
 
     feature.boundingboxLatLong = boundingboxLatLong;
+    computeFeatureDiagonal(feature);
+
+    feature.flyToFeature.onChange([this, index]() { flyToFeature(index); });
+}
+
+void GeoJsonComponent::computeFeatureDiagonal(SubFeatureProps& feature) const {
+    const glm::vec4 boundingboxLatLong = feature.boundingboxLatLong;
 
     // Compute the diagonal distance of the bounding box
     const Geodetic2 pos0 = {
@@ -779,8 +972,6 @@ void GeoJsonComponent::addMetaPropertiesToFeature(SubFeatureProps& feature, int 
     feature.boundingBoxDiagonal = static_cast<float>(
         std::abs(_globeNode.ellipsoid().greatCircleDistance(pos0, pos1))
     );
-
-    feature.flyToFeature.onChange([this, index]() { flyToFeature(index); });
 }
 
 void GeoJsonComponent::computeMainFeatureMetaPropeties() {

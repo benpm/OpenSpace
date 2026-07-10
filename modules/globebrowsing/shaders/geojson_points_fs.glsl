@@ -28,11 +28,10 @@ in Data {
   vec4 positionViewSpace;
   vec2 texCoords;
   flat float screenSpaceDepth;
+  flat vec4 color;
 } in_data;
 
 uniform sampler2D pointTexture;
-uniform vec3 color;
-uniform float opacity;
 
 // Can be used to preserve the whites in a point texture
 const bool PreserveWhite = true;
@@ -43,9 +42,9 @@ Fragment getFragment() {
 
   frag.color = texture(pointTexture, in_data.texCoords);
   if (!PreserveWhite || frag.color.r * frag.color.g * frag.color.b < 0.95) {
-    frag.color.rgb *= color;
+    frag.color.rgb *= in_data.color.rgb;
   }
-  frag.color.a *= opacity;
+  frag.color.a *= in_data.color.a;
 
   if (frag.color.a < 0.01) {
     discard;

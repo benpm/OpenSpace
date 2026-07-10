@@ -39,7 +39,6 @@
 #include <ghoul/opengl/openglstatecache.h>
 #include <ghoul/opengl/programobject.h>
 #include <ghoul/opengl/texture.h>
-#include <ghoul/opengl/textureunit.h>
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/Geometry.h>
 #include <geos/geom/LinearRing.h>
@@ -54,6 +53,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <limits>
+#include <span>
 #include <stdexcept>
 #include <string_view>
 #include <utility>
@@ -85,11 +85,13 @@ void GlobeGeometryFeature::setOffsets(glm::vec3 offsets) {
     _offsets = std::move(offsets);
 }
 
-void GlobeGeometryFeature::initializeGL(ghoul::opengl::ProgramObject* pointsProgram,
-                                    ghoul::opengl::ProgramObject* linesAndPolygonsProgram)
+void GlobeGeometryFeature::initializeGL(ghoul::opengl::ProgramObject* polygonsProgram,
+                                        rendering::MultiDrawBatch* pointsBatch,
+                                        rendering::MultiDrawBatch* linesBatch)
 {
-    _pointsProgram = pointsProgram;
-    _linesAndPolygonsProgram = linesAndPolygonsProgram;
+    _polygonsProgram = polygonsProgram;
+    _pointsBatch = pointsBatch;
+    _linesBatch = linesBatch;
 
     if (isPoints()) {
         updateTexture(true);
@@ -97,19 +99,14 @@ void GlobeGeometryFeature::initializeGL(ghoul::opengl::ProgramObject* pointsProg
 }
 
 void GlobeGeometryFeature::deinitializeGL() {
-    for (const RenderFeature& r : _renderFeatures) {
-        glDeleteVertexArrays(1, &r.vaoId);
-        glDeleteBuffers(1, &r.vertexVboId);
-        glDeleteBuffers(1, &r.heightVboId);
-    }
-
+    clearRenderFeatures();
     _pointTexture = nullptr;
 }
 
 bool GlobeGeometryFeature::isReady() const {
-    const bool shadersAreReady = _linesAndPolygonsProgram && _pointsProgram;
+    const bool resourcesAreReady = _polygonsProgram && _pointsBatch && _linesBatch;
     const bool textureIsReady = !_hasTexture || _pointTexture;
-    return shadersAreReady && textureIsReady;
+    return resourcesAreReady && textureIsReady;
 }
 
 bool GlobeGeometryFeature::isPoints() const {
@@ -288,13 +285,41 @@ void GlobeGeometryFeature::createFromSingleGeosGeometry(const geos::geom::Geomet
     }
 }
 
+GlobeGeometryFeature::GeometryType GlobeGeometryFeature::type() const {
+    return _type;
+}
+
+const std::vector<std::vector<Geodetic3>>& GlobeGeometryFeature::geoCoordinates() const {
+    return _geoCoordinates;
+}
+
+const std::vector<Geodetic3>& GlobeGeometryFeature::triangleCoordinates() const {
+    return _triangleCoordinates;
+}
+
+const std::vector<Geodetic3>& GlobeGeometryFeature::heightUpdateReferencePoints() const {
+    return _heightUpdateReferencePoints;
+}
+
+void GlobeGeometryFeature::setFromCachedData(GeometryType type,
+                                       std::vector<std::vector<Geodetic3>> geoCoordinates,
+                                       std::vector<Geodetic3> triangleCoordinates,
+                                       std::vector<Geodetic3> heightUpdateReferencePoints,
+                                       std::string key)
+{
+    _type = type;
+    _geoCoordinates = std::move(geoCoordinates);
+    _triangleCoordinates = std::move(triangleCoordinates);
+    _heightUpdateReferencePoints = std::move(heightUpdateReferencePoints);
+    _key = std::move(key);
+}
+
 void GlobeGeometryFeature::render(const RenderData& renderData, int pass,
                                   float mainOpacity,
                                   const ExtraRenderData& extraRenderData)
 {
     ghoul_assert(pass >= 0 && pass < 2, "Render pass variable out of accepted range");
 
-    const float opacity = mainOpacity * _properties.opacity();
     const float fillOpacity = mainOpacity * _properties.fillOpacity();
 
     const glm::dmat4 globeModelTransform = _globe.modelTransform();
@@ -307,22 +332,23 @@ void GlobeGeometryFeature::render(const RenderData& renderData, int pass,
 
     const glm::dmat4 projectionTransform = renderData.camera.projectionMatrix();
 
-    glLineWidth(_properties.lineWidth() * extraRenderData.lineWidthScale);
-
     for (const RenderFeature& r : _renderFeatures) {
+        // Points and lines are rendered batched, through emitBatchedDraws
+        if (r.type != RenderType::Polygon) {
+            continue;
+        }
+
         if (r.isExtrusionFeature && !_properties.extrude()) {
             continue;
         }
 
-        const bool shouldRenderTwice = (r.type == RenderType::Polygon) &&
-            fillOpacity < 1.f && _properties.extrude();
+        const bool shouldRenderTwice = fillOpacity < 1.f && _properties.extrude();
 
         if (pass > 0 && !shouldRenderTwice) {
             continue;
         }
 
-        ghoul::opengl::ProgramObject* shader = (r.type == RenderType::Points) ?
-            _pointsProgram : _linesAndPolygonsProgram;
+        ghoul::opengl::ProgramObject* shader = _polygonsProgram;
 
         shader->activate();
         shader->setUniform("modelTransform", globeModelTransform);
@@ -332,40 +358,16 @@ void GlobeGeometryFeature::render(const RenderData& renderData, int pass,
         shader->setUniform("heightOffset", _offsets.z);
         shader->setUniform("useHeightMapData", useHeightMap());
 
-        if (shader == _linesAndPolygonsProgram) {
-            const rendering::LightSourceRenderData& ls = extraRenderData.lightSourceData;
-            shader->setUniform("normalTransform", normalTransform);
-            shader->setUniform("nLightSources", ls.nLightSources);
-            shader->setUniform("lightIntensities", ls.intensitiesBuffer);
-            shader->setUniform("lightDirectionsViewSpace", ls.directionsViewSpaceBuffer);
-        }
+        const rendering::LightSourceRenderData& ls = extraRenderData.lightSourceData;
+        shader->setUniform("normalTransform", normalTransform);
+        shader->setUniform("nLightSources", ls.nLightSources);
+        shader->setUniform("lightIntensities", ls.intensitiesBuffer);
+        shader->setUniform("lightDirectionsViewSpace", ls.directionsViewSpaceBuffer);
 
         glBindVertexArray(r.vaoId);
 
-        switch (r.type) {
-            case RenderType::Lines:
-                shader->setUniform(
-                    "opacity",
-                    r.isExtrusionFeature ? fillOpacity : opacity
-                );
-                renderLines(r);
-                break;
-            case RenderType::Points:
-                shader->setUniform("opacity", opacity);
-                renderPoints(
-                    r,
-                    renderData,
-                    extraRenderData.pointRenderMode,
-                    extraRenderData.pointSizeScale
-                );
-                break;
-            case RenderType::Polygon:
-                shader->setUniform("opacity", fillOpacity);
-                renderPolygons(r, shouldRenderTwice, pass);
-                break;
-            default:
-                throw ghoul::MissingCaseException();
-        }
+        shader->setUniform("opacity", fillOpacity);
+        renderPolygons(r, shouldRenderTwice, pass);
 
         shader->deactivate();
     }
@@ -376,77 +378,69 @@ void GlobeGeometryFeature::render(const RenderData& renderData, int pass,
     global::renderEngine->openglStateCache().resetPolygonAndClippingState();
 }
 
-void GlobeGeometryFeature::renderPoints(const RenderFeature& feature,
-                                        const RenderData& renderData,
-                                        const PointRenderMode& renderMode,
-                                        float sizeScale) const
+void GlobeGeometryFeature::emitBatchedDraws(float mainOpacity,
+                                        const ExtraRenderData& extraRenderData,
+                                        bool wireframe,
+                                        std::map<int64_t, ghoul::opengl::Texture*>& pointTextures)
 {
-    ghoul_assert(feature.type == RenderType::Points, "Trying to render faulty geometry");
-    _pointsProgram->setUniform("color", _properties.color());
+    const float opacity = mainOpacity * _properties.opacity();
+    const float fillOpacity = mainOpacity * _properties.fillOpacity();
 
-    const float bs = static_cast<float>(_globe.boundingSphere());
-    const float size = 0.001f * sizeScale * _properties.pointSize() * bs;
-    _pointsProgram->setUniform("pointSize", size);
+    constexpr int64_t WireframeBit = GeoJsonDrawRecord::WireframeGroupBit;
 
-    _pointsProgram->setUniform("renderMode", static_cast<int>(renderMode));
+    for (const RenderFeature& r : _renderFeatures) {
+        if (r.batchHandle == rendering::MultiDrawBatch::InvalidHandle) {
+            continue;
+        }
+        if (r.isExtrusionFeature && !_properties.extrude()) {
+            continue;
+        }
 
-    using TextureAnchor = GeoJsonProperties::PointTextureAnchor;
-    _pointsProgram->setUniform(
-        "useBottomAnchorPoint",
-        _properties.pointTextureAnchor() != TextureAnchor::Center
-    );
+        GeoJsonDrawRecord record;
+        record.heightOffset = _offsets.z;
+        record.flags = useHeightMap() ? GeoJsonDrawRecord::FlagUseHeightMap : 0;
 
-    // Points are rendered as billboards
-    const glm::dvec3 cameraViewDirWorld = -renderData.camera.viewDirectionWorldSpace();
-    const glm::dvec3 cameraUpDirWorld = renderData.camera.lookUpVectorWorldSpace();
-    glm::dvec3 orthoRight = glm::normalize(
-        glm::cross(cameraUpDirWorld, cameraViewDirWorld)
-    );
-    if (orthoRight == glm::dvec3(0.0)) {
-        // For some reason, the up vector and camera view vector were the same. Use a
-        // slightly different vector
-        const glm::dvec3 otherVector = glm::vec3(
-            cameraUpDirWorld.y,
-            cameraUpDirWorld.x,
-            cameraUpDirWorld.z
-        );
-        orthoRight = glm::normalize(glm::cross(otherVector, cameraViewDirWorld));
+        if (r.type == RenderType::Lines) {
+            const glm::vec3 color = r.isExtrusionFeature ?
+                _properties.fillColor() : _properties.color();
+            record.color =
+                glm::vec4(color, r.isExtrusionFeature ? fillOpacity : opacity);
+            record.sizeOrWidth =
+                _properties.lineWidth() * extraRenderData.lineWidthScale;
+
+            _linesBatch->emitDraw(r.batchHandle, &record, wireframe ? WireframeBit : 0);
+        }
+        else if (r.type == RenderType::Points) {
+            record.color = glm::vec4(_properties.color(), opacity);
+
+            const float bs = static_cast<float>(_globe.boundingSphere());
+            record.sizeOrWidth =
+                0.001f * extraRenderData.pointSizeScale * _properties.pointSize() * bs;
+
+            ghoul::opengl::Texture* texture =
+                _pointTexture ? _pointTexture->texture() : nullptr;
+            record.textureWidthFactor = texture ?
+                static_cast<float>(texture->dimensions().x) /
+                static_cast<float>(texture->dimensions().y) :
+                1.f;
+
+            using TextureAnchor = GeoJsonProperties::PointTextureAnchor;
+            if (_properties.pointTextureAnchor() != TextureAnchor::Center) {
+                record.flags |= GeoJsonDrawRecord::FlagBottomAnchor;
+            }
+            record.flags |=
+                static_cast<uint32_t>(extraRenderData.pointRenderMode) <<
+                GeoJsonDrawRecord::FlagsRenderModeShift;
+
+            int64_t key = texture ? static_cast<int64_t>(GLuint(*texture)) : 0;
+            if (wireframe) {
+                key |= WireframeBit;
+            }
+            pointTextures[key] = texture;
+
+            _pointsBatch->emitDraw(r.batchHandle, &record, key);
+        }
     }
-    const glm::dvec3 orthoUp = glm::normalize(glm::cross(cameraViewDirWorld, orthoRight));
-
-    _pointsProgram->setUniform("cameraUp", glm::vec3(orthoUp));
-    _pointsProgram->setUniform("cameraRight", glm::vec3(orthoRight));
-
-    const glm::dvec3 cameraPositionWorld = renderData.camera.position();
-    _pointsProgram->setUniform("cameraPosition", cameraPositionWorld);
-    _pointsProgram->setUniform("cameraLookUp", glm::vec3(cameraUpDirWorld));
-
-    ghoul::opengl::TextureUnit unit;
-    unit.bind(*_pointTexture->texture());
-    _pointsProgram->setUniform("pointTexture", unit);
-
-    const float widthHeightRatio =
-        static_cast<float>(_pointTexture->texture()->dimensions().x) /
-        static_cast<float>(_pointTexture->texture()->dimensions().y);
-    _pointsProgram->setUniform("textureWidthFactor", widthHeightRatio);
-
-    glEnable(GL_PROGRAM_POINT_SIZE);
-    glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(feature.nVertices));
-    glDisable(GL_PROGRAM_POINT_SIZE);
-}
-
-void GlobeGeometryFeature::renderLines(const RenderFeature& feature) const {
-    ghoul_assert(feature.type == RenderType::Lines, "Trying to render faulty geometry");
-
-    const glm::vec3 color = feature.isExtrusionFeature ?
-        _properties.fillColor() : _properties.color();
-
-    _linesAndPolygonsProgram->setUniform("color", color);
-    _linesAndPolygonsProgram->setUniform("performShading", false);
-
-    glEnable(GL_LINE_SMOOTH);
-    glDrawArrays(GL_LINE_STRIP, 0, static_cast<GLsizei>(feature.nVertices));
-    glDisable(GL_LINE_SMOOTH);
 }
 
 void GlobeGeometryFeature::renderPolygons(const RenderFeature& feature,
@@ -458,8 +452,8 @@ void GlobeGeometryFeature::renderPolygons(const RenderFeature& feature,
         "Trying to render faulty geometry"
     );
 
-    _linesAndPolygonsProgram->setUniform("color", _properties.fillColor());
-    _linesAndPolygonsProgram->setUniform("performShading", _properties.performShading());
+    _polygonsProgram->setUniform("color", _properties.fillColor());
+    _polygonsProgram->setUniform("performShading", _properties.performShading());
 
     if (shouldRenderTwice) {
         glEnable(GL_CULL_FACE);
@@ -501,22 +495,25 @@ bool GlobeGeometryFeature::shouldUpdateDueToHeightMapChange() const {
     return !isSame;
 }
 
-void GlobeGeometryFeature::update(bool dataIsDirty, bool preventHeightUpdates) {
+bool GlobeGeometryFeature::update(bool dataIsDirty, bool preventHeightUpdates) {
+    bool geometryChanged = false;
     if (!preventHeightUpdates && shouldUpdateDueToHeightMapChange()) {
         updateHeightsFromHeightMap();
     }
     else if (dataIsDirty) {
         updateGeometry();
+        geometryChanged = true;
     }
 
     if (_pointTexture) {
         _pointTexture->update();
     }
+    return geometryChanged;
 }
 
 void GlobeGeometryFeature::updateGeometry() {
     // Update vertex data and compute model coordinates based on globe
-    _renderFeatures.clear();
+    clearRenderFeatures();
 
     if (_type == GeometryType::Point) {
         createPointGeometry();
@@ -763,13 +760,25 @@ void GlobeGeometryFeature::initializeRenderFeature(RenderFeature& feature,
     feature.vertices = geodetic2FromVertexList(_globe, vertices);
     feature.heights = heightMapHeightsFromGeodetic2List(_globe, feature.vertices);
 
-    ghoul_assert(_pointsProgram, "Shader program must be initialized");
-    ghoul_assert(_linesAndPolygonsProgram, "Shader program must be initialized");
+    // Points and lines go into the shared batches
+    if (feature.type == RenderType::Points || feature.type == RenderType::Lines) {
+        rendering::MultiDrawBatch* batch =
+            (feature.type == RenderType::Points) ? _pointsBatch : _linesBatch;
+        ghoul_assert(batch, "Batch must be initialized");
 
-    ghoul::opengl::ProgramObject* program = _linesAndPolygonsProgram;
-    if (feature.type == RenderType::Points) {
-        program = _pointsProgram;
+        const std::array<std::span<const std::byte>, 2> streamData = {
+            std::as_bytes(std::span(vertices)),
+            std::as_bytes(std::span(feature.heights))
+        };
+        feature.batchHandle = batch->addDraw(
+            static_cast<GLsizei>(vertices.size()),
+            streamData
+        );
+        return;
     }
+
+    ghoul_assert(_polygonsProgram, "Shader program must be initialized");
+    ghoul::opengl::ProgramObject* program = _polygonsProgram;
 
     // Generate buffers and buffer data
     glCreateBuffers(1, &feature.vertexVboId);
@@ -815,6 +824,22 @@ void GlobeGeometryFeature::initializeRenderFeature(RenderFeature& feature,
     glVertexArrayAttribBinding(feature.vaoId, heightAttrib, 1);
 }
 
+void GlobeGeometryFeature::clearRenderFeatures() {
+    for (const RenderFeature& r : _renderFeatures) {
+        if (r.batchHandle != rendering::MultiDrawBatch::InvalidHandle) {
+            rendering::MultiDrawBatch* batch =
+                (r.type == RenderType::Points) ? _pointsBatch : _linesBatch;
+            batch->removeDraw(r.batchHandle);
+        }
+        if (r.vaoId != 0) {
+            glDeleteVertexArrays(1, &r.vaoId);
+            glDeleteBuffers(1, &r.vertexVboId);
+            glDeleteBuffers(1, &r.heightVboId);
+        }
+    }
+    _renderFeatures.clear();
+}
+
 float GlobeGeometryFeature::tessellationStepSize() const {
     float distance = _properties.tessellationDistance();
     const bool shouldDivideDistance = _properties.useTessellationLevel() &&
@@ -844,8 +869,16 @@ std::vector<double> GlobeGeometryFeature::getCurrentReferencePointsHeights() con
 }
 
 void GlobeGeometryFeature::bufferDynamicHeightData(const RenderFeature& feature) {
-    ghoul_assert(_pointsProgram, "Shader program must be initialized");
-    ghoul_assert(_linesAndPolygonsProgram, "Shader program must be initialized");
+    if (feature.batchHandle != rendering::MultiDrawBatch::InvalidHandle) {
+        rendering::MultiDrawBatch* batch =
+            (feature.type == RenderType::Points) ? _pointsBatch : _linesBatch;
+        batch->updateStreamRange(
+            feature.batchHandle,
+            1,
+            std::as_bytes(std::span(feature.heights))
+        );
+        return;
+    }
 
     glNamedBufferData(
         feature.heightVboId,
