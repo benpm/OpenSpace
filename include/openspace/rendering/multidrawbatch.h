@@ -134,6 +134,7 @@ private:
     // Per-frame state
     std::vector<PendingDraw> _pending;
     std::vector<std::byte> _recordStaging;
+    std::vector<std::byte> _sortedRecordStaging;
     std::vector<GLint> _firsts;
     std::vector<GLsizei> _counts;
     std::vector<Group> _groups;

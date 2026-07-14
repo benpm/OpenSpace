@@ -39,6 +39,7 @@
 #include <openspace/properties/vector/vec4property.h>
 #include <openspace/rendering/helper.h>
 #include <chrono>
+#include <functional>
 #include <memory>
 #include <optional>
 
@@ -77,6 +78,15 @@ public:
     bool isReady() const;
     bool enabled() const;
 
+    /**
+     * Returns true when something that affects the batched draws changed since the
+     * last call to clearStyleDirty (property edits, fades, feature toggles, ...). The
+     * owning GeoJsonManager uses this to skip re-emitting the batch draw lists on
+     * frames where nothing changed.
+     */
+    bool styleIsDirty() const;
+    void clearStyleDirty();
+
     /// Renders the polygon features. Points and lines are rendered batched by the
     /// owning GeoJsonManager, fed through emitBatchedDraws
     void render(const RenderData& data);
@@ -100,6 +110,9 @@ private:
     class SubFeatureProps : public PropertyOwner, public Fadeable {
     public:
         SubFeatureProps(PropertyOwner::PropertyOwnerInfo info);
+
+        /// Register \p callback on every property that affects how the feature is drawn
+        void onStyleChange(std::function<void()> callback);
 
         BoolProperty enabled;
         Vec2Property centroidLatLong;
@@ -169,6 +182,15 @@ private:
     bool _dataIsDirty = true;
     bool _heightOffsetIsDirty = false;
     bool _textureIsDirty = false;
+    bool _styleIsDirty = true;
+    mutable bool _isReadyCached = false;
+
+    // Cached facts about the loaded features, used to skip the polygon render pass
+    // when no feature can possibly draw polygons. Extrude overrides are static after
+    // load; only the default extrude property is live
+    int _nFillPolygonFeatures = 0;
+    int _nExtrudeTrueOverride = 0;
+    int _nExtrudableNoOverride = 0;
 
     Vec2Property _centerLatLong;
     float _bboxDiagonalSize = 0.f;

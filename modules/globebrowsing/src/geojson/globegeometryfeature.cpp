@@ -320,7 +320,27 @@ void GlobeGeometryFeature::render(const RenderData& renderData, int pass,
 {
     ghoul_assert(pass >= 0 && pass < 2, "Render pass variable out of accepted range");
 
+    // Cheap rejection before any matrix math or GL work. This function only draws
+    // polygon render features (points and lines are batched); with tens of thousands
+    // of line features per file, per-feature per-frame overhead here dominates
+    const bool extrude = _properties.extrude();
     const float fillOpacity = mainOpacity * _properties.fillOpacity();
+    const bool shouldRenderTwice = fillOpacity < 1.f && extrude;
+
+    if (pass > 0 && !shouldRenderTwice) {
+        return;
+    }
+
+    const bool hasPolygonToDraw = std::any_of(
+        _renderFeatures.cbegin(),
+        _renderFeatures.cend(),
+        [extrude](const RenderFeature& r) {
+            return r.type == RenderType::Polygon && (!r.isExtrusionFeature || extrude);
+        }
+    );
+    if (!hasPolygonToDraw) {
+        return;
+    }
 
     const glm::dmat4 globeModelTransform = _globe.modelTransform();
     const glm::dmat4 modelViewTransform =
@@ -338,13 +358,7 @@ void GlobeGeometryFeature::render(const RenderData& renderData, int pass,
             continue;
         }
 
-        if (r.isExtrusionFeature && !_properties.extrude()) {
-            continue;
-        }
-
-        const bool shouldRenderTwice = fillOpacity < 1.f && _properties.extrude();
-
-        if (pass > 0 && !shouldRenderTwice) {
+        if (r.isExtrusionFeature && !extrude) {
             continue;
         }
 

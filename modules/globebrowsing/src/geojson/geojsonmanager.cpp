@@ -42,6 +42,7 @@
 #include <ghoul/opengl/texture.h>
 #include <ghoul/opengl/textureunit.h>
 #include <algorithm>
+#include <chrono>
 #include <functional>
 #include <utility>
 
@@ -138,6 +139,7 @@ void GeoJsonManager::deleteLayer(const std::string& layerIdentifier) {
             if (_pointsBatch.isInitialized()) {
                 _pointsBatch.commit();
                 _linesBatch.commit();
+                _emitIsDirty = true;
             }
             return;
         }
@@ -147,6 +149,9 @@ void GeoJsonManager::deleteLayer(const std::string& layerIdentifier) {
 
 void GeoJsonManager::update() {
     ZoneScoped;
+
+    const std::chrono::steady_clock::time_point start =
+        std::chrono::steady_clock::now();
 
     bool geometryChanged = false;
     for (std::unique_ptr<GeoJsonComponent>& obj : _geoJsonObjects) {
@@ -158,7 +163,10 @@ void GeoJsonManager::update() {
     if (geometryChanged) {
         _pointsBatch.commit();
         _linesBatch.commit();
+        _emitIsDirty = true;
     }
+
+    _perfUpdateTime += std::chrono::steady_clock::now() - start;
 }
 
 void GeoJsonManager::render(const RenderData& data) {
@@ -168,17 +176,37 @@ void GeoJsonManager::render(const RenderData& data) {
         return;
     }
 
-    // Collect this frame's points and lines draws from all components
-    _pointsBatch.beginFrame();
-    _linesBatch.beginFrame();
-    _pointTextures.clear();
-    for (std::unique_ptr<GeoJsonComponent>& obj : _geoJsonObjects) {
-        if (obj->enabled()) {
-            obj->emitBatchedDraws(_pointTextures);
-        }
+    using Clock = std::chrono::steady_clock;
+    const Clock::time_point start = Clock::now();
+    if (_perfLastRender.time_since_epoch().count() != 0) {
+        _perfFrameInterval += start - _perfLastRender;
     }
-    _pointsBatch.endFrame();
-    _linesBatch.endFrame();
+    _perfLastRender = start;
+
+    // The emitted draw lists and per-draw data only depend on properties, not on the
+    // camera, so they are rebuilt only when something changed since the last frame
+    bool needEmit = _emitIsDirty;
+    for (const std::unique_ptr<GeoJsonComponent>& obj : _geoJsonObjects) {
+        needEmit |= obj->styleIsDirty();
+    }
+
+    if (needEmit) {
+        // Collect this frame's points and lines draws from all components
+        _pointsBatch.beginFrame();
+        _linesBatch.beginFrame();
+        _pointTextures.clear();
+        for (std::unique_ptr<GeoJsonComponent>& obj : _geoJsonObjects) {
+            if (obj->enabled()) {
+                obj->emitBatchedDraws(_pointTextures);
+            }
+            obj->clearStyleDirty();
+        }
+        _pointsBatch.endFrame();
+        _linesBatch.endFrame();
+        _emitIsDirty = false;
+    }
+
+    const Clock::time_point emitted = Clock::now();
 
     if (_pointsBatch.nDrawsThisFrame() > 0 || _linesBatch.nDrawsThisFrame() > 0) {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -199,6 +227,32 @@ void GeoJsonManager::render(const RenderData& data) {
         if (obj->enabled()) {
             obj->render(data);
         }
+    }
+
+    const Clock::time_point end = Clock::now();
+    _perfEmitTime += emitted - start;
+    _perfRenderTime += end - emitted;
+    _perfFrameCount++;
+
+    if (end - _perfLastLog > std::chrono::seconds(10)) {
+        if (_perfFrameCount > 0 && _perfLastLog.time_since_epoch().count() != 0) {
+            const auto avgMs = [this](Clock::duration d) {
+                return std::chrono::duration<double, std::milli>(d).count() /
+                    _perfFrameCount;
+            };
+            LDEBUG(std::format(
+                "GeoJson perf over {} frames: frame interval {:.2f} ms, emit {:.2f} ms, "
+                "draw submit {:.2f} ms, update {:.2f} ms",
+                _perfFrameCount, avgMs(_perfFrameInterval), avgMs(_perfEmitTime),
+                avgMs(_perfRenderTime), avgMs(_perfUpdateTime)
+            ));
+        }
+        _perfFrameCount = 0;
+        _perfFrameInterval = {};
+        _perfEmitTime = {};
+        _perfRenderTime = {};
+        _perfUpdateTime = {};
+        _perfLastLog = end;
     }
 }
 

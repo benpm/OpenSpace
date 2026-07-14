@@ -30,6 +30,7 @@
 #include <modules/globebrowsing/src/geojson/geojsoncomponent.h>
 #include <openspace/rendering/multidrawbatch.h>
 #include <ghoul/opengl/bufferbinding.h>
+#include <chrono>
 #include <map>
 #include <memory>
 
@@ -92,6 +93,18 @@ private:
 
     /// Textures used by this frame's point draws, keyed by draw group key
     std::map<int64_t, ghoul::opengl::Texture*> _pointTextures;
+
+    /// Forces a rebuild of the emitted draw lists (set when batch geometry changes)
+    bool _emitIsDirty = true;
+
+    // Rolling performance counters, logged periodically at debug level
+    std::chrono::steady_clock::duration _perfFrameInterval{};
+    std::chrono::steady_clock::duration _perfEmitTime{};
+    std::chrono::steady_clock::duration _perfRenderTime{};
+    std::chrono::steady_clock::duration _perfUpdateTime{};
+    std::chrono::steady_clock::time_point _perfLastRender{};
+    std::chrono::steady_clock::time_point _perfLastLog{};
+    int _perfFrameCount = 0;
 };
 
 } // namespace openspace

@@ -231,15 +231,24 @@ void MultiDrawBatch::endFrame() {
         return;
     }
 
-    // Stable sort keeps emission order within each group deterministic
-    std::stable_sort(
-        _pending.begin(),
-        _pending.end(),
+    // In the common case draws are emitted already grouped (often a single group), in
+    // which case the sort and the record reshuffle can be skipped entirely
+    const bool alreadyGrouped = std::is_sorted(
+        _pending.cbegin(),
+        _pending.cend(),
         [](const PendingDraw& a, const PendingDraw& b) { return a.groupKey < b.groupKey; }
     );
 
-    std::vector<std::byte> sortedRecords;
-    sortedRecords.reserve(_recordStaging.size());
+    if (!alreadyGrouped) {
+        // Stable sort keeps emission order within each group deterministic
+        std::stable_sort(
+            _pending.begin(),
+            _pending.end(),
+            [](const PendingDraw& a, const PendingDraw& b) {
+                return a.groupKey < b.groupKey;
+            }
+        );
+    }
 
     _firsts.reserve(_pending.size());
     _counts.reserve(_pending.size());
@@ -257,17 +266,27 @@ void MultiDrawBatch::endFrame() {
 
         _firsts.push_back(d.first);
         _counts.push_back(d.nVertices);
-        sortedRecords.insert(
-            sortedRecords.end(),
-            _recordStaging.begin() + p.recordOffset,
-            _recordStaging.begin() + p.recordOffset + _drawRecordSize
-        );
+    }
+
+    const std::byte* records = _recordStaging.data();
+    if (!alreadyGrouped) {
+        // Reorder the records to match the sorted draw order
+        _sortedRecordStaging.clear();
+        _sortedRecordStaging.reserve(_recordStaging.size());
+        for (const PendingDraw& p : _pending) {
+            _sortedRecordStaging.insert(
+                _sortedRecordStaging.end(),
+                _recordStaging.begin() + p.recordOffset,
+                _recordStaging.begin() + p.recordOffset + _drawRecordSize
+            );
+        }
+        records = _sortedRecordStaging.data();
     }
 
     glNamedBufferData(
         _ssbo,
-        static_cast<GLsizeiptr>(sortedRecords.size()),
-        sortedRecords.data(),
+        static_cast<GLsizeiptr>(_recordStaging.size()),
+        records,
         GL_STREAM_DRAW
     );
 }

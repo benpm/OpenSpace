@@ -291,6 +291,12 @@ GeoJsonComponent::SubFeatureProps::SubFeatureProps(PropertyOwner::PropertyOwnerI
     addProperty(boundingboxLatLong);
 }
 
+void GeoJsonComponent::SubFeatureProps::onStyleChange(std::function<void()> callback) {
+    enabled.onChange(callback);
+    _opacity.onChange(callback);
+    _fade.onChange(std::move(callback));
+}
+
 GeoJsonComponent::GeoJsonComponent(const ghoul::Dictionary& dictionary,
                                    RenderableGlobe& globe)
     : PropertyOwner({
@@ -426,6 +432,22 @@ GeoJsonComponent::GeoJsonComponent(const ghoul::Dictionary& dictionary,
     _deletePropertyOwner.addProperty(_deleteThisComponent);
     addPropertySubOwner(_deletePropertyOwner);
 
+    // Anything that affects how the batched points and lines are drawn marks the style
+    // dirty, so that the GeoJsonManager knows to rebuild the shared draw lists. On
+    // frames where nothing changed, the previous lists and per-draw data are reused
+    auto markStyleDirty = [this]() { _styleIsDirty = true; };
+    _enabled.onChange(markStyleDirty);
+    _opacity.onChange(markStyleDirty);
+    _fade.onChange(markStyleDirty);
+    _heightOffset.onChange(markStyleDirty);
+    _pointSizeScale.onChange(markStyleDirty);
+    _lineWidthScale.onChange(markStyleDirty);
+    _pointRenderModeOption.onChange(markStyleDirty);
+    _drawWireframe.onChange(markStyleDirty);
+    for (Property* p : _defaultProperties.propertiesRecursive()) {
+        p->onChange(markStyleDirty);
+    }
+
     readFile();
 
     if (p.lightSources.has_value()) {
@@ -460,6 +482,14 @@ bool GeoJsonComponent::enabled() const {
     return _enabled;
 }
 
+bool GeoJsonComponent::styleIsDirty() const {
+    return _styleIsDirty;
+}
+
+void GeoJsonComponent::clearStyleDirty() {
+    _styleIsDirty = false;
+}
+
 void GeoJsonComponent::initialize() {
     ZoneScoped;
 
@@ -491,19 +521,39 @@ void GeoJsonComponent::deinitializeGL() {
     _polygonsProgram = nullptr;
     _pointsBatch = nullptr;
     _linesBatch = nullptr;
+    _isReadyCached = false;
 }
 
 bool GeoJsonComponent::isReady() const {
-    const bool isReady = std::all_of(
+    // Called every frame; scanning tens of thousands of features is not free, and once
+    // everything is ready it stays ready until deinitializeGL or a file reload
+    if (_isReadyCached) {
+        return true;
+    }
+    const bool isReady = _polygonsProgram && std::all_of(
         _geometryFeatures.cbegin(),
         _geometryFeatures.cend(),
         std::mem_fn(&GlobeGeometryFeature::isReady)
     );
-    return isReady && _polygonsProgram;
+    _isReadyCached = isReady;
+    return isReady;
 }
 
 void GeoJsonComponent::render(const RenderData& data) {
     if (!_enabled || !isVisible()) {
+        return;
+    }
+
+    // This pass only draws polygon render features (points and lines are batched by
+    // the manager). Skip the whole per-feature loop when no feature can draw polygons:
+    // fill polygons only exist for Polygon geometry, and extrusion polygons only draw
+    // when the feature's resolved extrude value is true. Extrude overrides are static,
+    // so only the default property is read here
+    const bool anyPolygonsToDraw =
+        _nFillPolygonFeatures > 0 ||
+        _nExtrudeTrueOverride > 0 ||
+        (_nExtrudableNoOverride > 0 && _defaultProperties.extrude);
+    if (!anyPolygonsToDraw) {
         return;
     }
 
@@ -605,6 +655,8 @@ bool GeoJsonComponent::update() {
 
         if (_textureIsDirty) [[unlikely]] {
             g.updateTexture();
+            // A changed texture changes the point draw group keys
+            _styleIsDirty = true;
         }
 
         geometryChanged |= g.update(_dataIsDirty, _preventUpdatesFromHeightMap);
@@ -625,6 +677,11 @@ void GeoJsonComponent::readFile() {
     }
 
     _geometryFeatures.clear();
+    _isReadyCached = false;
+    _styleIsDirty = true;
+    _nFillPolygonFeatures = 0;
+    _nExtrudeTrueOverride = 0;
+    _nExtrudableNoOverride = 0;
 
     using Clock = std::chrono::steady_clock;
     const auto secs = [](Clock::duration d) {
@@ -829,11 +886,26 @@ void GeoJsonComponent::parseSingleFeature(const geojson::ParsedFeature& feature,
                 // @TODO: Use description from file, if any
             };
             _features.push_back(std::make_unique<SubFeatureProps>(info));
+            _features.back()->onStyleChange([this]() { _styleIsDirty = true; });
 
             addMetaPropertiesToFeature(*_features.back(), index, geometry);
 
             _featuresPropertyOwner.addPropertySubOwner(_features.back().get());
             stats.registration += Clock::now() - registerStart;
+
+            using GeometryType = GlobeGeometryFeature::GeometryType;
+            const GeometryType featureType = _geometryFeatures.back().type();
+            if (featureType == GeometryType::Polygon) {
+                _nFillPolygonFeatures++;
+            }
+            else if (featureType == GeometryType::LineString) {
+                if (propsFromFile.extrude.value_or(false)) {
+                    _nExtrudeTrueOverride++;
+                }
+                else if (!propsFromFile.extrude.has_value()) {
+                    _nExtrudableNoOverride++;
+                }
+            }
 
             // Record the derived data for the load cache
             const GlobeGeometryFeature& gf = _geometryFeatures.back();
@@ -902,6 +974,7 @@ void GeoJsonComponent::loadFromCache(const geojson::GeoJsonCacheFile& cache) {
             const PropertyOwner::PropertyOwnerInfo info = { r.identifier, r.name };
             _features.push_back(std::make_unique<SubFeatureProps>(info));
             SubFeatureProps& f = *_features.back();
+            f.onStyleChange([this]() { _styleIsDirty = true; });
             f.centroidLatLong =
                 glm::vec2(r.centroidLatLong[0], r.centroidLatLong[1]);
             f.boundingboxLatLong = glm::vec4(
@@ -914,6 +987,20 @@ void GeoJsonComponent::loadFromCache(const geojson::GeoJsonCacheFile& cache) {
             f.flyToFeature.onChange([this, index]() { flyToFeature(index); });
 
             _featuresPropertyOwner.addPropertySubOwner(_features.back().get());
+
+            using GeometryType = GlobeGeometryFeature::GeometryType;
+            const GeometryType featureType = _geometryFeatures.back().type();
+            if (featureType == GeometryType::Polygon) {
+                _nFillPolygonFeatures++;
+            }
+            else if (featureType == GeometryType::LineString) {
+                if (props.extrude.value_or(false)) {
+                    _nExtrudeTrueOverride++;
+                }
+                else if (!props.extrude.has_value()) {
+                    _nExtrudableNoOverride++;
+                }
+            }
         }
     }
 }
