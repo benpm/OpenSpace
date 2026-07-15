@@ -35,6 +35,7 @@
 #include <cstdint>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -202,13 +203,47 @@ public:
     void emitBatchedDraws(float mainOpacity, const ExtraRenderData& extraRenderData,
         bool wireframe, std::map<int64_t, ghoul::opengl::Texture*>& pointTextures);
 
-    bool shouldUpdateDueToHeightMapChange() const;
+    /**
+     * Install per-render-feature heights loaded from the heights cache, along with
+     * the reference heights they were sampled against. They are consumed, in render
+     * feature build order, by the next geometry build; each vector is validated by
+     * vertex count and any mismatch discards the rest (alignment is positional).
+     * Later rebuilds are unaffected
+     */
+    void setPendingCachedHeights(std::vector<std::vector<float>> heights,
+        std::vector<double> controlHeights);
+
+    /// Copies of each render feature's heights, in build order (for the heights cache)
+    std::vector<std::vector<float>> currentHeights() const;
+
+    /// The reference heights the current per-vertex heights were computed with
+    const std::vector<double>& lastControlHeights() const;
+
+    /**
+     * Check whether the height map heights at the feature's reference points differ
+     * from the values the current per-vertex heights were computed with. Returns the
+     * new reference heights when they differ (pass them to applyHeightUpdate), or
+     * nullopt when nothing changed or the feature does not use the height map. With
+     * \p force, the new heights are returned without comparing. The polling cadence
+     * is owned by the GeoJsonComponent's refinement sweep
+     */
+    std::optional<std::vector<double>> checkHeightMapChange(bool force = false) const;
+
+    /**
+     * Re-sample the height map for all of the feature's vertices, upload the new
+     * heights and store \p newControlHeights as the reference state that
+     * checkHeightMapChange compares against
+     */
+    void applyHeightUpdate(std::vector<double> newControlHeights);
+
+    /// Number of vertices that a height re-sample has to query the globe for.
+    /// Used by the component to budget its refinement sweep
+    size_t heightVertexCount() const;
 
     /// Returns true if the geometry was rebuilt, i.e. draws were added to or removed
     /// from the shared batches, so that the owner knows to re-commit them
-    bool update(bool dataIsDirty, bool preventHeightUpdates);
+    bool update(bool dataIsDirty);
     void updateGeometry();
-    void updateHeightsFromHeightMap();
 
 private:
     rendering::MultiDrawBatch* batchForRenderType(RenderType type) const;
@@ -278,7 +313,12 @@ private:
 
     std::vector<Geodetic3> _heightUpdateReferencePoints;
     std::vector<double> _lastControlHeights;
-    std::chrono::system_clock::time_point _lastHeightUpdateTime;
+
+    // Heights installed from the heights cache, consumed by the next geometry build
+    std::vector<std::vector<float>> _pendingCachedHeights;
+    std::vector<double> _pendingControlHeights;
+    size_t _pendingHeightsCursor = 0;
+    bool _pendingHeightsValid = false;
 
     bool _hasTexture = false;
     std::unique_ptr<TextureComponent> _pointTexture;

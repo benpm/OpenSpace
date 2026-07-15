@@ -291,8 +291,9 @@ namespace {
         "The altitude mode decides how any height values of the geo coordinates should "
         "be interpreted. Absolute means that the height is interpreted as the height "
         "above the reference ellipsoid, while RelativeToGround takes the height map "
-        "into account. For coordinates with only two values (latitude and longitude), "
-        "the height is considered to be equal to zero.",
+        "into account, so that the geometry stays above the terrain. For coordinates "
+        "with only two values (latitude and longitude), the height is considered to be "
+        "equal to zero.",
         Property::Visibility::User
     };
 

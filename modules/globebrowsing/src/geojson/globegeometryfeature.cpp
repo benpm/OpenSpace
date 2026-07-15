@@ -60,8 +60,6 @@
 
 namespace {
     constexpr std::string_view _loggerCat = "GlobeGeometryFeature";
-
-    constexpr std::chrono::milliseconds HeightUpdateInterval(10000);
 } // namespace
 
 namespace openspace {
@@ -74,7 +72,6 @@ GlobeGeometryFeature::GlobeGeometryFeature(const RenderableGlobe& globe,
         .defaultValues = defaultProperties,
         .overrideValues = overrideProperties
     })
-    , _lastHeightUpdateTime(std::chrono::system_clock::now())
 {}
 
 std::string GlobeGeometryFeature::key() const {
@@ -409,23 +406,42 @@ void GlobeGeometryFeature::emitBatchedDraws(float mainOpacity,
     }
 }
 
-bool GlobeGeometryFeature::shouldUpdateDueToHeightMapChange() const {
+void GlobeGeometryFeature::setPendingCachedHeights(
+                                                 std::vector<std::vector<float>> heights,
+                                                   std::vector<double> controlHeights)
+{
+    _pendingCachedHeights = std::move(heights);
+    _pendingControlHeights = std::move(controlHeights);
+    _pendingHeightsCursor = 0;
+    _pendingHeightsValid = !_pendingCachedHeights.empty();
+}
+
+std::vector<std::vector<float>> GlobeGeometryFeature::currentHeights() const {
+    std::vector<std::vector<float>> res;
+    res.reserve(_renderFeatures.size());
+    for (const RenderFeature& f : _renderFeatures) {
+        res.push_back(f.heights);
+    }
+    return res;
+}
+
+const std::vector<double>& GlobeGeometryFeature::lastControlHeights() const {
+    return _lastControlHeights;
+}
+
+std::optional<std::vector<double>> GlobeGeometryFeature::checkHeightMapChange(
+                                                                        bool force) const
+{
     if (_properties.altitudeMode() != GeoJsonProperties::AltitudeMode::RelativeToGround) {
-        return false;
+        return std::nullopt;
     }
 
-    // Cap the update to a given time interval
-    const auto now = std::chrono::system_clock::now();
-    if (now - _lastHeightUpdateTime < HeightUpdateInterval) {
-        return false;
-    }
-
-    // TODO: Change computation so that we return true immediately if even one height
-    // value is different
-
-    // Check if last height values for the control positions have changed
     std::vector<double> newHeights = getCurrentReferencePointsHeights();
+    if (force) {
+        return newHeights;
+    }
 
+    // Check if the height values at the control positions have changed
     const bool isSame = std::equal(
         _lastControlHeights.cbegin(),
         _lastControlHeights.cend(),
@@ -435,15 +451,38 @@ bool GlobeGeometryFeature::shouldUpdateDueToHeightMapChange() const {
             return std::abs(a - b) < std::numeric_limits<double>::epsilon();
         }
     );
-    return !isSame;
+    if (isSame) {
+        return std::nullopt;
+    }
+    return newHeights;
 }
 
-bool GlobeGeometryFeature::update(bool dataIsDirty, bool preventHeightUpdates) {
-    bool geometryChanged = false;
-    if (!preventHeightUpdates && shouldUpdateDueToHeightMapChange()) {
-        updateHeightsFromHeightMap();
+void GlobeGeometryFeature::applyHeightUpdate(std::vector<double> newControlHeights) {
+    for (RenderFeature& f : _renderFeatures) {
+        if (f.vertices.empty()) {
+            // Height data was skipped at build time (not in RelativeToGround mode)
+            continue;
+        }
+        f.heights = heightMapHeightsFromGeodetic2List(_globe, f.vertices);
+        bufferDynamicHeightData(f);
     }
-    else if (dataIsDirty) {
+
+    // Store the reference state the heights were computed with, so the next check
+    // compares against the applied heights instead of re-resampling forever
+    _lastControlHeights = std::move(newControlHeights);
+}
+
+size_t GlobeGeometryFeature::heightVertexCount() const {
+    size_t count = 0;
+    for (const RenderFeature& f : _renderFeatures) {
+        count += f.vertices.size();
+    }
+    return count;
+}
+
+bool GlobeGeometryFeature::update(bool dataIsDirty) {
+    bool geometryChanged = false;
+    if (dataIsDirty) {
         updateGeometry();
         geometryChanged = true;
     }
@@ -472,24 +511,29 @@ void GlobeGeometryFeature::updateGeometry() {
         createPolygonGeometry();
     }
 
-    // Compute new heights - to see if height map changed. Only relevant when the
-    // heights are actually used; the reference heights are also globe queries
-    _lastControlHeights =
-        useHeightMap() ? getCurrentReferencePointsHeights() : std::vector<double>();
-}
-
-void GlobeGeometryFeature::updateHeightsFromHeightMap() {
-    // @TODO: do the updating piece by piece, not all in one frame
-    for (RenderFeature& f : _renderFeatures) {
-        if (f.vertices.empty()) {
-            // Height data was skipped at build time (not in RelativeToGround mode)
-            continue;
-        }
-        f.heights = heightMapHeightsFromGeodetic2List(_globe, f.vertices);
-        bufferDynamicHeightData(f);
+    // Reference heights that the current per-vertex heights were computed with. With
+    // fully consumed cached heights the cached reference state applies; otherwise
+    // start at zero, which is what an unstreamed height map reports, so the first
+    // refinement sweep detects the difference once tiles stream in. No globe queries
+    // happen here
+    if (!useHeightMap()) {
+        _lastControlHeights.clear();
+    }
+    else if (_pendingHeightsValid &&
+             _pendingHeightsCursor == _pendingCachedHeights.size())
+    {
+        _lastControlHeights = std::move(_pendingControlHeights);
+    }
+    else {
+        _lastControlHeights.assign(_heightUpdateReferencePoints.size(), 0.0);
     }
 
-    _lastHeightUpdateTime = std::chrono::system_clock::now();
+    // Cached heights are only valid for the first build after installation; later
+    // rebuilds (changed tessellation, offsets, ...) sample fresh values
+    _pendingCachedHeights.clear();
+    _pendingControlHeights.clear();
+    _pendingHeightsCursor = 0;
+    _pendingHeightsValid = false;
 }
 
 std::vector<std::vector<glm::vec3>> GlobeGeometryFeature::createLineGeometry() {
@@ -711,15 +755,30 @@ void GlobeGeometryFeature::initializeRenderFeature(RenderFeature& feature,
                                                    const std::vector<Vertex>& vertices)
 {
     if (useHeightMap()) {
-        // Get height map heights
         feature.vertices = geodetic2FromVertexList(_globe, vertices);
-        feature.heights = heightMapHeightsFromGeodetic2List(_globe, feature.vertices);
+
+        if (_pendingHeightsValid &&
+            _pendingHeightsCursor < _pendingCachedHeights.size() &&
+            _pendingCachedHeights[_pendingHeightsCursor].size() == vertices.size())
+        {
+            // Use the heights loaded from the heights cache
+            feature.heights = std::move(_pendingCachedHeights[_pendingHeightsCursor]);
+            _pendingHeightsCursor++;
+        }
+        else {
+            // No cached heights, or the cached build configuration drifted. Start at
+            // zero — what an unstreamed height map reports — and let the component's
+            // refinement sweep fill in real values once tiles stream in. This avoids
+            // one globe height query per vertex at load time. Alignment with the
+            // cached vectors is positional, so a mismatch discards the rest
+            _pendingHeightsValid = false;
+            feature.heights.assign(vertices.size(), 0.f);
+        }
     }
     else {
         // The heights are only consumed by the shaders in RelativeToGround mode, so
-        // skip the expensive per-vertex globe height queries (and the retained
-        // geodetic copies). A change of the altitude mode marks the component's data
-        // dirty, which rebuilds the geometry with real heights
+        // skip the retained geodetic copies. A change of the altitude mode marks the
+        // component's data dirty, which rebuilds the geometry
         feature.heights.assign(vertices.size(), 0.f);
     }
 

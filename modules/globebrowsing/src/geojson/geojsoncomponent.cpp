@@ -24,6 +24,8 @@
 
 #include <modules/globebrowsing/src/geojson/geojsoncomponent.h>
 
+#include <modules/globebrowsing/src/layergroup.h>
+#include <modules/globebrowsing/src/layermanager.h>
 #include <modules/globebrowsing/src/renderableglobe.h>
 #include <openspace/documentation/documentation.h>
 #include <openspace/engine/globals.h>
@@ -64,6 +66,13 @@ namespace {
     using namespace openspace;
 
     constexpr std::string_view _loggerCat = "GeoJsonComponent";
+
+    // Height refinement sweep pacing: minimum time between the starts of two full
+    // sweeps, per-frame time budget for the reference-point change checks, and the
+    // per-frame budget of vertices to re-sample when changes are found
+    constexpr std::chrono::seconds MinSweepInterval(10);
+    constexpr std::chrono::microseconds SweepCheckTimeBudget(1500);
+    constexpr size_t SweepResampleVertexBudget = 30000;
 
     constexpr std::string_view KeyIdentifier = "Identifier";
     constexpr std::string_view KeyName = "Name";
@@ -122,7 +131,8 @@ namespace {
         "ForceUpdateHeightData",
         "Force update height data",
         "Triggering this leads to a recomputation of the heights based on the globe "
-        "height map value at the geometry's positions.",
+        "height map value at the geometry's positions. The recomputation is spread "
+        "over the following frames.",
         Property::Visibility::AdvancedUser
     };
 
@@ -409,9 +419,12 @@ GeoJsonComponent::GeoJsonComponent(const ghoul::Dictionary& dictionary,
     _defaultProperties.altitudeModeOption.onChange([this]() { _dataIsDirty = true; });
 
     _forceUpdateHeightData.onChange([this]() {
-        for (GlobeGeometryFeature& f : _geometryFeatures) {
-            f.updateHeightsFromHeightMap();
-        }
+        // Restart the refinement sweep in forced mode; the re-sampling is spread over
+        // the next frames rather than done all at once
+        _forceResampleAll = true;
+        _heightSweepActive = true;
+        _heightSweepCursor = 0;
+        _lastSweepStart = std::chrono::steady_clock::now();
     });
     addProperty(_forceUpdateHeightData);
 
@@ -532,6 +545,22 @@ void GeoJsonComponent::initializeGL(rendering::MultiDrawBatch* pointsBatch,
 }
 
 void GeoJsonComponent::deinitializeGL() {
+    // Persist the refined height map heights so that the next load of this file
+    // starts from the best known values instead of re-sampling from scratch. This
+    // must happen before the features release their render data below
+    if (_heightsDirtyForCache && !_heightsCacheFile.empty()) {
+        geojson::GeoJsonHeightsCacheFile out;
+        out.features.reserve(_geometryFeatures.size());
+        for (const GlobeGeometryFeature& g : _geometryFeatures) {
+            geojson::CachedFeatureHeights h;
+            h.controlHeights = g.lastControlHeights();
+            h.perRenderFeatureHeights = g.currentHeights();
+            out.features.push_back(std::move(h));
+        }
+        geojson::saveGeoJsonHeightsCache(out, _heightsCacheFile);
+        _heightsDirtyForCache = false;
+    }
+
     for (GlobeGeometryFeature& g : _geometryFeatures) {
         g.deinitializeGL();
     }
@@ -623,54 +652,110 @@ bool GeoJsonComponent::update() {
         return false;
     }
 
-    // Skip the whole per-feature loop on idle frames. It only does work when something
-    // is dirty, when point textures may need per-frame updates, or when heights may
-    // need re-sampling from the height map (RelativeToGround altitude mode). Altitude
-    // mode overrides are static after load; the default property is live
+    // Heights may need re-sampling from the height map (RelativeToGround altitude
+    // mode) as tiles stream in. Altitude mode overrides are static after load; the
+    // default property is live. A globe without active height layers reports zero
+    // heights everywhere, so there is nothing to refine
     using AltitudeMode = GeoJsonProperties::AltitudeMode;
     const bool anyRelativeToGround = _nRelativeToGroundOverride > 0 ||
         (_nAltitudeModeNoOverride > 0 &&
             _defaultProperties.altitudeMode() == AltitudeMode::RelativeToGround);
-    const bool needsLoop = _dataIsDirty || _heightOffsetIsDirty || _textureIsDirty ||
-        _nPointTextureFeatures > 0 ||
-        (anyRelativeToGround && !_preventUpdatesFromHeightMap);
-    if (!needsLoop) {
+    const bool globeHasHeightLayers = !_globeNode.layerManager().layerGroup(
+        layers::Group::ID::HeightLayers
+    ).activeLayers().empty();
+    const bool heightsEnabled = anyRelativeToGround && globeHasHeightLayers &&
+        !_preventUpdatesFromHeightMap;
+
+    const auto now = std::chrono::steady_clock::now();
+    if (heightsEnabled && !_heightSweepActive &&
+        now - _lastSweepStart >= MinSweepInterval)
+    {
+        _heightSweepActive = true;
+        _heightSweepCursor = 0;
+        _lastSweepStart = now;
+    }
+
+    // Skip all per-feature work on idle frames
+    const bool featureLoopNeeded = _dataIsDirty || _heightOffsetIsDirty ||
+        _textureIsDirty || _nPointTextureFeatures > 0;
+    if (!featureLoopNeeded && !(heightsEnabled && _heightSweepActive)) {
         return false;
     }
 
-    const glm::vec3 offsets = glm::vec3(_latLongOffset.value(), _heightOffset.value());
-    const bool textureWasDirty = _textureIsDirty;
-
+    const bool dataWasDirty = _dataIsDirty;
     bool geometryChanged = false;
 
-    // Note that geometry is updated even for disabled sub-features, so that their draws
-    // exist in the shared batches and they can be enabled or faded in without a rebuild
-    for (GlobeGeometryFeature& g : _geometryFeatures) {
-        if (_dataIsDirty || _heightOffsetIsDirty) [[unlikely]] {
-            g.setOffsets(offsets);
+    if (featureLoopNeeded) {
+        const glm::vec3 offsets =
+            glm::vec3(_latLongOffset.value(), _heightOffset.value());
+        const bool textureWasDirty = _textureIsDirty;
+
+        // Note that geometry is updated even for disabled sub-features, so that their
+        // draws exist in the shared batches and they can be enabled or faded in
+        // without a rebuild
+        for (GlobeGeometryFeature& g : _geometryFeatures) {
+            if (_dataIsDirty || _heightOffsetIsDirty) [[unlikely]] {
+                g.setOffsets(offsets);
+            }
+
+            if (_textureIsDirty) [[unlikely]] {
+                g.updateTexture();
+                // A changed texture changes the point draw group keys
+                _styleIsDirty = true;
+            }
+
+            geometryChanged |= g.update(_dataIsDirty);
         }
 
-        if (_textureIsDirty) [[unlikely]] {
-            g.updateTexture();
-            // A changed texture changes the point draw group keys
-            _styleIsDirty = true;
-        }
-
-        geometryChanged |= g.update(_dataIsDirty, _preventUpdatesFromHeightMap);
-    }
-
-    if (textureWasDirty) {
-        _nPointTextureFeatures = 0;
-        for (const GlobeGeometryFeature& g : _geometryFeatures) {
-            if (g.hasPointTexture()) {
-                _nPointTextureFeatures++;
+        if (textureWasDirty) {
+            _nPointTextureFeatures = 0;
+            for (const GlobeGeometryFeature& g : _geometryFeatures) {
+                if (g.hasPointTexture()) {
+                    _nPointTextureFeatures++;
+                }
             }
         }
+
+        _textureIsDirty = false;
+        _dataIsDirty = false;
+        _heightOffsetIsDirty = false;
     }
 
-    _textureIsDirty = false;
-    _dataIsDirty = false;
-    _heightOffsetIsDirty = false;
+    // Advance the height refinement sweep, budgeted per frame both in reference-point
+    // check time and in re-sampled vertices. Skipped on rebuild frames, where the
+    // fresh geometry establishes its own reference state
+    if (heightsEnabled && _heightSweepActive && !dataWasDirty) {
+        const auto sweepStart = std::chrono::steady_clock::now();
+        size_t resampledVertices = 0;
+        while (_heightSweepCursor < _geometryFeatures.size()) {
+            GlobeGeometryFeature& g = _geometryFeatures[_heightSweepCursor];
+
+            std::optional<std::vector<double>> newHeights =
+                g.checkHeightMapChange(_forceResampleAll);
+            if (newHeights.has_value()) {
+                // Always allow at least one re-sample per frame, even a large one
+                if (resampledVertices > 0 &&
+                    resampledVertices + g.heightVertexCount() >
+                        SweepResampleVertexBudget)
+                {
+                    break; // cursor stays; this feature is re-sampled next frame
+                }
+                g.applyHeightUpdate(std::move(*newHeights));
+                _heightsDirtyForCache = true;
+                resampledVertices += g.heightVertexCount();
+            }
+            _heightSweepCursor++;
+
+            if (std::chrono::steady_clock::now() - sweepStart > SweepCheckTimeBudget) {
+                break;
+            }
+        }
+        if (_heightSweepCursor >= _geometryFeatures.size()) {
+            _heightSweepActive = false;
+            _forceResampleAll = false;
+        }
+    }
+
     return geometryChanged;
 }
 
@@ -687,6 +772,9 @@ void GeoJsonComponent::readFile() {
     _features.clear();
     _featureMeta.clear();
     _usedFeatureIdentifiers.clear();
+    _loadedHeightsCache.reset();
+    _heightsCacheFile.clear();
+    _heightsDirtyForCache = false;
     _isReadyCached = false;
     _styleIsDirty = true;
     _nFillPolygonFeatures = 0;
@@ -717,6 +805,35 @@ void GeoJsonComponent::readFile() {
         );
         cacheFile = FileSys.cacheManager()->cachedFilename(source, cacheInfo);
 
+        // The heights sidecar cache holds the height map heights refined during
+        // earlier runs. It shares the source-modification-time component with the
+        // geometry cache above, so editing the source file invalidates both. It is
+        // additionally keyed on the globe (heights are per height map) and on the
+        // lat/long offset (it moves the sample positions). Missing or mismatching
+        // sidecar just means heights start at zero and refine at runtime
+        const glm::vec2 latLongOffset = _latLongOffset.value();
+        const std::string heightsCacheInfo = std::format(
+            "geojsonheights|v{}|globe{}|ih{}|off{}_{}|{}",
+            geojson::HeightsCacheVersion,
+            _globeNode.owner() ? _globeNode.owner()->identifier() : "unknown",
+            _ignoreHeightsFromFile ? 1 : 0,
+            latLongOffset.x, latLongOffset.y,
+            lastWrite
+        );
+        _heightsCacheFile =
+            FileSys.cacheManager()->cachedFilename(source, heightsCacheInfo);
+        if (std::filesystem::is_regular_file(_heightsCacheFile)) {
+            std::optional<geojson::GeoJsonHeightsCacheFile> heights =
+                geojson::loadGeoJsonHeightsCache(_heightsCacheFile);
+            if (heights && heights->version == geojson::HeightsCacheVersion) {
+                LDEBUG(std::format(
+                    "Using cached height map heights for {} features of '{}'",
+                    heights->features.size(), _geoJsonFile.value()
+                ));
+                _loadedHeightsCache = std::move(heights);
+            }
+        }
+
         if (std::filesystem::is_regular_file(cacheFile)) {
             std::optional<geojson::GeoJsonCacheFile> cached =
                 geojson::loadGeoJsonCache(cacheFile);
@@ -732,6 +849,7 @@ void GeoJsonComponent::readFile() {
                 loadFromCache(*cached);
                 computeMainFeatureMetaPropeties();
                 countPointTextureFeatures();
+                _loadedHeightsCache.reset();
                 LINFO(std::format(
                     "Loaded '{}' from cache: {} features in {:.2f} s",
                     _geoJsonFile.value(), _geometryFeatures.size(),
@@ -802,6 +920,7 @@ void GeoJsonComponent::readFile() {
 
     computeMainFeatureMetaPropeties();
     countPointTextureFeatures();
+    _loadedHeightsCache.reset();
 
     Clock::duration cacheWrite{};
     if (FileSys.cacheManager() && !_geometryFeatures.empty()) {
@@ -840,6 +959,19 @@ void GeoJsonComponent::countPointTextureFeatures() {
             _nPointTextureFeatures++;
         }
     }
+}
+
+void GeoJsonComponent::installCachedHeights(int index) {
+    if (!_loadedHeightsCache ||
+        index >= static_cast<int>(_loadedHeightsCache->features.size()))
+    {
+        return;
+    }
+    geojson::CachedFeatureHeights& h = _loadedHeightsCache->features[index];
+    _geometryFeatures.back().setPendingCachedHeights(
+        std::move(h.perRenderFeatureHeights),
+        std::move(h.controlHeights)
+    );
 }
 
 void GeoJsonComponent::parseSingleFeature(const geojson::ParsedFeature& feature,
@@ -913,6 +1045,7 @@ void GeoJsonComponent::parseSingleFeature(const geojson::ParsedFeature& feature,
             g.createFromSingleGeosGeometry(geometry, index, _ignoreHeightsFromFile);
             g.initializeGL(_pointsBatch, _linesBatch, _polygonsBatch);
             _geometryFeatures.push_back(std::move(g));
+            installCachedHeights(index);
             stats.derive += Clock::now() - deriveStart;
 
             std::string name = _geometryFeatures.back().key();
@@ -1024,6 +1157,7 @@ void GeoJsonComponent::loadFromCache(const geojson::GeoJsonCacheFile& cache) {
             );
             g.initializeGL(_pointsBatch, _linesBatch, _polygonsBatch);
             _geometryFeatures.push_back(std::move(g));
+            installCachedHeights(index);
 
             FeatureMeta meta;
             meta.centroidLatLong =

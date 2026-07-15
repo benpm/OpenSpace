@@ -106,11 +106,49 @@ struct GeoJsonCacheFile {
     std::vector<CachedSourceFeature> features;
 };
 
+/// Bump to invalidate all existing heights sidecar caches (part of its cache key)
+inline constexpr int32_t HeightsCacheVersion = 1;
+
+/**
+ * Sampled height map heights for one GlobeGeometryFeature. Render features are built
+ * in a deterministic order for a fixed configuration, so the per-render-feature
+ * vectors are matched by sequence and validated by vertex count at install time.
+ */
+struct CachedFeatureHeights {
+    /// The reference-point heights the per-vertex heights were sampled against
+    /// (GlobeGeometryFeature's control heights). Installing these makes the
+    /// refinement sweep a no-op until the height map actually differs
+    std::vector<double> controlHeights;
+    /// One entry per render feature, in build order; inner size == vertex count
+    std::vector<std::vector<float>> perRenderFeatureHeights;
+};
+
+/**
+ * Sidecar cache to GeoJsonCacheFile, holding the height map heights refined at
+ * runtime. Kept separate because heights depend on the globe and its height layers
+ * while the derived geometry does not, and because it is re-written on shutdown
+ * while the geometry cache is written once.
+ */
+struct GeoJsonHeightsCacheFile {
+    int32_t version = HeightsCacheVersion;
+    /// One entry per rendered feature, aligned with the flattened rendered-feature
+    /// order of the geometry cache (i.e. the component's feature order)
+    std::vector<CachedFeatureHeights> features;
+};
+
 /// Returns std::nullopt when the file is missing, corrupt, or truncated, in which case
 /// the caller falls back to the cold path
 std::optional<GeoJsonCacheFile> loadGeoJsonCache(const std::filesystem::path& cacheFile);
 
 bool saveGeoJsonCache(const GeoJsonCacheFile& data,
+    const std::filesystem::path& cacheFile);
+
+/// Returns std::nullopt when the file is missing, corrupt, or truncated, in which case
+/// heights simply start at zero and refine at runtime
+std::optional<GeoJsonHeightsCacheFile> loadGeoJsonHeightsCache(
+    const std::filesystem::path& cacheFile);
+
+bool saveGeoJsonHeightsCache(const GeoJsonHeightsCacheFile& data,
     const std::filesystem::path& cacheFile);
 
 CachedOverrideProperties toCached(const GeoJsonOverrideProperties& props);

@@ -28,6 +28,7 @@
 #include <openspace/properties/propertyowner.h>
 #include <openspace/rendering/fadeable.h>
 
+#include <modules/globebrowsing/src/geojson/geojsoncache.h>
 #include <modules/globebrowsing/src/geojson/geojsonproperties.h>
 #include <modules/globebrowsing/src/geojson/globegeometryfeature.h>
 #include <openspace/properties/misc/optionproperty.h>
@@ -39,6 +40,7 @@
 #include <openspace/properties/vector/vec4property.h>
 #include <openspace/rendering/helper.h>
 #include <chrono>
+#include <filesystem>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -46,7 +48,6 @@
 
 namespace geos::geom { class Geometry; }
 
-namespace openspace::geojson { struct GeoJsonCacheFile; }
 namespace ghoul {
     namespace opengl {
         class ProgramObject;
@@ -161,6 +162,10 @@ private:
     /// Recount how many features own a point texture (needing per-frame updates)
     void countPointTextureFeatures();
 
+    /// Hand the most recently created geometry feature its cached heights (if the
+    /// heights sidecar cache was loaded and has an entry for \p index)
+    void installCachedHeights(int index);
+
     /// Construct all features from a load cache, skipping JSON parsing and GEOS work
     void loadFromCache(const geojson::GeoJsonCacheFile& cache);
 
@@ -212,6 +217,20 @@ private:
     bool _textureIsDirty = false;
     bool _styleIsDirty = true;
     mutable bool _isReadyCached = false;
+
+    // Height refinement sweep: a budgeted round-robin over the features that checks
+    // whether streamed height map data changed and re-samples where it did. Replaces
+    // per-feature timers, which all fired in the same frame
+    size_t _heightSweepCursor = 0;
+    bool _heightSweepActive = false;
+    std::chrono::steady_clock::time_point _lastSweepStart;
+    bool _forceResampleAll = false;
+
+    // Sidecar cache holding the refined heights across runs; written on
+    // deinitialization when any heights changed
+    std::filesystem::path _heightsCacheFile;
+    bool _heightsDirtyForCache = false;
+    std::optional<geojson::GeoJsonHeightsCacheFile> _loadedHeightsCache;
 
     // Cached facts about the loaded features, used to skip per-feature work when no
     // feature can possibly need it. Property overrides are static after load; only the

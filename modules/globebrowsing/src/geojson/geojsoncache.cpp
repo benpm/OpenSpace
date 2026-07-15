@@ -79,6 +79,54 @@ bool saveGeoJsonCache(const GeoJsonCacheFile& data,
     return file.good();
 }
 
+std::optional<GeoJsonHeightsCacheFile> loadGeoJsonHeightsCache(
+                                                  const std::filesystem::path& cacheFile)
+{
+    std::ifstream file = std::ifstream(cacheFile, std::ios::binary);
+    if (!file.good()) {
+        return std::nullopt;
+    }
+
+    const std::string buffer = std::string(
+        std::istreambuf_iterator<char>(file),
+        std::istreambuf_iterator<char>()
+    );
+
+    GeoJsonHeightsCacheFile res;
+    const glz::error_ctx ec = glz::read_beve(res, buffer);
+    if (ec) {
+        LWARNING(std::format(
+            "Failed reading GeoJson heights cache file '{}'; heights will be "
+            "re-sampled from the height map", cacheFile
+        ));
+        return std::nullopt;
+    }
+    return res;
+}
+
+bool saveGeoJsonHeightsCache(const GeoJsonHeightsCacheFile& data,
+                             const std::filesystem::path& cacheFile)
+{
+    std::string buffer;
+    const glz::error_ctx ec = glz::write_beve(data, buffer);
+    if (ec) {
+        LWARNING(std::format(
+            "Failed serializing GeoJson heights cache for '{}'", cacheFile
+        ));
+        return false;
+    }
+
+    std::ofstream file = std::ofstream(cacheFile, std::ios::binary);
+    if (!file.good()) {
+        LWARNING(std::format(
+            "Failed opening GeoJson heights cache file '{}'", cacheFile
+        ));
+        return false;
+    }
+    file.write(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+    return file.good();
+}
+
 CachedOverrideProperties toCached(const GeoJsonOverrideProperties& props) {
     const auto color = [](const std::optional<glm::vec3>& c) {
         return c.has_value() ?
