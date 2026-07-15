@@ -75,17 +75,19 @@ private:
 
     void renderBatchedLines(const RenderData& data);
     void renderBatchedPoints(const RenderData& data);
+    void renderBatchedPolygons(const RenderData& data);
 
     std::vector<std::unique_ptr<GeoJsonComponent>> _geoJsonObjects;
     RenderableGlobe* _parentGlobe = nullptr;
 
-    // All points and lines of all components on the globe are batched into these and
-    // rendered with a few multidraw calls, with per-draw data in an SSBO. Polygons are
-    // still rendered per feature, by the components
+    // All geometry of all components on the globe is batched by type into these and
+    // rendered with a few multidraw calls, with per-draw data in an SSBO
     rendering::MultiDrawBatch _pointsBatch;
     rendering::MultiDrawBatch _linesBatch;
+    rendering::MultiDrawBatch _polygonsBatch;
     std::unique_ptr<SsboBinding> _pointsSsboBinding;
     std::unique_ptr<SsboBinding> _linesSsboBinding;
+    std::unique_ptr<SsboBinding> _polygonsSsboBinding;
 
     std::unique_ptr<ghoul::opengl::ProgramObject> _polygonsProgram;
     std::unique_ptr<ghoul::opengl::ProgramObject> _linesProgram;

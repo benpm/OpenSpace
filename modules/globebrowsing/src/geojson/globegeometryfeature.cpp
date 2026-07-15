@@ -85,13 +85,13 @@ void GlobeGeometryFeature::setOffsets(glm::vec3 offsets) {
     _offsets = std::move(offsets);
 }
 
-void GlobeGeometryFeature::initializeGL(ghoul::opengl::ProgramObject* polygonsProgram,
-                                        rendering::MultiDrawBatch* pointsBatch,
-                                        rendering::MultiDrawBatch* linesBatch)
+void GlobeGeometryFeature::initializeGL(rendering::MultiDrawBatch* pointsBatch,
+                                        rendering::MultiDrawBatch* linesBatch,
+                                        rendering::MultiDrawBatch* polygonsBatch)
 {
-    _polygonsProgram = polygonsProgram;
     _pointsBatch = pointsBatch;
     _linesBatch = linesBatch;
+    _polygonsBatch = polygonsBatch;
 
     if (isPoints()) {
         updateTexture(true);
@@ -104,7 +104,7 @@ void GlobeGeometryFeature::deinitializeGL() {
 }
 
 bool GlobeGeometryFeature::isReady() const {
-    const bool resourcesAreReady = _polygonsProgram && _pointsBatch && _linesBatch;
+    const bool resourcesAreReady = _pointsBatch && _linesBatch && _polygonsBatch;
     const bool textureIsReady = !_hasTexture || _pointTexture;
     return resourcesAreReady && textureIsReady;
 }
@@ -116,6 +116,10 @@ bool GlobeGeometryFeature::isPoints() const {
 bool GlobeGeometryFeature::useHeightMap() const {
     return _properties.altitudeMode() ==
         GeoJsonProperties::AltitudeMode::RelativeToGround;
+}
+
+bool GlobeGeometryFeature::hasPointTexture() const {
+    return _pointTexture != nullptr;
 }
 
 void GlobeGeometryFeature::updateTexture(bool isInitializeStep) {
@@ -314,84 +318,6 @@ void GlobeGeometryFeature::setFromCachedData(GeometryType type,
     _key = std::move(key);
 }
 
-void GlobeGeometryFeature::render(const RenderData& renderData, int pass,
-                                  float mainOpacity,
-                                  const ExtraRenderData& extraRenderData)
-{
-    ghoul_assert(pass >= 0 && pass < 2, "Render pass variable out of accepted range");
-
-    // Cheap rejection before any matrix math or GL work. This function only draws
-    // polygon render features (points and lines are batched); with tens of thousands
-    // of line features per file, per-feature per-frame overhead here dominates
-    const bool extrude = _properties.extrude();
-    const float fillOpacity = mainOpacity * _properties.fillOpacity();
-    const bool shouldRenderTwice = fillOpacity < 1.f && extrude;
-
-    if (pass > 0 && !shouldRenderTwice) {
-        return;
-    }
-
-    const bool hasPolygonToDraw = std::any_of(
-        _renderFeatures.cbegin(),
-        _renderFeatures.cend(),
-        [extrude](const RenderFeature& r) {
-            return r.type == RenderType::Polygon && (!r.isExtrusionFeature || extrude);
-        }
-    );
-    if (!hasPolygonToDraw) {
-        return;
-    }
-
-    const glm::dmat4 globeModelTransform = _globe.modelTransform();
-    const glm::dmat4 modelViewTransform =
-        renderData.camera.combinedViewMatrix() * globeModelTransform;
-
-    const glm::mat3 normalTransform = glm::mat3(
-        glm::transpose(glm::inverse(modelViewTransform))
-    );
-
-    const glm::dmat4 projectionTransform = renderData.camera.projectionMatrix();
-
-    for (const RenderFeature& r : _renderFeatures) {
-        // Points and lines are rendered batched, through emitBatchedDraws
-        if (r.type != RenderType::Polygon) {
-            continue;
-        }
-
-        if (r.isExtrusionFeature && !extrude) {
-            continue;
-        }
-
-        ghoul::opengl::ProgramObject* shader = _polygonsProgram;
-
-        shader->activate();
-        shader->setUniform("modelTransform", globeModelTransform);
-        shader->setUniform("viewTransform", renderData.camera.combinedViewMatrix());
-        shader->setUniform("projectionTransform", projectionTransform);
-
-        shader->setUniform("heightOffset", _offsets.z);
-        shader->setUniform("useHeightMapData", useHeightMap());
-
-        const rendering::LightSourceRenderData& ls = extraRenderData.lightSourceData;
-        shader->setUniform("normalTransform", normalTransform);
-        shader->setUniform("nLightSources", ls.nLightSources);
-        shader->setUniform("lightIntensities", ls.intensitiesBuffer);
-        shader->setUniform("lightDirectionsViewSpace", ls.directionsViewSpaceBuffer);
-
-        glBindVertexArray(r.vaoId);
-
-        shader->setUniform("opacity", fillOpacity);
-        renderPolygons(r, shouldRenderTwice, pass);
-
-        shader->deactivate();
-    }
-
-    glBindVertexArray(0);
-
-    // Reset when we're done rendering all the polygon features
-    global::renderEngine->openglStateCache().resetPolygonAndClippingState();
-}
-
 void GlobeGeometryFeature::emitBatchedDraws(float mainOpacity,
                                         const ExtraRenderData& extraRenderData,
                                         bool wireframe,
@@ -454,30 +380,33 @@ void GlobeGeometryFeature::emitBatchedDraws(float mainOpacity,
 
             _pointsBatch->emitDraw(r.batchHandle, &record, key);
         }
-    }
-}
+        else if (r.type == RenderType::Polygon) {
+            // Fill triangles and extrusion walls both use the fill color
+            record.color = glm::vec4(_properties.fillColor(), fillOpacity);
+            if (_properties.performShading()) {
+                record.flags |= GeoJsonDrawRecord::FlagPerformShading;
+            }
 
-void GlobeGeometryFeature::renderPolygons(const RenderFeature& feature,
-                                          bool shouldRenderTwice, int renderPass) const
-{
-    ghoul_assert(renderPass == 0 || renderPass == 1, "Invalid render pass");
-    ghoul_assert(
-        feature.type == RenderType::Polygon,
-        "Trying to render faulty geometry"
-    );
-
-    _polygonsProgram->setUniform("color", _properties.fillColor());
-    _polygonsProgram->setUniform("performShading", _properties.performShading());
-
-    if (shouldRenderTwice) {
-        glEnable(GL_CULL_FACE);
-        // First draw back faces, then front faces
-        glCullFace(renderPass == 0 ? GL_FRONT : GL_BACK);
+            const int64_t base = extraRenderData.polygonGroupBase;
+            if (fillOpacity < 1.f && _properties.extrude()) {
+                // Transparent extruded features are drawn twice for correct opacity of
+                // overlapping surfaces: first the back faces, then the front faces
+                _polygonsBatch->emitDraw(
+                    r.batchHandle,
+                    &record,
+                    base | GeoJsonDrawRecord::PolygonBackFacePass
+                );
+                _polygonsBatch->emitDraw(
+                    r.batchHandle,
+                    &record,
+                    base | GeoJsonDrawRecord::PolygonFrontFacePass
+                );
+            }
+            else {
+                _polygonsBatch->emitDraw(r.batchHandle, &record, base);
+            }
+        }
     }
-    else {
-        glDisable(GL_CULL_FACE);
-    }
-    glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(feature.nVertices));
 }
 
 bool GlobeGeometryFeature::shouldUpdateDueToHeightMapChange() const {
@@ -534,17 +463,28 @@ void GlobeGeometryFeature::updateGeometry() {
     }
     else {
         const std::vector<std::vector<glm::vec3>> edgeVertices = createLineGeometry();
-        createExtrudedGeometry(edgeVertices);
+        // The extrusion walls can be a large amount of geometry (two triangles per
+        // boundary edge), so they are only built when actually drawn. The extrude
+        // property marks the component's data dirty, so a toggle rebuilds the geometry
+        if (_properties.extrude()) {
+            createExtrudedGeometry(edgeVertices);
+        }
         createPolygonGeometry();
     }
 
-    // Compute new heights - to see if height map changed
-    _lastControlHeights = getCurrentReferencePointsHeights();
+    // Compute new heights - to see if height map changed. Only relevant when the
+    // heights are actually used; the reference heights are also globe queries
+    _lastControlHeights =
+        useHeightMap() ? getCurrentReferencePointsHeights() : std::vector<double>();
 }
 
 void GlobeGeometryFeature::updateHeightsFromHeightMap() {
     // @TODO: do the updating piece by piece, not all in one frame
     for (RenderFeature& f : _renderFeatures) {
+        if (f.vertices.empty()) {
+            // Height data was skipped at build time (not in RelativeToGround mode)
+            continue;
+        }
         f.heights = heightMapHeightsFromGeodetic2List(_globe, f.vertices);
         bufferDynamicHeightData(f);
     }
@@ -770,85 +710,71 @@ void GlobeGeometryFeature::createPolygonGeometry() {
 void GlobeGeometryFeature::initializeRenderFeature(RenderFeature& feature,
                                                    const std::vector<Vertex>& vertices)
 {
-    // Get height map heights
-    feature.vertices = geodetic2FromVertexList(_globe, vertices);
-    feature.heights = heightMapHeightsFromGeodetic2List(_globe, feature.vertices);
+    if (useHeightMap()) {
+        // Get height map heights
+        feature.vertices = geodetic2FromVertexList(_globe, vertices);
+        feature.heights = heightMapHeightsFromGeodetic2List(_globe, feature.vertices);
+    }
+    else {
+        // The heights are only consumed by the shaders in RelativeToGround mode, so
+        // skip the expensive per-vertex globe height queries (and the retained
+        // geodetic copies). A change of the altitude mode marks the component's data
+        // dirty, which rebuilds the geometry with real heights
+        feature.heights.assign(vertices.size(), 0.f);
+    }
 
-    // Points and lines go into the shared batches
-    if (feature.type == RenderType::Points || feature.type == RenderType::Lines) {
-        rendering::MultiDrawBatch* batch =
-            (feature.type == RenderType::Points) ? _pointsBatch : _linesBatch;
-        ghoul_assert(batch, "Batch must be initialized");
+    if (feature.type == RenderType::Polygon) {
+        // Polygons are flat shaded with normals derived in the fragment shader, so
+        // their batch's vertex stream holds positions only
+        ghoul_assert(_polygonsBatch, "Batch must be initialized");
+        std::vector<glm::vec3> positions;
+        positions.reserve(vertices.size());
+        for (const Vertex& v : vertices) {
+            positions.push_back(v.position);
+        }
 
         const std::array<std::span<const std::byte>, 2> streamData = {
-            std::as_bytes(std::span(vertices)),
+            std::as_bytes(std::span(positions)),
             std::as_bytes(std::span(feature.heights))
         };
-        feature.batchHandle = batch->addDraw(
+        feature.batchHandle = _polygonsBatch->addDraw(
             static_cast<GLsizei>(vertices.size()),
             streamData
         );
         return;
     }
 
-    ghoul_assert(_polygonsProgram, "Shader program must be initialized");
-    ghoul::opengl::ProgramObject* program = _polygonsProgram;
+    rendering::MultiDrawBatch* batch =
+        (feature.type == RenderType::Points) ? _pointsBatch : _linesBatch;
+    ghoul_assert(batch, "Batch must be initialized");
 
-    // Generate buffers and buffer data
-    glCreateBuffers(1, &feature.vertexVboId);
-    glNamedBufferData(
-        feature.vertexVboId,
-        vertices.size() * sizeof(Vertex),
-        vertices.data(),
-        GL_STATIC_DRAW
+    const std::array<std::span<const std::byte>, 2> streamData = {
+        std::as_bytes(std::span(vertices)),
+        std::as_bytes(std::span(feature.heights))
+    };
+    feature.batchHandle = batch->addDraw(
+        static_cast<GLsizei>(vertices.size()),
+        streamData
     );
+}
 
-    glCreateBuffers(1, &feature.heightVboId);
-    glNamedBufferData(
-        feature.heightVboId,
-        feature.heights.size() * sizeof(float),
-        feature.heights.data(),
-        GL_STATIC_DRAW
-    );
-
-    glCreateVertexArrays(1, &feature.vaoId);
-    glVertexArrayVertexBuffer(feature.vaoId, 0, feature.vertexVboId, 0, sizeof(Vertex));
-    glVertexArrayVertexBuffer(feature.vaoId, 1, feature.heightVboId, 0, sizeof(float));
-
-    const GLint positionAttrib = program->attributeLocation("in_position");
-    glEnableVertexArrayAttrib(feature.vaoId, positionAttrib);
-    glVertexArrayAttribFormat(feature.vaoId, positionAttrib, 3, GL_FLOAT, GL_FALSE, 0);
-    glVertexArrayAttribBinding(feature.vaoId, positionAttrib, 0);
-
-    const GLint normalAttrib = program->attributeLocation("in_normal");
-    glEnableVertexArrayAttrib(feature.vaoId, normalAttrib);
-    glVertexArrayAttribFormat(
-        feature.vaoId,
-        normalAttrib,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        3 * sizeof(float)
-    );
-    glVertexArrayAttribBinding(feature.vaoId, normalAttrib, 0);
-
-    const GLint heightAttrib = program->attributeLocation("in_height");
-    glEnableVertexArrayAttrib(feature.vaoId, heightAttrib);
-    glVertexArrayAttribFormat(feature.vaoId, heightAttrib, 1, GL_FLOAT, GL_FALSE, 0);
-    glVertexArrayAttribBinding(feature.vaoId, heightAttrib, 1);
+rendering::MultiDrawBatch* GlobeGeometryFeature::batchForRenderType(
+                                                                   RenderType type) const
+{
+    switch (type) {
+        case RenderType::Points:
+            return _pointsBatch;
+        case RenderType::Lines:
+            return _linesBatch;
+        default:
+            return _polygonsBatch;
+    }
 }
 
 void GlobeGeometryFeature::clearRenderFeatures() {
     for (const RenderFeature& r : _renderFeatures) {
         if (r.batchHandle != rendering::MultiDrawBatch::InvalidHandle) {
-            rendering::MultiDrawBatch* batch =
-                (r.type == RenderType::Points) ? _pointsBatch : _linesBatch;
-            batch->removeDraw(r.batchHandle);
-        }
-        if (r.vaoId != 0) {
-            glDeleteVertexArrays(1, &r.vaoId);
-            glDeleteBuffers(1, &r.vertexVboId);
-            glDeleteBuffers(1, &r.heightVboId);
+            batchForRenderType(r.type)->removeDraw(r.batchHandle);
         }
     }
     _renderFeatures.clear();
@@ -884,22 +810,12 @@ std::vector<double> GlobeGeometryFeature::getCurrentReferencePointsHeights() con
 
 void GlobeGeometryFeature::bufferDynamicHeightData(const RenderFeature& feature) {
     if (feature.batchHandle != rendering::MultiDrawBatch::InvalidHandle) {
-        rendering::MultiDrawBatch* batch =
-            (feature.type == RenderType::Points) ? _pointsBatch : _linesBatch;
-        batch->updateStreamRange(
+        batchForRenderType(feature.type)->updateStreamRange(
             feature.batchHandle,
             1,
             std::as_bytes(std::span(feature.heights))
         );
-        return;
     }
-
-    glNamedBufferData(
-        feature.heightVboId,
-        feature.heights.size() * sizeof(float),
-        feature.heights.data(),
-        GL_DYNAMIC_DRAW
-    );
 }
 
 } // namespace openspace

@@ -131,14 +131,14 @@ set(SHADER_FILES
   shaders/blending.glsl
   shaders/ellipsoid.glsl
   shaders/geojson_drawdata.glsl
-  shaders/geojson_fs.glsl
   shaders/geojson_lines_fs.glsl
   shaders/geojson_lines_gs.glsl
   shaders/geojson_lines_vs.glsl
   shaders/geojson_points_fs.glsl
   shaders/geojson_points_gs.glsl
   shaders/geojson_points_vs.glsl
-  shaders/geojson_vs.glsl
+  shaders/geojson_polygons_fs.glsl
+  shaders/geojson_polygons_vs.glsl
   shaders/globalrenderer_vs.glsl
   shaders/interpolate_fs.glsl
   shaders/interpolate_vs.glsl

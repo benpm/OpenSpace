@@ -240,6 +240,15 @@ namespace {
         // [[codegen::verbatim(DrawWireframeInfo.description)]]
         std::optional<bool> drawWireframe;
 
+        // The maximum number of features for which individual per-feature settings
+        // (enabled, fade, fly-to) are exposed as properties. Files with more features
+        // than this only provide the component-level controls, since hundreds of
+        // thousands of per-feature properties use a lot of memory and make the user
+        // interface unusably slow. The count refers to the number of features in the
+        // file; multi-geometries may render as more features than that. Defaults to
+        // 10000
+        std::optional<int> perFeaturePropertiesThreshold [[codegen::greaterequal(0)]];
+
         // These properties will be used as default values for the geoJson rendering,
         // meaning that they will be used when there is no value given for the
         // individual geoJson features.
@@ -393,6 +402,12 @@ GeoJsonComponent::GeoJsonComponent(const ghoul::Dictionary& dictionary,
     _defaultProperties.tessellation.level.onChange([this]() { _dataIsDirty = true; });
     _defaultProperties.tessellation.distance.onChange([this]() { _dataIsDirty = true; });
 
+    // Extrusion wall geometry is only built when actually drawn, so a toggle of the
+    // extrude property requires a geometry rebuild. The same applies to the per-vertex
+    // height map data, which is only computed in RelativeToGround altitude mode
+    _defaultProperties.extrude.onChange([this]() { _dataIsDirty = true; });
+    _defaultProperties.altitudeModeOption.onChange([this]() { _dataIsDirty = true; });
+
     _forceUpdateHeightData.onChange([this]() {
         for (GlobeGeometryFeature& f : _geometryFeatures) {
             f.updateHeightsFromHeightMap();
@@ -406,6 +421,9 @@ GeoJsonComponent::GeoJsonComponent(const ghoul::Dictionary& dictionary,
 
     _drawWireframe = p.drawWireframe.value_or(_drawWireframe);
     addProperty(_drawWireframe);
+
+    _perFeaturePropertiesThreshold =
+        p.perFeaturePropertiesThreshold.value_or(_perFeaturePropertiesThreshold);
 
     using PointRenderMode = GlobeGeometryFeature::PointRenderMode;
     _pointRenderModeOption.addOptions({
@@ -498,18 +516,18 @@ void GeoJsonComponent::initialize() {
     }
 }
 
-void GeoJsonComponent::initializeGL(ghoul::opengl::ProgramObject* polygonsProgram,
-                                    rendering::MultiDrawBatch* pointsBatch,
-                                    rendering::MultiDrawBatch* linesBatch)
+void GeoJsonComponent::initializeGL(rendering::MultiDrawBatch* pointsBatch,
+                                    rendering::MultiDrawBatch* linesBatch,
+                                    rendering::MultiDrawBatch* polygonsBatch)
 {
     ZoneScoped;
 
-    _polygonsProgram = polygonsProgram;
     _pointsBatch = pointsBatch;
     _linesBatch = linesBatch;
+    _polygonsBatch = polygonsBatch;
 
     for (GlobeGeometryFeature& g : _geometryFeatures) {
-        g.initializeGL(_polygonsProgram, _pointsBatch, _linesBatch);
+        g.initializeGL(_pointsBatch, _linesBatch, _polygonsBatch);
     }
 }
 
@@ -518,9 +536,9 @@ void GeoJsonComponent::deinitializeGL() {
         g.deinitializeGL();
     }
 
-    _polygonsProgram = nullptr;
     _pointsBatch = nullptr;
     _linesBatch = nullptr;
+    _polygonsBatch = nullptr;
     _isReadyCached = false;
 }
 
@@ -530,7 +548,7 @@ bool GeoJsonComponent::isReady() const {
     if (_isReadyCached) {
         return true;
     }
-    const bool isReady = _polygonsProgram && std::all_of(
+    const bool isReady = std::all_of(
         _geometryFeatures.cbegin(),
         _geometryFeatures.cend(),
         std::mem_fn(&GlobeGeometryFeature::isReady)
@@ -539,76 +557,28 @@ bool GeoJsonComponent::isReady() const {
     return isReady;
 }
 
-void GeoJsonComponent::render(const RenderData& data) {
-    if (!_enabled || !isVisible()) {
-        return;
-    }
-
-    // This pass only draws polygon render features (points and lines are batched by
-    // the manager). Skip the whole per-feature loop when no feature can draw polygons:
-    // fill polygons only exist for Polygon geometry, and extrusion polygons only draw
+bool GeoJsonComponent::hasPolygonsToDraw() const {
+    // Fill polygons only exist for Polygon geometry, and extrusion polygons only draw
     // when the feature's resolved extrude value is true. Extrude overrides are static,
     // so only the default property is read here
-    const bool anyPolygonsToDraw =
-        _nFillPolygonFeatures > 0 ||
+    return _nFillPolygonFeatures > 0 ||
         _nExtrudeTrueOverride > 0 ||
         (_nExtrudableNoOverride > 0 && _defaultProperties.extrude);
-    if (!anyPolygonsToDraw) {
-        return;
-    }
+}
 
+void GeoJsonComponent::updateLightSources(const RenderData& data) {
     // @TODO (2023-03-17, emmbr): Once the light source for the globe can be configured,
     // this code should use the same light source as the globe
     _lightsourceRenderData.updateBasedOnLightSources(data, _lightSources);
+}
 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-    glEnable(GL_DEPTH_TEST);
-
-    if (_drawWireframe) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
-
-    using PointRenderMode = GlobeGeometryFeature::PointRenderMode;
-    PointRenderMode pointRenderMode =
-        static_cast<PointRenderMode>(_pointRenderModeOption.value());
-
-    // Compose extra data from relevant properties to pass to the individual features
-    const GlobeGeometryFeature::ExtraRenderData extraRenderdata = {
-        _pointSizeScale,
-        _lineWidthScale,
-        pointRenderMode,
-        _lightsourceRenderData
-    };
-
-    // Do two render passes, to properly render opacity of overlaying objects
-    for (int renderPass = 0; renderPass < 2; renderPass++) {
-        for (size_t i = 0; i < _geometryFeatures.size(); i++) {
-            if (_features[i]->enabled && _features[i]->isVisible()) {
-                _geometryFeatures[i].render(
-                    data,
-                    renderPass,
-                    opacity() * _features[i]->opacity(),
-                    extraRenderdata
-                );
-            }
-        }
-    }
-
-    if (_drawWireframe) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-
-    glBindVertexArray(0);
-
-    global::renderEngine->openglStateCache().resetPolygonAndClippingState();
-    global::renderEngine->openglStateCache().resetBlendState();
-    global::renderEngine->openglStateCache().resetDepthState();
-    global::renderEngine->openglStateCache().resetLineState();
+const rendering::LightSourceRenderData& GeoJsonComponent::lightSourceRenderData() const {
+    return _lightsourceRenderData;
 }
 
 void GeoJsonComponent::emitBatchedDraws(
-                                 std::map<int64_t, ghoul::opengl::Texture*>& pointTextures)
+                                std::map<int64_t, ghoul::opengl::Texture*>& pointTextures,
+                                                                        int componentIndex)
 {
     if (!_enabled || !isVisible()) {
         return;
@@ -618,22 +588,33 @@ void GeoJsonComponent::emitBatchedDraws(
     PointRenderMode pointRenderMode =
         static_cast<PointRenderMode>(_pointRenderModeOption.value());
 
+    const int64_t polygonGroupBase =
+        (static_cast<int64_t>(componentIndex) <<
+            GeoJsonDrawRecord::PolygonComponentShift) |
+        (_drawWireframe ? GeoJsonDrawRecord::WireframeGroupBit : 0);
+
     const GlobeGeometryFeature::ExtraRenderData extraRenderdata = {
         _pointSizeScale,
         _lineWidthScale,
         pointRenderMode,
-        _lightsourceRenderData
+        _lightsourceRenderData,
+        polygonGroupBase
     };
 
     for (size_t i = 0; i < _geometryFeatures.size(); i++) {
-        if (_features[i]->enabled && _features[i]->isVisible()) {
-            _geometryFeatures[i].emitBatchedDraws(
-                opacity() * _features[i]->opacity(),
-                extraRenderdata,
-                _drawWireframe,
-                pointTextures
-            );
+        if (_createPerFeatureProps &&
+            (!_features[i]->enabled || !_features[i]->isVisible()))
+        {
+            continue;
         }
+        const float featureOpacity =
+            _createPerFeatureProps ? _features[i]->opacity() : 1.f;
+        _geometryFeatures[i].emitBatchedDraws(
+            opacity() * featureOpacity,
+            extraRenderdata,
+            _drawWireframe,
+            pointTextures
+        );
     }
 }
 
@@ -642,7 +623,23 @@ bool GeoJsonComponent::update() {
         return false;
     }
 
+    // Skip the whole per-feature loop on idle frames. It only does work when something
+    // is dirty, when point textures may need per-frame updates, or when heights may
+    // need re-sampling from the height map (RelativeToGround altitude mode). Altitude
+    // mode overrides are static after load; the default property is live
+    using AltitudeMode = GeoJsonProperties::AltitudeMode;
+    const bool anyRelativeToGround = _nRelativeToGroundOverride > 0 ||
+        (_nAltitudeModeNoOverride > 0 &&
+            _defaultProperties.altitudeMode() == AltitudeMode::RelativeToGround);
+    const bool needsLoop = _dataIsDirty || _heightOffsetIsDirty || _textureIsDirty ||
+        _nPointTextureFeatures > 0 ||
+        (anyRelativeToGround && !_preventUpdatesFromHeightMap);
+    if (!needsLoop) {
+        return false;
+    }
+
     const glm::vec3 offsets = glm::vec3(_latLongOffset.value(), _heightOffset.value());
+    const bool textureWasDirty = _textureIsDirty;
 
     bool geometryChanged = false;
 
@@ -662,8 +659,18 @@ bool GeoJsonComponent::update() {
         geometryChanged |= g.update(_dataIsDirty, _preventUpdatesFromHeightMap);
     }
 
+    if (textureWasDirty) {
+        _nPointTextureFeatures = 0;
+        for (const GlobeGeometryFeature& g : _geometryFeatures) {
+            if (g.hasPointTexture()) {
+                _nPointTextureFeatures++;
+            }
+        }
+    }
+
     _textureIsDirty = false;
     _dataIsDirty = false;
+    _heightOffsetIsDirty = false;
     return geometryChanged;
 }
 
@@ -677,11 +684,17 @@ void GeoJsonComponent::readFile() {
     }
 
     _geometryFeatures.clear();
+    _features.clear();
+    _featureMeta.clear();
+    _usedFeatureIdentifiers.clear();
     _isReadyCached = false;
     _styleIsDirty = true;
     _nFillPolygonFeatures = 0;
     _nExtrudeTrueOverride = 0;
     _nExtrudableNoOverride = 0;
+    _nRelativeToGroundOverride = 0;
+    _nAltitudeModeNoOverride = 0;
+    _nPointTextureFeatures = 0;
 
     using Clock = std::chrono::steady_clock;
     const auto secs = [](Clock::duration d) {
@@ -710,8 +723,15 @@ void GeoJsonComponent::readFile() {
             if (cached && cached->version == geojson::CacheVersion &&
                 cached->ignoreHeights == _ignoreHeightsFromFile)
             {
+                size_t nRendered = 0;
+                for (const geojson::CachedSourceFeature& f : cached->features) {
+                    nRendered += f.rendered.size();
+                }
+                decidePerFeatureProps(nRendered);
+
                 loadFromCache(*cached);
                 computeMainFeatureMetaPropeties();
+                countPointTextureFeatures();
                 LINFO(std::format(
                     "Loaded '{}' from cache: {} features in {:.2f} s",
                     _geoJsonFile.value(), _geometryFeatures.size(),
@@ -752,6 +772,8 @@ void GeoJsonComponent::readFile() {
         const geojson::ParsedGeoJson parsed = geojson::parseGeoJson(content);
         stats.parse = Clock::now() - parseStart;
 
+        decidePerFeatureProps(parsed.features.size());
+
         for (const geojson::ParsedFeature& feature : parsed.features) {
             count++;
             parseSingleFeature(feature, count, stats, cacheOut);
@@ -779,6 +801,7 @@ void GeoJsonComponent::readFile() {
     }
 
     computeMainFeatureMetaPropeties();
+    countPointTextureFeatures();
 
     Clock::duration cacheWrite{};
     if (FileSys.cacheManager() && !_geometryFeatures.empty()) {
@@ -794,6 +817,29 @@ void GeoJsonComponent::readFile() {
         secs(Clock::now() - startTime), secs(stats.parse), secs(stats.validate),
         secs(stats.derive), secs(stats.registration), secs(cacheWrite)
     ));
+}
+
+void GeoJsonComponent::decidePerFeatureProps(size_t nFeatures) {
+    _createPerFeatureProps =
+        nFeatures <= static_cast<size_t>(_perFeaturePropertiesThreshold);
+    if (!_createPerFeatureProps) {
+        LINFO(std::format(
+            "GeoJson layer '{}' has {} features, which is more than the per-feature "
+            "properties threshold of {}. Individual per-feature settings (enable, "
+            "fade, fly-to) will not be created; component-level settings still apply. "
+            "The limit can be changed with the PerFeaturePropertiesThreshold key",
+            identifier(), nFeatures, _perFeaturePropertiesThreshold
+        ));
+    }
+}
+
+void GeoJsonComponent::countPointTextureFeatures() {
+    _nPointTextureFeatures = 0;
+    for (const GlobeGeometryFeature& g : _geometryFeatures) {
+        if (g.hasPointTexture()) {
+            _nPointTextureFeatures++;
+        }
+    }
 }
 
 void GeoJsonComponent::parseSingleFeature(const geojson::ParsedFeature& feature,
@@ -865,7 +911,7 @@ void GeoJsonComponent::parseSingleFeature(const geojson::ParsedFeature& feature,
             const Clock::time_point deriveStart = Clock::now();
             GlobeGeometryFeature g(_globeNode, _defaultProperties, propsFromFile);
             g.createFromSingleGeosGeometry(geometry, index, _ignoreHeightsFromFile);
-            g.initializeGL(_polygonsProgram, _pointsBatch, _linesBatch);
+            g.initializeGL(_pointsBatch, _linesBatch, _polygonsBatch);
             _geometryFeatures.push_back(std::move(g));
             stats.derive += Clock::now() - deriveStart;
 
@@ -874,23 +920,26 @@ void GeoJsonComponent::parseSingleFeature(const geojson::ParsedFeature& feature,
 
             const Clock::time_point registerStart = Clock::now();
 
-            // If there is already an owner with that name as an identifier, make a unique
-            // one
-            if (_featuresPropertyOwner.hasPropertySubOwner(identifier)) {
+            // If there is already a feature with that identifier, make a unique one
+            if (!_usedFeatureIdentifiers.insert(identifier).second) {
                 identifier = std::format("Feature{}-{}", index, identifier);
+                _usedFeatureIdentifiers.insert(identifier);
             }
 
-            const PropertyOwner::PropertyOwnerInfo info = {
-                std::move(identifier),
-                std::move(name)
-                // @TODO: Use description from file, if any
-            };
-            _features.push_back(std::make_unique<SubFeatureProps>(info));
-            _features.back()->onStyleChange([this]() { _styleIsDirty = true; });
+            const FeatureMeta meta = computeFeatureMeta(geometry);
+            _featureMeta.push_back(meta);
 
-            addMetaPropertiesToFeature(*_features.back(), index, geometry);
-
-            _featuresPropertyOwner.addPropertySubOwner(_features.back().get());
+            if (_createPerFeatureProps) {
+                const PropertyOwner::PropertyOwnerInfo info = {
+                    identifier,
+                    name
+                    // @TODO: Use description from file, if any
+                };
+                _features.push_back(std::make_unique<SubFeatureProps>(info));
+                _features.back()->onStyleChange([this]() { _styleIsDirty = true; });
+                applyMetaToFeature(*_features.back(), meta, index);
+                _featuresPropertyOwner.addPropertySubOwner(_features.back().get());
+            }
             stats.registration += Clock::now() - registerStart;
 
             using GeometryType = GlobeGeometryFeature::GeometryType;
@@ -906,10 +955,18 @@ void GeoJsonComponent::parseSingleFeature(const geojson::ParsedFeature& feature,
                     _nExtrudableNoOverride++;
                 }
             }
+            using AltitudeMode = GeoJsonProperties::AltitudeMode;
+            if (propsFromFile.altitudeMode.has_value()) {
+                if (*propsFromFile.altitudeMode == AltitudeMode::RelativeToGround) {
+                    _nRelativeToGroundOverride++;
+                }
+            }
+            else {
+                _nAltitudeModeNoOverride++;
+            }
 
             // Record the derived data for the load cache
             const GlobeGeometryFeature& gf = _geometryFeatures.back();
-            const SubFeatureProps& props = *_features.back();
             geojson::CachedRenderedFeature cached;
             cached.geometryType = static_cast<int32_t>(gf.type());
             cached.geoCoordinates.reserve(gf.geoCoordinates().size());
@@ -920,12 +977,11 @@ void GeoJsonComponent::parseSingleFeature(const geojson::ParsedFeature& feature,
             cached.heightUpdateReferencePoints =
                 geojson::toCached(gf.heightUpdateReferencePoints());
             cached.key = gf.key();
-            const glm::vec2 centroid = props.centroidLatLong;
-            cached.centroidLatLong = { centroid.x, centroid.y };
-            const glm::vec4 bbox = props.boundingboxLatLong;
+            cached.centroidLatLong = { meta.centroidLatLong.x, meta.centroidLatLong.y };
+            const glm::vec4 bbox = meta.boundingboxLatLong;
             cached.boundingboxLatLong = { bbox.x, bbox.y, bbox.z, bbox.w };
-            cached.identifier = props.identifier();
-            cached.name = props.guiName();
+            cached.identifier = std::move(identifier);
+            cached.name = std::move(name);
             cachedFeature.rendered.push_back(std::move(cached));
         }
         catch (const ghoul::RuntimeError& error) {
@@ -966,27 +1022,30 @@ void GeoJsonComponent::loadFromCache(const geojson::GeoJsonCacheFile& cache) {
                 geojson::fromCached(r.heightUpdateReferencePoints),
                 r.key
             );
-            g.initializeGL(_polygonsProgram, _pointsBatch, _linesBatch);
+            g.initializeGL(_pointsBatch, _linesBatch, _polygonsBatch);
             _geometryFeatures.push_back(std::move(g));
 
-            // Identifiers were de-duplicated on the cold path and are replayed
-            // verbatim, in the same order, so the GUI listing is identical
-            const PropertyOwner::PropertyOwnerInfo info = { r.identifier, r.name };
-            _features.push_back(std::make_unique<SubFeatureProps>(info));
-            SubFeatureProps& f = *_features.back();
-            f.onStyleChange([this]() { _styleIsDirty = true; });
-            f.centroidLatLong =
+            FeatureMeta meta;
+            meta.centroidLatLong =
                 glm::vec2(r.centroidLatLong[0], r.centroidLatLong[1]);
-            f.boundingboxLatLong = glm::vec4(
+            meta.boundingboxLatLong = glm::vec4(
                 r.boundingboxLatLong[0],
                 r.boundingboxLatLong[1],
                 r.boundingboxLatLong[2],
                 r.boundingboxLatLong[3]
             );
-            computeFeatureDiagonal(f);
-            f.flyToFeature.onChange([this, index]() { flyToFeature(index); });
+            computeFeatureDiagonal(meta);
+            _featureMeta.push_back(meta);
 
-            _featuresPropertyOwner.addPropertySubOwner(_features.back().get());
+            if (_createPerFeatureProps) {
+                // Identifiers were de-duplicated on the cold path and are replayed
+                // verbatim, in the same order, so the GUI listing is identical
+                const PropertyOwner::PropertyOwnerInfo info = { r.identifier, r.name };
+                _features.push_back(std::make_unique<SubFeatureProps>(info));
+                _features.back()->onStyleChange([this]() { _styleIsDirty = true; });
+                applyMetaToFeature(*_features.back(), meta, index);
+                _featuresPropertyOwner.addPropertySubOwner(_features.back().get());
+            }
 
             using GeometryType = GlobeGeometryFeature::GeometryType;
             const GeometryType featureType = _geometryFeatures.back().type();
@@ -1001,25 +1060,34 @@ void GeoJsonComponent::loadFromCache(const geojson::GeoJsonCacheFile& cache) {
                     _nExtrudableNoOverride++;
                 }
             }
+            using AltitudeMode = GeoJsonProperties::AltitudeMode;
+            if (props.altitudeMode.has_value()) {
+                if (*props.altitudeMode == AltitudeMode::RelativeToGround) {
+                    _nRelativeToGroundOverride++;
+                }
+            }
+            else {
+                _nAltitudeModeNoOverride++;
+            }
         }
     }
 }
 
-void GeoJsonComponent::addMetaPropertiesToFeature(SubFeatureProps& feature, int index,
-                                                  const geos::geom::Geometry* geometry)
+GeoJsonComponent::FeatureMeta GeoJsonComponent::computeFeatureMeta(
+                                            const geos::geom::Geometry* geometry) const
 {
+    FeatureMeta meta;
+
     std::unique_ptr<geos::geom::Point> centroid = geometry->getCentroid();
     const geos::geom::CoordinateXY centroidCoord = *centroid->getCoordinate();
-    const glm::vec2 centroidLatLong = glm::vec2(centroidCoord.y, centroidCoord.x);
-    feature.centroidLatLong = centroidLatLong;
+    meta.centroidLatLong = glm::vec2(centroidCoord.y, centroidCoord.x);
 
     std::unique_ptr<geos::geom::Geometry> boundingbox = geometry->getEnvelope();
     std::unique_ptr<geos::geom::CoordinateSequence> coords =
         boundingbox->getCoordinates();
-    glm::vec4 boundingboxLatLong;
     if (boundingbox->isRectangle()) {
         // A rectangle has 5 coordinates, where the first and third are two corners
-        boundingboxLatLong = glm::vec4(
+        meta.boundingboxLatLong = glm::vec4(
             (*coords)[0].y,
             (*coords)[0].x,
             (*coords)[2].y,
@@ -1029,66 +1097,63 @@ void GeoJsonComponent::addMetaPropertiesToFeature(SubFeatureProps& feature, int 
     else {
         // Invalid boundingbox. Can happen e.g. for single points. Just add a degree to
         // every direction from the centroid
-        boundingboxLatLong = glm::vec4(
-            centroidLatLong.x - 1.f,
-            centroidLatLong.y - 1.f,
-            centroidLatLong.x + 1.f,
-            centroidLatLong.y + 1.f
+        meta.boundingboxLatLong = glm::vec4(
+            meta.centroidLatLong.x - 1.f,
+            meta.centroidLatLong.y - 1.f,
+            meta.centroidLatLong.x + 1.f,
+            meta.centroidLatLong.y + 1.f
         );
     }
 
-    feature.boundingboxLatLong = boundingboxLatLong;
-    computeFeatureDiagonal(feature);
+    computeFeatureDiagonal(meta);
+    return meta;
+}
 
+void GeoJsonComponent::applyMetaToFeature(SubFeatureProps& feature,
+                                          const FeatureMeta& meta, int index)
+{
+    feature.centroidLatLong = meta.centroidLatLong;
+    feature.boundingboxLatLong = meta.boundingboxLatLong;
+    feature.boundingBoxDiagonal = meta.boundingBoxDiagonal;
     feature.flyToFeature.onChange([this, index]() { flyToFeature(index); });
 }
 
-void GeoJsonComponent::computeFeatureDiagonal(SubFeatureProps& feature) const {
-    const glm::vec4 boundingboxLatLong = feature.boundingboxLatLong;
-
+void GeoJsonComponent::computeFeatureDiagonal(FeatureMeta& meta) const {
     // Compute the diagonal distance of the bounding box
     const Geodetic2 pos0 = {
-        glm::radians(boundingboxLatLong.x),
-        glm::radians(boundingboxLatLong.y)
+        glm::radians(meta.boundingboxLatLong.x),
+        glm::radians(meta.boundingboxLatLong.y)
     };
 
     const Geodetic2 pos1 = {
-        glm::radians(boundingboxLatLong.z),
-        glm::radians(boundingboxLatLong.w)
+        glm::radians(meta.boundingboxLatLong.z),
+        glm::radians(meta.boundingboxLatLong.w)
     };
-    feature.boundingBoxDiagonal = static_cast<float>(
+    meta.boundingBoxDiagonal = static_cast<float>(
         std::abs(_globeNode.ellipsoid().greatCircleDistance(pos0, pos1))
     );
 }
 
 void GeoJsonComponent::computeMainFeatureMetaPropeties() {
-    if (_features.empty()) {
+    if (_featureMeta.empty()) {
         return;
     }
 
     glm::vec2 bboxLowerCorner = glm::vec2(
-        _features.front()->boundingboxLatLong.value().x,
-        _features.front()->boundingboxLatLong.value().y
+        _featureMeta.front().boundingboxLatLong.x,
+        _featureMeta.front().boundingboxLatLong.y
     );
     glm::vec2 bboxUpperCorner = glm::vec2(
-        _features.front()->boundingboxLatLong.value().z,
-        _features.front()->boundingboxLatLong.value().w
+        _featureMeta.front().boundingboxLatLong.z,
+        _featureMeta.front().boundingboxLatLong.w
     );
 
-    for (const std::unique_ptr<SubFeatureProps>& f : _features) {
+    for (const FeatureMeta& m : _featureMeta) {
         // Update bbox corners
-        if (f->boundingboxLatLong.value().x < bboxLowerCorner.x) {
-            bboxLowerCorner.x = f->boundingboxLatLong.value().x;
-        }
-        if (f->boundingboxLatLong.value().y < bboxLowerCorner.y) {
-            bboxLowerCorner.y = f->boundingboxLatLong.value().y;
-        }
-        if (f->boundingboxLatLong.value().z > bboxUpperCorner.x) {
-            bboxUpperCorner.x = f->boundingboxLatLong.value().z;
-        }
-        if (f->boundingboxLatLong.value().w > bboxUpperCorner.y) {
-            bboxUpperCorner.y = f->boundingboxLatLong.value().w;
-        }
+        bboxLowerCorner.x = std::min(bboxLowerCorner.x, m.boundingboxLatLong.x);
+        bboxLowerCorner.y = std::min(bboxLowerCorner.y, m.boundingboxLatLong.y);
+        bboxUpperCorner.x = std::max(bboxUpperCorner.x, m.boundingboxLatLong.z);
+        bboxUpperCorner.y = std::max(bboxUpperCorner.y, m.boundingboxLatLong.w);
     }
 
     // Identify the bounding box midpoints
@@ -1116,10 +1181,10 @@ void GeoJsonComponent::flyToFeature(std::optional<int> index) const {
     float centroidLon = _centerLatLong.value().y;
 
     if (index.has_value()) {
-        const SubFeatureProps* f = _features[*index].get();
-        diagonal = f->boundingBoxDiagonal;
-        centroidLat = f->centroidLatLong.value().x;
-        centroidLon = f->centroidLatLong.value().y;
+        const FeatureMeta& m = _featureMeta[*index];
+        diagonal = m.boundingBoxDiagonal;
+        centroidLat = m.centroidLatLong.x;
+        centroidLon = m.centroidLatLong.y;
     }
 
     // Compute a good distance to travel to based on the feature's size. Assumes 80 degree

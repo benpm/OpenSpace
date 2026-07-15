@@ -22,53 +22,45 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "fragment.glsl"
+#version __CONTEXT__
 
-in Data {
+#include "geojson_drawdata.glsl"
+
+layout(location = 0) in vec3 in_position;
+layout(location = 2) in float in_height;
+
+out Data {
   vec4 positionViewSpace;
-  vec3 normal;
   float depth;
-} in_data;
+  flat vec4 color;
+  flat uint flags;
+} out_data;
 
-uniform vec3 color;
-uniform float opacity;
-
-uniform float ambientIntensity = 0.2;
-uniform float diffuseIntensity = 0.8;
-uniform bool performShading = true;
-
-uniform uint nLightSources;
-uniform vec3 lightDirectionsViewSpace[8];
-uniform float lightIntensities[8];
-
-const vec3 LightColor = vec3(1.0);
+uniform dmat4 modelTransform;
+uniform dmat4 viewTransform;
+uniform dmat4 projectionTransform;
 
 
-Fragment getFragment() {
-  if (opacity == 0.0) {
-    discard;
+void main() {
+  DrawElement element = drawElements[baseDrawId + gl_DrawID];
+
+  dvec4 modelPos = dvec4(in_position, 1.0);
+
+  // Offset model pos based on height info
+  if (length(in_position) > 0.0) {
+    dvec3 outDirection = normalize(dvec3(in_position));
+    bool useHeightMapData = (element.flags & FlagUseHeightMap) != 0u;
+    double height = useHeightMapData ?
+      in_height + element.heightOffset :
+      element.heightOffset;
+    modelPos += dvec4(outDirection * height, 0.0);
   }
 
-  Fragment frag;
-  frag.color = vec4(color, opacity);
-
-  // Simple diffuse phong shading based on light sources
-  if (performShading && nLightSources > 0) {
-    // @TODO: Fix faulty triangle normals. This should not have to be inverted
-    vec3 n = -normalize(in_data.normal);
-
-    // Ambient color
-    frag.color.xyz = ambientIntensity * color;
-
-    for (int i = 0; i < nLightSources; i++) {
-      vec3 l = lightDirectionsViewSpace[i];
-      vec3 diffuseColor = diffuseIntensity * max(dot(n, l), 0.0) * color;
-      frag.color.xyz += lightIntensities[i] * (LightColor * diffuseColor);
-    }
-  }
-
-  frag.depth = in_data.depth;
-  frag.gPosition = in_data.positionViewSpace;
-  frag.gNormal = vec4(0.0, 0.0, 0.0, 1.0);
-  return frag;
+  out_data.positionViewSpace = vec4(viewTransform * modelTransform * modelPos);
+  out_data.color = element.color;
+  out_data.flags = element.flags;
+  gl_Position = vec4(projectionTransform * out_data.positionViewSpace);
+  // Set z to 0 to disable near and far plane, unique handling for perspective in space
+  gl_Position.z = 0.0;
+  out_data.depth = gl_Position.w;
 }

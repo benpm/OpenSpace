@@ -22,41 +22,60 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#version __CONTEXT__
+#include "fragment.glsl"
 
-layout(location = 0) in vec3 in_position;
-layout(location = 1) in vec3 in_normal;
-layout(location = 2) in float in_height;
-
-out Data {
+in Data {
   vec4 positionViewSpace;
-  vec3 normal;
   float depth;
-} out_data;
+  flat vec4 color;
+  flat uint flags;
+} in_data;
 
-uniform dmat4 modelTransform;
-uniform dmat4 viewTransform;
-uniform dmat4 projectionTransform;
-uniform mat3 normalTransform;
+uniform float ambientIntensity = 0.2;
+uniform float diffuseIntensity = 0.8;
 
-uniform float heightOffset;
-uniform bool useHeightMapData;
+uniform uint nLightSources;
+uniform vec3 lightDirectionsViewSpace[8];
+uniform float lightIntensities[8];
+
+const uint FlagPerformShading = 16u;
+
+const vec3 LightColor = vec3(1.0);
 
 
-void main() {
-  dvec4 modelPos = dvec4(in_position, 1.0);
-
-  // Offset model pos based on height info
-  if (length(in_position) > 0.0) {
-    dvec3 outDirection = normalize(dvec3(in_position));
-    double height = useHeightMapData ? in_height + heightOffset : heightOffset;
-    modelPos += dvec4(outDirection * height, 0.0);
+Fragment getFragment() {
+  if (in_data.color.a == 0.0) {
+    discard;
   }
 
-  out_data.positionViewSpace = vec4(viewTransform * modelTransform * modelPos);
-  out_data.normal = normalize(normalTransform * in_normal);
-  gl_Position = vec4(projectionTransform * out_data.positionViewSpace);
-  // Set z to 0 to disable near and far plane, unique handling for perspective in space
-  gl_Position.z = 0.0;
-  out_data.depth = gl_Position.w;
+  Fragment frag;
+  frag.color = in_data.color;
+
+  // Simple diffuse phong shading based on light sources
+  if ((in_data.flags & FlagPerformShading) != 0u && nLightSources > 0) {
+    // All polygon triangles are flat shaded (the old vertex normals were one flat
+    // normal per triangle), so the normal is derived from the view-space position
+    // derivatives instead of a vertex attribute. Flip it to face the camera, matching
+    // the visible side that used to be lit
+    vec3 n = normalize(
+      cross(dFdx(in_data.positionViewSpace.xyz), dFdy(in_data.positionViewSpace.xyz))
+    );
+    if (!gl_FrontFacing) {
+      n = -n;
+    }
+
+    // Ambient color
+    frag.color.xyz = ambientIntensity * in_data.color.rgb;
+
+    for (int i = 0; i < nLightSources; i++) {
+      vec3 l = lightDirectionsViewSpace[i];
+      vec3 diffuseColor = diffuseIntensity * max(dot(n, l), 0.0) * in_data.color.rgb;
+      frag.color.xyz += lightIntensities[i] * (LightColor * diffuseColor);
+    }
+  }
+
+  frag.depth = in_data.depth;
+  frag.gPosition = in_data.positionViewSpace;
+  frag.gNormal = vec4(0.0, 0.0, 0.0, 1.0);
+  return frag;
 }

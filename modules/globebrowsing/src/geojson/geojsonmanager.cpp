@@ -68,8 +68,10 @@ void GeoJsonManager::deinitializeGL() {
 
     _pointsBatch.deinitialize();
     _linesBatch.deinitialize();
+    _polygonsBatch.deinitialize();
     _pointsSsboBinding = nullptr;
     _linesSsboBinding = nullptr;
+    _polygonsSsboBinding = nullptr;
 
     if (_polygonsProgram) {
         global::renderEngine->removeRenderProgram(_polygonsProgram.get());
@@ -111,7 +113,7 @@ void GeoJsonManager::addGeoJsonLayer(const ghoul::Dictionary& layerDict) {
         std::unique_ptr<GeoJsonComponent> geo =
             std::make_unique<GeoJsonComponent>(layerDict, *_parentGlobe);
 
-        geo->initializeGL(_polygonsProgram.get(), &_pointsBatch, &_linesBatch);
+        geo->initializeGL(&_pointsBatch, &_linesBatch, &_polygonsBatch);
 
         GeoJsonComponent* ptr = geo.get();
         _geoJsonObjects.push_back(std::move(geo));
@@ -139,6 +141,7 @@ void GeoJsonManager::deleteLayer(const std::string& layerIdentifier) {
             if (_pointsBatch.isInitialized()) {
                 _pointsBatch.commit();
                 _linesBatch.commit();
+                _polygonsBatch.commit();
                 _emitIsDirty = true;
             }
             return;
@@ -163,6 +166,7 @@ void GeoJsonManager::update() {
     if (geometryChanged) {
         _pointsBatch.commit();
         _linesBatch.commit();
+        _polygonsBatch.commit();
         _emitIsDirty = true;
     }
 
@@ -191,42 +195,42 @@ void GeoJsonManager::render(const RenderData& data) {
     }
 
     if (needEmit) {
-        // Collect this frame's points and lines draws from all components
+        // Collect this frame's draws from all components
         _pointsBatch.beginFrame();
         _linesBatch.beginFrame();
+        _polygonsBatch.beginFrame();
         _pointTextures.clear();
-        for (std::unique_ptr<GeoJsonComponent>& obj : _geoJsonObjects) {
+        for (size_t i = 0; i < _geoJsonObjects.size(); i++) {
+            GeoJsonComponent* obj = _geoJsonObjects[i].get();
             if (obj->enabled()) {
-                obj->emitBatchedDraws(_pointTextures);
+                obj->emitBatchedDraws(_pointTextures, static_cast<int>(i));
             }
             obj->clearStyleDirty();
         }
         _pointsBatch.endFrame();
         _linesBatch.endFrame();
+        _polygonsBatch.endFrame();
         _emitIsDirty = false;
     }
 
     const Clock::time_point emitted = Clock::now();
 
-    if (_pointsBatch.nDrawsThisFrame() > 0 || _linesBatch.nDrawsThisFrame() > 0) {
+    const bool anyDraws = _pointsBatch.nDrawsThisFrame() > 0 ||
+        _linesBatch.nDrawsThisFrame() > 0 ||
+        _polygonsBatch.nDrawsThisFrame() > 0;
+    if (anyDraws) {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
 
         renderBatchedLines(data);
         renderBatchedPoints(data);
+        renderBatchedPolygons(data);
 
         glBindVertexArray(0);
         global::renderEngine->openglStateCache().resetPolygonAndClippingState();
         global::renderEngine->openglStateCache().resetBlendState();
         global::renderEngine->openglStateCache().resetDepthState();
-    }
-
-    // Polygons are still rendered per component
-    for (std::unique_ptr<GeoJsonComponent>& obj : _geoJsonObjects) {
-        if (obj->enabled()) {
-            obj->render(data);
-        }
     }
 
     const Clock::time_point end = Clock::now();
@@ -242,9 +246,13 @@ void GeoJsonManager::render(const RenderData& data) {
             };
             LDEBUG(std::format(
                 "GeoJson perf over {} frames: frame interval {:.2f} ms, emit {:.2f} ms, "
-                "draw submit {:.2f} ms, update {:.2f} ms",
+                "draw submit {:.2f} ms, update {:.2f} ms, sub-draws {}/{} pts, "
+                "{}/{} lines, {}/{} polys (after/before merge)",
                 _perfFrameCount, avgMs(_perfFrameInterval), avgMs(_perfEmitTime),
-                avgMs(_perfRenderTime), avgMs(_perfUpdateTime)
+                avgMs(_perfRenderTime), avgMs(_perfUpdateTime),
+                _pointsBatch.nDrawsThisFrame(), _pointsBatch.nEmittedThisFrame(),
+                _linesBatch.nDrawsThisFrame(), _linesBatch.nEmittedThisFrame(),
+                _polygonsBatch.nDrawsThisFrame(), _polygonsBatch.nEmittedThisFrame()
             ));
         }
         _perfFrameCount = 0;
@@ -263,8 +271,8 @@ void GeoJsonManager::initializeGLResources() {
 
     _polygonsProgram = global::renderEngine->buildRenderProgram(
         "GeoPolygonsProgram",
-        absPath("${MODULE_GLOBEBROWSING}/shaders/geojson_vs.glsl"),
-        absPath("${MODULE_GLOBEBROWSING}/shaders/geojson_fs.glsl")
+        absPath("${MODULE_GLOBEBROWSING}/shaders/geojson_polygons_vs.glsl"),
+        absPath("${MODULE_GLOBEBROWSING}/shaders/geojson_polygons_fs.glsl")
     );
 
     _linesProgram = global::renderEngine->buildRenderProgram(
@@ -299,8 +307,33 @@ void GeoJsonManager::initializeGLResources() {
     _pointsBatch.initialize(streams, attributes, sizeof(GeoJsonDrawRecord));
     _linesBatch.initialize(streams, attributes, sizeof(GeoJsonDrawRecord));
 
+    // Polygons are flat shaded with normals derived in the fragment shader, so their
+    // vertex stream holds positions only
+    const std::vector<rendering::MultiDrawBatch::StreamSpec> polygonStreams = {
+        { .stride = sizeof(glm::vec3), .usage = GL_STATIC_DRAW },
+        { .stride = sizeof(float), .usage = GL_DYNAMIC_DRAW }
+    };
+    const std::vector<rendering::MultiDrawBatch::AttributeSpec> polygonAttributes = {
+        { .location = 0, .nComponents = 3, .type = GL_FLOAT, .streamIndex = 0,
+          .offsetInStream = 0 },
+        { .location = 2, .nComponents = 1, .type = GL_FLOAT, .streamIndex = 1,
+          .offsetInStream = 0 }
+    };
+    _polygonsBatch.initialize(
+        polygonStreams,
+        polygonAttributes,
+        sizeof(GeoJsonDrawRecord)
+    );
+
+    // Points render as GL_POINTS and polygons as GL_TRIANGLES, so adjacent identical
+    // draws can be merged. Lines render as GL_LINE_STRIP, where merging would connect
+    // separate strips
+    _pointsBatch.setCoalescingEnabled(true);
+    _polygonsBatch.setCoalescingEnabled(true);
+
     _pointsSsboBinding = std::make_unique<SsboBinding>();
     _linesSsboBinding = std::make_unique<SsboBinding>();
+    _polygonsSsboBinding = std::make_unique<SsboBinding>();
 }
 
 void GeoJsonManager::renderBatchedLines(const RenderData& data) {
@@ -406,6 +439,80 @@ void GeoJsonManager::renderBatchedPoints(const RenderData& data) {
     }
 
     _pointsProgram->deactivate();
+}
+
+void GeoJsonManager::renderBatchedPolygons(const RenderData& data) {
+    const std::span<const rendering::MultiDrawBatch::Group> groups =
+        _polygonsBatch.groups();
+    if (groups.empty()) {
+        return;
+    }
+
+    // The light source data is view dependent, so it is updated every frame for the
+    // components whose polygons are drawn
+    for (const std::unique_ptr<GeoJsonComponent>& obj : _geoJsonObjects) {
+        if (obj->enabled() && obj->hasPolygonsToDraw()) {
+            obj->updateLightSources(data);
+        }
+    }
+
+    _polygonsProgram->activate();
+
+    _polygonsProgram->setUniform("modelTransform", _parentGlobe->modelTransform());
+    _polygonsProgram->setUniform("viewTransform", data.camera.combinedViewMatrix());
+    _polygonsProgram->setUniform(
+        "projectionTransform",
+        glm::dmat4(data.camera.projectionMatrix())
+    );
+
+    // Re-applied every frame, since the block binding is lost on shader hot-reload
+    glBindBufferBase(
+        GL_SHADER_STORAGE_BUFFER,
+        _polygonsSsboBinding->bindingNumber(),
+        _polygonsBatch.ssboId()
+    );
+    _polygonsProgram->setSsboBinding("DrawData", _polygonsSsboBinding->bindingNumber());
+
+    _polygonsBatch.bindVertexArray();
+
+    int64_t lastComponent = -1;
+    for (const rendering::MultiDrawBatch::Group& g : groups) {
+        const bool wireframe = (g.groupKey & GeoJsonDrawRecord::WireframeGroupBit) != 0;
+        glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
+
+        const int64_t component =
+            g.groupKey >> GeoJsonDrawRecord::PolygonComponentShift;
+        if (component != lastComponent) {
+            const rendering::LightSourceRenderData& ls =
+                _geoJsonObjects[static_cast<size_t>(component)]->lightSourceRenderData();
+            _polygonsProgram->setUniform("nLightSources", ls.nLightSources);
+            _polygonsProgram->setUniform("lightIntensities", ls.intensitiesBuffer);
+            _polygonsProgram->setUniform(
+                "lightDirectionsViewSpace",
+                ls.directionsViewSpaceBuffer
+            );
+            lastComponent = component;
+        }
+
+        switch (g.groupKey & GeoJsonDrawRecord::PolygonCullPassMask) {
+            case GeoJsonDrawRecord::PolygonBackFacePass:
+                glEnable(GL_CULL_FACE);
+                glCullFace(GL_FRONT);
+                break;
+            case GeoJsonDrawRecord::PolygonFrontFacePass:
+                glEnable(GL_CULL_FACE);
+                glCullFace(GL_BACK);
+                break;
+            default:
+                glDisable(GL_CULL_FACE);
+                break;
+        }
+
+        _polygonsProgram->setUniform("baseDrawId", g.baseDrawId);
+        _polygonsBatch.renderGroup(GL_TRIANGLES, g);
+    }
+
+    _polygonsProgram->deactivate();
 }
 
 } // namespace openspace

@@ -96,6 +96,15 @@ public:
     void updateStreamRange(DrawHandle handle, GLuint streamIndex,
         std::span<const std::byte> data);
 
+    /**
+     * Allow #endFrame to merge queued draws that are adjacent in the committed vertex
+     * buffers, belong to the same group and have byte-identical records into a single
+     * sub-draw. Merging is opportunistic (non-contiguous draws are simply not merged)
+     * and only valid for non-strip primitive modes, where concatenating two draws'
+     * vertices cannot create new primitives between them.
+     */
+    void setCoalescingEnabled(bool enabled);
+
     void beginFrame();
     /// Queue a draw for this frame. \p record must point at drawRecordSize bytes
     void emitDraw(DrawHandle handle, const void* record, int64_t groupKey);
@@ -107,7 +116,10 @@ public:
     void bindVertexArray() const;
     void renderGroup(GLenum mode, const Group& group) const;
     GLuint ssboId() const;
+    /// Number of sub-draws after coalescing (what glMultiDrawArrays receives)
     size_t nDrawsThisFrame() const;
+    /// Number of draws queued via #emitDraw this frame, before coalescing
+    size_t nEmittedThisFrame() const;
 
 private:
     struct DrawEntry {
@@ -129,7 +141,9 @@ private:
     size_t _drawRecordSize = 0;
     std::vector<StreamSpec> _streams;
     std::vector<DrawEntry> _draws;
+    std::vector<DrawHandle> _freeSlots;
     bool _isCommitted = false;
+    bool _coalesce = false;
 
     // Per-frame state
     std::vector<PendingDraw> _pending;

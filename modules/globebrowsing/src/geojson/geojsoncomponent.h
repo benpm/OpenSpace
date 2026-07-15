@@ -42,6 +42,7 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <unordered_set>
 
 namespace geos::geom { class Geometry; }
 
@@ -71,8 +72,8 @@ public:
     ~GeoJsonComponent() override;
 
     void initialize();
-    void initializeGL(ghoul::opengl::ProgramObject* polygonsProgram,
-        rendering::MultiDrawBatch* pointsBatch, rendering::MultiDrawBatch* linesBatch);
+    void initializeGL(rendering::MultiDrawBatch* pointsBatch,
+        rendering::MultiDrawBatch* linesBatch, rendering::MultiDrawBatch* polygonsBatch);
     void deinitializeGL();
 
     bool isReady() const;
@@ -87,13 +88,22 @@ public:
     bool styleIsDirty() const;
     void clearStyleDirty();
 
-    /// Renders the polygon features. Points and lines are rendered batched by the
-    /// owning GeoJsonManager, fed through emitBatchedDraws
-    void render(const RenderData& data);
+    /// Returns true if any feature of this component can currently draw polygon
+    /// geometry (fill triangles or extrusion walls)
+    bool hasPolygonsToDraw() const;
 
-    /// Queue this component's points and lines draws into the shared batches for the
-    /// current frame (see GlobeGeometryFeature::emitBatchedDraws)
-    void emitBatchedDraws(std::map<int64_t, ghoul::opengl::Texture*>& pointTextures);
+    /// Update the view-dependent light source data used by the polygon shading.
+    /// Called by the owning GeoJsonManager once per frame when polygons are drawn
+    void updateLightSources(const RenderData& data);
+    const rendering::LightSourceRenderData& lightSourceRenderData() const;
+
+    /**
+     * Queue this component's draws into the shared batches for the current frame (see
+     * GlobeGeometryFeature::emitBatchedDraws). \p componentIndex is this component's
+     * index in the manager's list and becomes part of the polygon draw group keys
+     */
+    void emitBatchedDraws(std::map<int64_t, ghoul::opengl::Texture*>& pointTextures,
+        int componentIndex);
 
     /// Returns true if any feature's geometry was rebuilt, so that the owner knows to
     /// re-commit the shared batches
@@ -129,23 +139,41 @@ private:
         std::chrono::steady_clock::duration registration{};
     };
 
+    /**
+     * Per-feature meta data, always kept 1:1 with _geometryFeatures. The
+     * SubFeatureProps property owners are only created when the number of features is
+     * at most the per-feature-properties threshold; everything else reads from here
+     */
+    struct FeatureMeta {
+        glm::vec2 centroidLatLong = glm::vec2(0.f);
+        glm::vec4 boundingboxLatLong = glm::vec4(0.f);
+        float boundingBoxDiagonal = 0.f;
+    };
+
     void readFile();
     void parseSingleFeature(const geojson::ParsedFeature& feature, int indexInFile,
         LoadStats& stats, geojson::GeoJsonCacheFile& cacheOut);
 
+    /// Decide whether per-feature property owners are created, based on the feature
+    /// count and the configured threshold
+    void decidePerFeatureProps(size_t nFeatures);
+
+    /// Recount how many features own a point texture (needing per-frame updates)
+    void countPointTextureFeatures();
+
     /// Construct all features from a load cache, skipping JSON parsing and GEOS work
     void loadFromCache(const geojson::GeoJsonCacheFile& cache);
 
-    /// Compute the bounding box diagonal from the feature's boundingboxLatLong. Depends
+    /// Compute the bounding box diagonal from the meta's boundingboxLatLong. Depends
     /// on the globe's ellipsoid, which is why it is not part of the load cache
-    void computeFeatureDiagonal(SubFeatureProps& feature) const;
+    void computeFeatureDiagonal(FeatureMeta& meta) const;
 
-    /**
-     * Add meta properties to the feature, to allow things like flying to it, identifying
-     * its location, etc.
-     */
-    void addMetaPropertiesToFeature(SubFeatureProps& feature, int index,
-        const geos::geom::Geometry* geometry);
+    /// Compute the centroid, bounding box and diagonal of the geometry
+    FeatureMeta computeFeatureMeta(const geos::geom::Geometry* geometry) const;
+
+    /// Copy the meta values into the feature's properties and hook up its fly-to
+    void applyMetaToFeature(SubFeatureProps& feature, const FeatureMeta& meta,
+        int index);
 
     void computeMainFeatureMetaPropeties();
 
@@ -185,12 +213,15 @@ private:
     bool _styleIsDirty = true;
     mutable bool _isReadyCached = false;
 
-    // Cached facts about the loaded features, used to skip the polygon render pass
-    // when no feature can possibly draw polygons. Extrude overrides are static after
-    // load; only the default extrude property is live
+    // Cached facts about the loaded features, used to skip per-feature work when no
+    // feature can possibly need it. Property overrides are static after load; only the
+    // default properties are live
     int _nFillPolygonFeatures = 0;
     int _nExtrudeTrueOverride = 0;
     int _nExtrudableNoOverride = 0;
+    int _nRelativeToGroundOverride = 0;
+    int _nAltitudeModeNoOverride = 0;
+    int _nPointTextureFeatures = 0;
 
     Vec2Property _centerLatLong;
     float _bboxDiagonalSize = 0.f;
@@ -206,12 +237,19 @@ private:
 
     PropertyOwner _lightSourcePropertyOwner;
     PropertyOwner _featuresPropertyOwner;
+
+    /// Only filled when _createPerFeatureProps; otherwise features are always enabled
+    /// with full opacity and meta data is read from _featureMeta
     std::vector<std::unique_ptr<SubFeatureProps>> _features;
+    std::vector<FeatureMeta> _featureMeta;
+    std::unordered_set<std::string> _usedFeatureIdentifiers;
+    bool _createPerFeatureProps = true;
+    int _perFeaturePropertiesThreshold = 10000;
 
     // Owned by the GeoJsonManager and shared between all components on the globe
-    ghoul::opengl::ProgramObject* _polygonsProgram = nullptr;
     rendering::MultiDrawBatch* _pointsBatch = nullptr;
     rendering::MultiDrawBatch* _linesBatch = nullptr;
+    rendering::MultiDrawBatch* _polygonsBatch = nullptr;
 };
 
 } // namespace openspace

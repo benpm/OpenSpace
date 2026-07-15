@@ -89,6 +89,7 @@ void MultiDrawBatch::deinitialize() {
     }
     _streams.clear();
     _draws.clear();
+    _freeSlots.clear();
     _pending.clear();
     _recordStaging.clear();
     _firsts.clear();
@@ -122,21 +123,21 @@ MultiDrawBatch::DrawHandle MultiDrawBatch::addDraw(GLsizei nVertices,
     }
 
     // Reuse a freed slot if one exists, to keep handles small
-    for (size_t i = 0; i < _draws.size(); i++) {
-        if (!_draws[i].active) {
-            _draws[i] = std::move(entry);
-            _isCommitted = false;
-            return i;
-        }
+    _isCommitted = false;
+    if (!_freeSlots.empty()) {
+        const size_t i = _freeSlots.back();
+        _freeSlots.pop_back();
+        _draws[i] = std::move(entry);
+        return i;
     }
     _draws.push_back(std::move(entry));
-    _isCommitted = false;
     return _draws.size() - 1;
 }
 
 void MultiDrawBatch::removeDraw(DrawHandle handle) {
     ghoul_assert(handle < _draws.size() && _draws[handle].active, "Invalid draw handle");
     _draws[handle] = DrawEntry();
+    _freeSlots.push_back(handle);
     _isCommitted = false;
 }
 
@@ -201,6 +202,10 @@ void MultiDrawBatch::updateStreamRange(DrawHandle handle, GLuint streamIndex,
     }
 }
 
+void MultiDrawBatch::setCoalescingEnabled(bool enabled) {
+    _coalesce = enabled;
+}
+
 void MultiDrawBatch::beginFrame() {
     _pending.clear();
     _recordStaging.clear();
@@ -250,12 +255,38 @@ void MultiDrawBatch::endFrame() {
         );
     }
 
+    // Coalescing merges sub-draws, so the records can no longer be uploaded 1:1 with
+    // _pending and must be compacted alongside the draw list (as must sorted emission)
+    const bool compactRecords = _coalesce || !alreadyGrouped;
+    if (compactRecords) {
+        _sortedRecordStaging.clear();
+        _sortedRecordStaging.reserve(_recordStaging.size());
+    }
+
     _firsts.reserve(_pending.size());
     _counts.reserve(_pending.size());
     for (const PendingDraw& p : _pending) {
         const DrawEntry& d = _draws[p.handle];
+        const std::byte* rec = _recordStaging.data() + p.recordOffset;
 
-        if (_groups.empty() || _groups.back().groupKey != p.groupKey) {
+        const bool newGroup = _groups.empty() || _groups.back().groupKey != p.groupKey;
+
+        // Merge into the previous sub-draw when this draw continues it in the vertex
+        // buffer and shares its record, so both index the same SSBO entry
+        if (_coalesce && !newGroup &&
+            _firsts.back() + _counts.back() == d.first &&
+            std::memcmp(
+                rec,
+                _sortedRecordStaging.data() + _sortedRecordStaging.size() -
+                    _drawRecordSize,
+                _drawRecordSize
+            ) == 0)
+        {
+            _counts.back() += d.nVertices;
+            continue;
+        }
+
+        if (newGroup) {
             _groups.push_back({
                 .groupKey = p.groupKey,
                 .baseDrawId = static_cast<int>(_firsts.size())
@@ -266,27 +297,18 @@ void MultiDrawBatch::endFrame() {
 
         _firsts.push_back(d.first);
         _counts.push_back(d.nVertices);
-    }
-
-    const std::byte* records = _recordStaging.data();
-    if (!alreadyGrouped) {
-        // Reorder the records to match the sorted draw order
-        _sortedRecordStaging.clear();
-        _sortedRecordStaging.reserve(_recordStaging.size());
-        for (const PendingDraw& p : _pending) {
-            _sortedRecordStaging.insert(
-                _sortedRecordStaging.end(),
-                _recordStaging.begin() + p.recordOffset,
-                _recordStaging.begin() + p.recordOffset + _drawRecordSize
-            );
+        if (compactRecords) {
+            _sortedRecordStaging.insert(_sortedRecordStaging.end(),
+                rec, rec + _drawRecordSize);
         }
-        records = _sortedRecordStaging.data();
     }
 
     glNamedBufferData(
         _ssbo,
-        static_cast<GLsizeiptr>(_recordStaging.size()),
-        records,
+        static_cast<GLsizeiptr>(
+            compactRecords ? _sortedRecordStaging.size() : _recordStaging.size()
+        ),
+        compactRecords ? _sortedRecordStaging.data() : _recordStaging.data(),
         GL_STREAM_DRAW
     );
 }
@@ -319,6 +341,10 @@ GLuint MultiDrawBatch::ssboId() const {
 
 size_t MultiDrawBatch::nDrawsThisFrame() const {
     return _firsts.size();
+}
+
+size_t MultiDrawBatch::nEmittedThisFrame() const {
+    return _pending.size();
 }
 
 } // namespace openspace::rendering

@@ -65,10 +65,20 @@ struct GeoJsonDrawRecord {
     static constexpr uint32_t FlagUseHeightMap = 1;
     static constexpr uint32_t FlagBottomAnchor = 2;
     static constexpr uint32_t FlagsRenderModeShift = 2;
+    static constexpr uint32_t FlagPerformShading = 16;
 
     /// Draw group key bit marking wireframe groups. Group keys otherwise hold the GL
     /// texture name for points, so this bit is kept well clear of that range
     static constexpr int64_t WireframeGroupBit = int64_t(1) << 40;
+
+    // Polygon group keys: bits 0-1 hold the cull pass, bit 40 wireframe and the bits
+    // from PolygonComponentShift up the owning component's index. Component-major key
+    // ordering keeps the current per-component draw order: single-pass draws, then the
+    // two culled passes of transparent extruded features, then the next component
+    static constexpr int64_t PolygonCullPassMask = 3;
+    static constexpr int64_t PolygonBackFacePass = 1;  // glCullFace(GL_FRONT)
+    static constexpr int64_t PolygonFrontFacePass = 2; // glCullFace(GL_BACK)
+    static constexpr int PolygonComponentShift = 41;
 
     glm::vec4 color = glm::vec4(1.f); // rgb + final opacity, fades folded in
     float heightOffset = 0.f; // meters
@@ -119,15 +129,11 @@ public:
     };
 
     /**
-     * Each geometry feature might translate into several render features. Lines and
-     * Points render features live as a draw in one of the shared batches; Polygon
-     * features own their GL objects and are drawn individually.
+     * Each geometry feature might translate into several render features. Every render
+     * feature lives as one draw in the shared batch matching its type.
      */
     struct RenderFeature {
         RenderType type = RenderType::Uninitialized;
-        GLuint vaoId = 0;
-        GLuint vertexVboId = 0;
-        GLuint heightVboId = 0;
         rendering::MultiDrawBatch::DrawHandle batchHandle =
             rendering::MultiDrawBatch::InvalidHandle;
         size_t nVertices = 0;
@@ -149,18 +155,21 @@ public:
         float lineWidthScale;
         PointRenderMode& pointRenderMode;
         rendering::LightSourceRenderData& lightSourceData;
+        /// Base group key for polygon draws: component index and wireframe bit
+        int64_t polygonGroupBase;
     };
 
     std::string key() const;
 
     void setOffsets(glm::vec3 offsets);
 
-    void initializeGL(ghoul::opengl::ProgramObject* polygonsProgram,
-        rendering::MultiDrawBatch* pointsBatch, rendering::MultiDrawBatch* linesBatch);
+    void initializeGL(rendering::MultiDrawBatch* pointsBatch,
+        rendering::MultiDrawBatch* linesBatch, rendering::MultiDrawBatch* polygonsBatch);
     void deinitializeGL();
     bool isReady() const;
     bool isPoints() const;
     bool useHeightMap() const;
+    bool hasPointTexture() const;
 
     void updateTexture(bool isInitializeStep = false);
 
@@ -184,16 +193,11 @@ public:
         std::vector<Geodetic3> heightUpdateReferencePoints,
         std::string key);
 
-    // 2 pass rendering to get correct culling for polygons. Points and lines are not
-    // rendered here, but batched through emitBatchedDraws
-    void render(const RenderData& renderData, int pass, float mainOpacity,
-        const ExtraRenderData& extraRenderData);
-
     /**
-     * Queue this feature's points and lines draws into the shared batches for the
-     * current frame. Textures used by point draws are recorded in \p pointTextures,
-     * keyed by the same group key as the emitted draws, so that the batch owner can
-     * bind the right texture per group.
+     * Queue this feature's draws into the shared batches for the current frame.
+     * Textures used by point draws are recorded in \p pointTextures, keyed by the same
+     * group key as the emitted draws, so that the batch owner can bind the right
+     * texture per group.
      */
     void emitBatchedDraws(float mainOpacity, const ExtraRenderData& extraRenderData,
         bool wireframe, std::map<int64_t, ghoul::opengl::Texture*>& pointTextures);
@@ -207,10 +211,9 @@ public:
     void updateHeightsFromHeightMap();
 
 private:
-    void renderPolygons(const RenderFeature& feature, bool shouldRenderTwice,
-        int renderPass) const;
+    rendering::MultiDrawBatch* batchForRenderType(RenderType type) const;
 
-    /// Remove all render features, releasing their batch draws and GL objects
+    /// Remove all render features, releasing their batch draws
     void clearRenderFeatures();
 
     /**
@@ -280,9 +283,9 @@ private:
     bool _hasTexture = false;
     std::unique_ptr<TextureComponent> _pointTexture;
 
-    ghoul::opengl::ProgramObject* _polygonsProgram = nullptr;
     rendering::MultiDrawBatch* _pointsBatch = nullptr;
     rendering::MultiDrawBatch* _linesBatch = nullptr;
+    rendering::MultiDrawBatch* _polygonsBatch = nullptr;
 };
 
 } // namespace openspace
