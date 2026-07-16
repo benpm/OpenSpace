@@ -37,6 +37,7 @@
 #include <ghoul/misc/defer.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/exception.h>
+#include <ghoul/misc/stringhelper.h>
 #include <ghoul/logging/logmanager.h>
 #include <ghoul/lua/lua_helper.h>
 #include <ghoul/lua/luastate.h>
@@ -84,6 +85,70 @@ namespace {
             return PathType::Tokenized;
         }
         return PathType::RelativeToAssetRoot;
+    }
+
+    bool isDataAssetFile(const std::filesystem::path& path) {
+        const std::string ext = ghoul::toLowerCase(path.extension().string());
+        return ext == ".geojson" || ext == ".vrt";
+    }
+
+    // Generates a wrapper asset for a raw data file that can be required like a regular
+    // asset. GeoJson files become a GeoJson layer on the Earth globe and VRT (GDAL
+    // virtual raster) files become a color layer on it. The Earth scene graph node must
+    // exist by the time the wrapper initializes, i.e. a globe asset has to be loaded
+    // before the data file
+    std::string dataAssetToLua(const std::filesystem::path& path) {
+        const std::string file = path.generic_string();
+        const std::string stem = path.stem().string();
+        const std::string ext = ghoul::toLowerCase(path.extension().string());
+
+        std::string add;
+        std::string remove;
+        std::string description;
+        if (ext == ".geojson") {
+            add = std::format(
+                "openspace.globebrowsing.addGeoJson(Globe, {{ "
+                "Identifier = Identifier, Name = [[{}]], File = [[{}]] }})", stem, file
+            );
+            remove = "openspace.globebrowsing.deleteGeoJson(Globe, Identifier)";
+            description = std::format("GeoJson layer loaded from '{}'", file);
+        }
+        else if (ext == ".vrt") {
+            add = std::format(
+                "openspace.globebrowsing.addLayer(Globe, \"ColorLayers\", {{ "
+                "Identifier = Identifier, Name = [[{}]], FilePath = [[{}]] }})",
+                stem, file
+            );
+            remove =
+                "openspace.globebrowsing.deleteLayer(Globe, \"ColorLayers\", Identifier)";
+            description = std::format("Color layer loaded from '{}'", file);
+        }
+        else {
+            throw ghoul::RuntimeError(std::format(
+                "Unsupported data asset file '{}'", path
+            ));
+        }
+
+        return std::format(R"(
+local Globe = "Earth"
+local Identifier = openspace.makeIdentifier([[{0}]])
+asset.onInitialize(function()
+  if not openspace.hasSceneGraphNode(Globe) then
+    error("Cannot load '{1}': No 'Earth' scene graph node exists. A globe asset must be loaded before this file")
+  end
+  {2}
+end)
+asset.onDeinitialize(function()
+  if openspace.hasSceneGraphNode(Globe) then
+    {3}
+  end
+end)
+asset.export("Globe", Globe)
+asset.export("Identifier", Identifier)
+asset.meta = {{ Name = [[{0}]], Description = [[{4}]] }}
+)",
+            stem, file, add, remove, description
+        );
     }
 
     struct [[codegen::Dictionary(AssetMeta)]] Parameters {
@@ -387,9 +452,11 @@ bool AssetManager::loadAsset(Asset* asset, Asset* parent) {
     }
     const bool isRegularAsset = asset->path().extension() == ".asset";
     const bool isJasset = asset->path().extension() == ".jasset";
-    if (!(isRegularAsset || isJasset)) {
+    const bool isDataAsset = isDataAssetFile(asset->path());
+    if (!(isRegularAsset || isJasset || isDataAsset)) {
         LERROR(std::format(
-            "Could not load asset '{}': Unknown extension", asset->path())
+            "Could not load asset '{}': Unknown extension. Supported extensions are "
+            "'.asset', '.jasset', '.geojson', and '.vrt'", asset->path())
         );
         return false;
     }
@@ -401,6 +468,10 @@ bool AssetManager::loadAsset(Asset* asset, Asset* parent) {
         else if (isJasset) {
             std::string jassetString = jassetToLua(asset->path());
             ghoul::lua::runScript(*_luaState, jassetString);
+        }
+        else if (isDataAsset) {
+            std::string dataAssetString = dataAssetToLua(asset->path());
+            ghoul::lua::runScript(*_luaState, dataAssetString);
         }
     }
     catch (const ghoul::lua::LuaRuntimeException& e) {
