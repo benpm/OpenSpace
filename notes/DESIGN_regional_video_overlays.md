@@ -8,6 +8,18 @@ sub-region** of a globe (a lat/lon bounding box), composited over the existing i
 with playback tied to application or simulation time, working on any planet and in
 clustered multi-window setups.
 
+> **2026-07-02 update** — source verification + polygon generalization:
+> - §6.1's load-bearing assumption is now **confirmed from source**: the `Normal` layer
+>   blend is true alpha-over (`blendNormal`, `modules/globebrowsing/shaders/blending.glsl:28-31`)
+>   and texel alpha survives layer settings (`texturetilemapping.glsl:110-114`). No
+>   shader-clip fallback needed; risk column in §9 drops to low.
+> - New gotcha found: the `VideoPlayer` frame texture is created with ghoul's default
+>   sampler = **`GL_REPEAT`** (`videoplayer.cpp:1006-1029` → ghoul `texture.h:147`), so the
+>   §2 out-of-range UVs would *tile the video across the globe* unless the wrap mode is
+>   changed to `ClampToBorder(0,0,0,0)`. That change is required, not optional.
+> - For clipping to **arbitrary GeoJSON polygon regions** (not just a bbox) see the
+>   follow-on design: [DESIGN_video_on_geojson_features.md](DESIGN_video_on_geojson_features.md).
+
 ---
 
 ## 1. What already exists (and why the gap is narrow)

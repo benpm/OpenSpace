@@ -201,6 +201,85 @@ lift features clear of terrain — this is the single most common "my GeoJSON is
   `Scene.<Globe>.Renderable.GeographicOverlays`.
 - See `notes/openspace-web-api.md` for driving GeoJSON layers from the WebSocket API.
 
+## 10. Rendering internals (source deep-dive, 2026-07-02)
+
+Read from the actual source on this branch; line numbers refer to
+`modules/globebrowsing/src/geojson/`.
+
+### Shader programs (two, shared per component)
+Built in `GeoJsonComponent::initializeGL` (geojsoncomponent.cpp:473-484):
+- **`GeoLinesAndPolygonProgram`** — `shaders/geojson_vs.glsl` + `geojson_fs.glsl`. Used for
+  lines, polygon fills, and extrusion walls.
+- **`GeoPointsProgram`** — `geojson_points_{vs,fs,gs}.glsl`. Points are expanded to
+  billboards in the geometry shader.
+
+### Geometry pipeline (CPU)
+1. **Parse** (`createFromSingleGeosGeometry`, globegeometryfeature.cpp:165-289): polygons
+   are triangulated *at parse time* with GEOS `ConstrainedDelaunayTriangulator`
+   (handles holes; winding flipped CW→CCW, lines 197-209). Ring outlines are kept
+   separately in `_geoCoordinates` (outer ring first, then holes). Also computes
+   `_heightUpdateReferencePoints` = centroid + envelope corners (lines 268-281).
+2. **Build** (`updateGeometry`, lines 517-532) creates `RenderFeature`s:
+   - lines: each ring → `GL_LINE_STRIP` vertices, tessellated by `subdivideLine`
+     (fixed step = `tessellationStepSize()`);
+   - extrusion walls: quads from ring edges (`createExtrudedGeometryVertices`);
+   - polygon fill: each parsed triangle subdivided by `subdivideTriangle` →
+     unindexed `GL_TRIANGLES` soup (no index buffer anywhere).
+3. Every **final (post-tessellation) vertex** position is converted *back* to geodetic:
+   `feature.vertices = geodetic2FromVertexList(...)` uses
+   `ellipsoid().cartesianToGeodetic2(v.position)` per vertex
+   (globegeometryhelper.cpp:81-90) — kept CPU-side purely so heights can be re-sampled.
+   **This means per-vertex lat/lon already exists for every drawn vertex** (relevant for
+   any future UV/texturing work, see `DESIGN_video_on_geojson_features.md`).
+
+### GPU data layout (`initializeRenderFeature`, lines 759-816)
+- VBO 0: `Vertex = rendering::VertexXYZNormal` `{ vec3 position; vec3 normal }`,
+  attributes `in_position`, `in_normal`. Positions are **single-precision model-space**
+  coordinates of the full-size globe (Earth radius ≈ 6.37e6 m → float mantissa gives
+  ~0.5–1 m quantization; fine for visualization, explains why no sub-meter registration
+  can be expected).
+- VBO 1: `in_height` — one float per vertex, the sampled height-map height
+  (`heightMapHeightsFromGeodetic2List` → `getHeightToReferenceSurface`). Re-uploaded with
+  `glNamedBufferData(GL_DYNAMIC_DRAW)` on height-map change (`bufferDynamicHeightData`,
+  lines 846-856) — vertex *positions* are never touched by height updates.
+- Height update policy (`shouldUpdateDueToHeightMapChange`, lines 475-502): only in
+  `RelativeToGround` mode, at most every **10 s** (`HeightUpdateInterval`, line 64), and
+  only if the sampled heights at the reference points changed. The refresh
+  (`updateHeightsFromHeightMap`, lines 534-542) re-samples **all** vertices in one frame
+  (has a `@TODO` to amortize — a known hitch for huge features, cf. issue #2730).
+
+### Vertex shader (geojson_vs.glsl:46-61)
+Terrain conformance is done in the shader, not by rebuilding geometry:
+`modelPos += normalize(in_position) * (useHeightMapData ? in_height + heightOffset : heightOffset)`.
+So `HeightOffset` edits are free (uniform), and the displacement direction is the
+*geocentric* out-direction, not the ellipsoid normal. `gl_Position.z` is forced to 0
+(depth handled via `out_data.depth = w`, the ABuffer/fragment framework convention).
+
+### Fragment shader (geojson_fs.glsl:47-74)
+Flat `vec4(color, opacity)`; optional per-light Lambert shading (normals are inverted with
+a `@TODO fix faulty triangle normals` note). **No texture sampling for lines/polygons** —
+only the points program samples a texture (billboard sprite + `textureWidthFactor`
+aspect correction, globegeometryfeature.cpp:424-431). Point size =
+`0.001 * pointSizeScale * PointSize * globe.boundingSphere()` (lines 387-389).
+
+### Draw pass structure
+`GeoJsonComponent::render` (geojsoncomponent.cpp:512-565): standard
+`SRC_ALPHA, ONE_MINUS_SRC_ALPHA` blending + depth test, then **two global passes** over
+all features. Per feature (`GlobeGeometryFeature::render`, lines 291-377):
+- pass 1 is skipped unless `shouldRenderTwice = polygon && fillOpacity < 1 && Extrude` —
+  in that case pass 0 draws back faces, pass 1 front faces (`glCullFace`,
+  renderPolygons lines 464-471) so translucent extruded volumes composite correctly.
+- Extrusion features draw with `fillColor`/`fillOpacity`; outline lines with
+  `color`/`opacity`.
+- Each `RenderFeature` is its own VAO + `glDrawArrays` call with full uniform re-upload —
+  many-feature files pay per-feature program state cost (another #2730 angle).
+
+### Where it hooks into the globe
+`GeoJsonManager` is a `PropertyOwner` ("GeographicOverlays") owned by `RenderableGlobe`;
+its components render **after** the globe's tile chunks in the same render task, i.e.
+vector features composite over the raster layer stack with regular GL blending (not part
+of the per-tile layer shader).
+
 ## Sources
 - [Globe Geometry Features from GeoJson Files — OpenSpace docs (latest)](https://docs.openspaceproject.com/latest/building-content/globebrowsing/geojson-layers.html)
 - [Adding Geometry with GeoJson — OpenSpace docs (v0.21)](https://docs.openspaceproject.com/releases-v0.21/building-content/globebrowsing/creation/adding-geojson-layers.html)

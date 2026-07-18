@@ -7,6 +7,7 @@
 - [ ] Making rendering of GeoJSONs more efficient by loading only those primitives that are visible [`#2730`](https://github.com/OpenSpace/OpenSpace/issues/2730) Improve performance of GeoJson rendering
 - [ ] Adding ability to layer animations over part of the Earth in addition to over the entire globe / Create the ability to geospatially place movies onto the surfaces of planets
   - Related: [`#3846`](https://github.com/OpenSpace/OpenSpace/issues/3846) Mismatching video / NOAA SOS layer on Earth; [`#2683`](https://github.com/OpenSpace/OpenSpace/issues/2683) Video player on globe rendering flickering (closed); [`#2684`](https://github.com/OpenSpace/OpenSpace/issues/2684) Add video layer to Jupiter for Juno profile (closed)
+  - Designs: [DESIGN_regional_video_overlays.md](DESIGN_regional_video_overlays.md) (lat/lon bbox, validated against source 2026-07-02), [DESIGN_video_on_geojson_features.md](DESIGN_video_on_geojson_features.md) (clip/project onto GeoJSON polygon features)
 - [ ] Overlaying geospatial animated maps onto Earth’s surface, there are other example assets I can send you at a future date.
   - Related: [`#4025`](https://github.com/OpenSpace/OpenSpace/issues/4025) Globe Imagery Browser should add Temporal layers when possible; [`#2830`](https://github.com/OpenSpace/OpenSpace/issues/2830) Globebrowsing support scripts for NOAA Temporal datasets via GDAL
 - [ ] overlaying geospatial animated maps onto Earth’s surface, there are other examples
