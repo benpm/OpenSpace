@@ -42,17 +42,8 @@ void main() {
   int drawIndex = baseDrawId + gl_DrawID;
   DrawElement element = drawElements[drawIndex];
 
-  dvec4 modelPos = dvec4(in_position, 1.0);
-
   // Offset model pos based on height info
-  if (length(in_position) > 0.0) {
-    dvec3 outDirection = normalize(dvec3(in_position));
-    bool useHeightMapData = (element.flags & FlagUseHeightMap) != 0u;
-    double height = useHeightMapData ?
-      in_height + element.heightOffset :
-      element.heightOffset;
-    modelPos += dvec4(outDirection * height, 0.0);
-  }
+  dvec4 modelPos = offsetByHeight(in_position, in_height, element);
 
   out_data.positionViewSpace = vec4(viewTransform * modelTransform * modelPos);
   out_data.drawIndex = drawIndex;

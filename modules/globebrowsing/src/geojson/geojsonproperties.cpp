@@ -68,24 +68,38 @@ namespace {
         return keyMatches(key, array, propInfo);
     }
 
-    /// Thrown when a property value cannot be interpreted as the expected type;
-    /// reported by the per-property catch in propsFromGeoJson
+    /**
+     * Thrown when a property value cannot be interpreted as the expected type;
+     * reported by the per-property catch in propsFromGeoJson.
+     */
     struct PropertyTypeError : std::exception {};
 
     std::string_view geoJsonTypeName(const geojson::PropertyValue& value) {
-        if (std::holds_alternative<std::string>(value)) { return "string"; }
-        if (std::holds_alternative<double>(value)) { return "number"; }
-        if (std::holds_alternative<bool>(value)) { return "boolean"; }
-        if (std::holds_alternative<std::vector<double>>(value)) { return "array"; }
+        if (std::holds_alternative<std::string>(value)) {
+            return "string";
+        }
+        if (std::holds_alternative<double>(value)) {
+            return "number";
+        }
+        if (std::holds_alternative<bool>(value)) {
+            return "boolean";
+        }
+        if (std::holds_alternative<std::vector<double>>(value)) {
+            return "array";
+        }
         return "null";
     }
 
     std::string geoJsonValueToString(const geojson::PropertyValue& value) {
-        if (const std::string* s = std::get_if<std::string>(&value)) { return *s; }
+        if (const std::string* s = std::get_if<std::string>(&value)) {
+            return *s;
+        }
         if (const double* d = std::get_if<double>(&value)) {
             return std::format("{}", *d);
         }
-        if (const bool* b = std::get_if<bool>(&value)) { return *b ? "true" : "false"; }
+        if (const bool* b = std::get_if<bool>(&value)) {
+            return *b ? "true" : "false";
+        }
         return std::string(geoJsonTypeName(value));
     }
 

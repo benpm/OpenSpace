@@ -41,8 +41,10 @@ namespace geos::geom { class Geometry; }
  */
 namespace openspace::geojson {
 
-/// One value from a feature's `properties` object. monostate represents null or a value
-/// type that no consumer cares about (nested objects, non-numeric arrays)
+/**
+ * One value from a feature's `properties` object. monostate represents null or a value
+ * type that no consumer cares about (nested objects, non-numeric arrays).
+ */
 using PropertyValue = std::variant<
     std::monostate, bool, double, std::string, std::vector<double>
 >;
@@ -59,8 +61,10 @@ enum class GeometryKind {
     GeometryCollection
 };
 
-/// One GeoJSON position: [lon, lat] or [lon, lat, alt]. z is NaN when absent, matching
-/// geos Coordinate semantics (toGeodetic maps NaN heights to 0)
+/**
+ * One GeoJSON position: [lon, lat] or [lon, lat, alt]. z is NaN when absent, matching
+ * geos Coordinate semantics (toGeodetic maps NaN heights to 0).
+ */
 struct Position {
     double x = 0.0;
     double y = 0.0;
@@ -77,12 +81,12 @@ struct ParsedGeometry {
     ///   MultiPolygon              -> coords[i][j]
     std::vector<std::vector<std::vector<Position>>> coords;
 
-    /// Only used for GeometryCollection
+    /// Only used for GeometryCollection.
     std::vector<ParsedGeometry> children;
 };
 
 struct ParsedFeature {
-    /// kind == None represents a null geometry
+    /// kind == None represents a null geometry.
     ParsedGeometry geometry;
     PropertyMap properties;
 };
@@ -95,8 +99,11 @@ struct ParsedGeoJson {
  * Parse GeoJSON text into features. Accepts a FeatureCollection, a single Feature, or a
  * bare geometry (parity with geos::io::GeoJSONReader::readFeatures).
  *
- * Throws ghoul::RuntimeError with a formatted parse error (including location context)
- * on malformed input.
+ * \param content The GeoJSON text to parse
+ * \return The parsed features
+ *
+ * \throw ghoul::RuntimeError If the input is malformed; the message includes a
+ *        formatted parse error with location context
  */
 ParsedGeoJson parseGeoJson(const std::string& content);
 

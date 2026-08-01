@@ -214,7 +214,10 @@ std::vector<Geodetic3> fromCached(const std::vector<CachedGeodetic3>& coords) {
     std::vector<Geodetic3> res;
     res.reserve(coords.size());
     for (const CachedGeodetic3& c : coords) {
-        res.push_back({ .geodetic2 = { .lat = c.lat, .lon = c.lon }, .height = c.height });
+        res.push_back({
+            .geodetic2 = { .lat = c.lat, .lon = c.lon },
+            .height = c.height
+        });
     }
     return res;
 }

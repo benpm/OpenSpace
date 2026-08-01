@@ -41,17 +41,19 @@
 // geometry type, property values can be anything) are deferred with glz::raw_json and
 // parsed in a second, exactly-typed pass. In a named namespace because glaze's
 // compile-time reflection requires types with linkage
-namespace openspace::geojson::rawdoc {
+namespace openspace::geojson::internal {
 
 struct RawGeometry {
     std::string type;
     glz::raw_json coordinates;
-    glz::raw_json geometries; // GeometryCollection only
+    /// GeometryCollection only
+    glz::raw_json geometries;
 };
 
 struct RawFeature {
     std::string type;
-    std::optional<RawGeometry> geometry; // JSON null -> nullopt
+    /// JSON null -> nullopt
+    std::optional<RawGeometry> geometry;
     std::optional<std::map<std::string, glz::raw_json>> properties;
 };
 
@@ -60,220 +62,240 @@ struct RawFeatureCollection {
     std::vector<RawFeature> features;
 };
 
-/// Minimal struct to read only the top-level "type" member
+/**
+ * Minimal struct to read only the top-level "type" member.
+ */
 struct TypeProbe {
     std::string type;
 };
 
-} // namespace openspace::geojson::rawdoc
+} // namespace openspace::geojson::internal
 
 namespace {
 
-constexpr glz::opts ReadOpts{ .error_on_unknown_keys = false };
+    constexpr glz::opts ReadOpts = { .error_on_unknown_keys = false };
 
-using namespace openspace;
-using namespace openspace::geojson::rawdoc;
+    using namespace openspace;
+    using namespace openspace::geojson::internal;
 
-template <typename T>
-T readRaw(const std::string& buffer, std::string_view what) {
-    T value{};
-    const glz::error_ctx ec = glz::read<ReadOpts>(value, buffer);
-    if (ec) {
-        throw ghoul::RuntimeError(
-            std::format("Error parsing {}: {}", what, glz::format_error(ec, buffer)),
-            "GeoJsonParser"
-        );
-    }
-    return value;
-}
-
-geojson::GeometryKind kindFromType(std::string_view type) {
-    using enum geojson::GeometryKind;
-    if (type == "Point") { return Point; }
-    if (type == "MultiPoint") { return MultiPoint; }
-    if (type == "LineString") { return LineString; }
-    if (type == "MultiLineString") { return MultiLineString; }
-    if (type == "Polygon") { return Polygon; }
-    if (type == "MultiPolygon") { return MultiPolygon; }
-    if (type == "GeometryCollection") { return GeometryCollection; }
-    return None;
-}
-
-geojson::Position toPosition(const std::vector<double>& coords) {
-    if (coords.size() < 2 || coords.size() > 3) {
-        throw ghoul::RuntimeError(
-            std::format("Expected two or three coordinates, found {}", coords.size()),
-            "GeoJsonParser"
-        );
-    }
-    geojson::Position p = { .x = coords[0], .y = coords[1] };
-    if (coords.size() == 3) {
-        p.z = coords[2];
-    }
-    return p;
-}
-
-std::vector<geojson::Position> toPositions(const std::vector<std::vector<double>>& list) {
-    std::vector<geojson::Position> res;
-    res.reserve(list.size());
-    for (const std::vector<double>& c : list) {
-        res.push_back(toPosition(c));
-    }
-    return res;
-}
-
-geojson::ParsedGeometry parseGeometry(const RawGeometry& raw) {
-    using Coords1 = std::vector<double>;
-    using Coords2 = std::vector<Coords1>;
-    using Coords3 = std::vector<Coords2>;
-    using Coords4 = std::vector<Coords3>;
-
-    geojson::ParsedGeometry res;
-    res.kind = kindFromType(raw.type);
-
-    switch (res.kind) {
-        case geojson::GeometryKind::Point: {
-            const Coords1 c = readRaw<Coords1>(raw.coordinates.str, "Point coordinates");
-            if (!c.empty()) {
-                res.coords = { { { toPosition(c) } } };
-            }
-            break;
-        }
-        case geojson::GeometryKind::MultiPoint:
-        case geojson::GeometryKind::LineString: {
-            const Coords2 c = readRaw<Coords2>(raw.coordinates.str, "coordinates");
-            res.coords = { { toPositions(c) } };
-            break;
-        }
-        case geojson::GeometryKind::MultiLineString:
-        case geojson::GeometryKind::Polygon: {
-            const Coords3 c = readRaw<Coords3>(raw.coordinates.str, "coordinates");
-            res.coords.emplace_back();
-            res.coords.back().reserve(c.size());
-            for (const Coords2& part : c) {
-                res.coords.back().push_back(toPositions(part));
-            }
-            break;
-        }
-        case geojson::GeometryKind::MultiPolygon: {
-            const Coords4 c = readRaw<Coords4>(raw.coordinates.str, "coordinates");
-            res.coords.reserve(c.size());
-            for (const Coords3& polygon : c) {
-                std::vector<std::vector<geojson::Position>> rings;
-                rings.reserve(polygon.size());
-                for (const Coords2& ring : polygon) {
-                    rings.push_back(toPositions(ring));
-                }
-                res.coords.push_back(std::move(rings));
-            }
-            break;
-        }
-        case geojson::GeometryKind::GeometryCollection: {
-            const std::vector<RawGeometry> children = readRaw<std::vector<RawGeometry>>(
-                raw.geometries.str,
-                "GeometryCollection geometries"
-            );
-            res.children.reserve(children.size());
-            for (const RawGeometry& child : children) {
-                res.children.push_back(parseGeometry(child));
-            }
-            break;
-        }
-        case geojson::GeometryKind::None:
+    template <typename T>
+    T readRaw(const std::string& buffer, std::string_view what) {
+        T value{};
+        const glz::error_ctx ec = glz::read<ReadOpts>(value, buffer);
+        if (ec) {
             throw ghoul::RuntimeError(
-                std::format("Unknown geometry type '{}'", raw.type),
+                std::format("Error parsing {}: {}", what, glz::format_error(ec, buffer)),
                 "GeoJsonParser"
             );
-    }
-    return res;
-}
-
-geojson::PropertyValue parsePropertyValue(const std::string& raw) {
-    const size_t i = raw.find_first_not_of(" \t\r\n");
-    if (i == std::string::npos) {
-        return std::monostate();
+        }
+        return value;
     }
 
-    switch (raw[i]) {
-        case 'n': // null
+    geojson::GeometryKind kindFromType(std::string_view type) {
+        using enum geojson::GeometryKind;
+        if (type == "Point") {
+            return Point;
+        }
+        if (type == "MultiPoint") {
+            return MultiPoint;
+        }
+        if (type == "LineString") {
+            return LineString;
+        }
+        if (type == "MultiLineString") {
+            return MultiLineString;
+        }
+        if (type == "Polygon") {
+            return Polygon;
+        }
+        if (type == "MultiPolygon") {
+            return MultiPolygon;
+        }
+        if (type == "GeometryCollection") {
+            return GeometryCollection;
+        }
+        return None;
+    }
+
+    geojson::Position toPosition(const std::vector<double>& coords) {
+        if (coords.size() < 2 || coords.size() > 3) {
+            throw ghoul::RuntimeError(
+                std::format("Expected two or three coordinates, found {}", coords.size()),
+                "GeoJsonParser"
+            );
+        }
+        geojson::Position p = { .x = coords[0], .y = coords[1] };
+        if (coords.size() == 3) {
+            p.z = coords[2];
+        }
+        return p;
+    }
+
+    std::vector<geojson::Position> toPositions(
+                                             const std::vector<std::vector<double>>& list)
+    {
+        std::vector<geojson::Position> res;
+        res.reserve(list.size());
+        for (const std::vector<double>& c : list) {
+            res.push_back(toPosition(c));
+        }
+        return res;
+    }
+
+    geojson::ParsedGeometry parseGeometry(const RawGeometry& raw) {
+        using Coords1 = std::vector<double>;
+        using Coords2 = std::vector<Coords1>;
+        using Coords3 = std::vector<Coords2>;
+        using Coords4 = std::vector<Coords3>;
+
+        geojson::ParsedGeometry res;
+        res.kind = kindFromType(raw.type);
+
+        switch (res.kind) {
+            case geojson::GeometryKind::Point: {
+                const Coords1 c =
+                    readRaw<Coords1>(raw.coordinates.str, "Point coordinates");
+                if (!c.empty()) {
+                    res.coords = { { { toPosition(c) } } };
+                }
+                break;
+            }
+            case geojson::GeometryKind::MultiPoint:
+            case geojson::GeometryKind::LineString: {
+                const Coords2 c = readRaw<Coords2>(raw.coordinates.str, "coordinates");
+                res.coords = { { toPositions(c) } };
+                break;
+            }
+            case geojson::GeometryKind::MultiLineString:
+            case geojson::GeometryKind::Polygon: {
+                const Coords3 c = readRaw<Coords3>(raw.coordinates.str, "coordinates");
+                res.coords.emplace_back();
+                res.coords.back().reserve(c.size());
+                for (const Coords2& part : c) {
+                    res.coords.back().push_back(toPositions(part));
+                }
+                break;
+            }
+            case geojson::GeometryKind::MultiPolygon: {
+                const Coords4 c = readRaw<Coords4>(raw.coordinates.str, "coordinates");
+                res.coords.reserve(c.size());
+                for (const Coords3& polygon : c) {
+                    std::vector<std::vector<geojson::Position>> rings;
+                    rings.reserve(polygon.size());
+                    for (const Coords2& ring : polygon) {
+                        rings.push_back(toPositions(ring));
+                    }
+                    res.coords.push_back(std::move(rings));
+                }
+                break;
+            }
+            case geojson::GeometryKind::GeometryCollection: {
+                const std::vector<RawGeometry> children =
+                    readRaw<std::vector<RawGeometry>>(
+                        raw.geometries.str,
+                        "GeometryCollection geometries"
+                    );
+                res.children.reserve(children.size());
+                for (const RawGeometry& child : children) {
+                    res.children.push_back(parseGeometry(child));
+                }
+                break;
+            }
+            case geojson::GeometryKind::None:
+                throw ghoul::RuntimeError(
+                    std::format("Unknown geometry type '{}'", raw.type),
+                    "GeoJsonParser"
+                );
+        }
+        return res;
+    }
+
+    geojson::PropertyValue parsePropertyValue(const std::string& raw) {
+        const size_t i = raw.find_first_not_of(" \t\r\n");
+        if (i == std::string::npos) {
             return std::monostate();
-        case 't':
-            return true;
-        case 'f':
-            return false;
-        case '"': {
-            std::string s;
-            const glz::error_ctx ec = glz::read<ReadOpts>(s, raw);
-            return ec ? geojson::PropertyValue(std::monostate()) : std::move(s);
         }
-        case '[': {
-            // Only arrays of numbers are meaningful downstream (color values)
-            std::vector<double> v;
-            const glz::error_ctx ec = glz::read<ReadOpts>(v, raw);
-            return ec ? geojson::PropertyValue(std::monostate()) : std::move(v);
-        }
-        case '{':
-            // Nested objects have no downstream consumer
-            return std::monostate();
-        default: {
-            double d = 0.0;
-            const glz::error_ctx ec = glz::read<ReadOpts>(d, raw);
-            return ec ? geojson::PropertyValue(std::monostate()) : d;
-        }
-    }
-}
 
-geojson::ParsedFeature parseFeature(RawFeature& raw) {
-    geojson::ParsedFeature res;
-    if (raw.geometry.has_value()) {
-        res.geometry = parseGeometry(*raw.geometry);
-    }
-    if (raw.properties.has_value()) {
-        res.properties.reserve(raw.properties->size());
-        for (auto& [key, value] : *raw.properties) {
-            res.properties.emplace_back(key, parsePropertyValue(value.str));
+        switch (raw[i]) {
+            case 'n': // null
+                return std::monostate();
+            case 't':
+                return true;
+            case 'f':
+                return false;
+            case '"': {
+                std::string s;
+                const glz::error_ctx ec = glz::read<ReadOpts>(s, raw);
+                return ec ? geojson::PropertyValue(std::monostate()) : std::move(s);
+            }
+            case '[': {
+                // Only arrays of numbers are meaningful downstream (color values)
+                std::vector<double> v;
+                const glz::error_ctx ec = glz::read<ReadOpts>(v, raw);
+                return ec ? geojson::PropertyValue(std::monostate()) : std::move(v);
+            }
+            case '{':
+                // Nested objects have no downstream consumer
+                return std::monostate();
+            default: {
+                double d = 0.0;
+                const glz::error_ctx ec = glz::read<ReadOpts>(d, raw);
+                return ec ? geojson::PropertyValue(std::monostate()) : d;
+            }
         }
     }
-    return res;
-}
 
-std::unique_ptr<geos::geom::CoordinateSequence> makeCoordinateSequence(
-                                            const std::vector<geojson::Position>& points)
-{
-    auto seq = std::make_unique<geos::geom::CoordinateSequence>();
-    seq->reserve(points.size());
-    for (const geojson::Position& p : points) {
-        seq->add(geos::geom::Coordinate(p.x, p.y, p.z));
+    geojson::ParsedFeature parseFeature(RawFeature& raw) {
+        geojson::ParsedFeature res;
+        if (raw.geometry.has_value()) {
+            res.geometry = parseGeometry(*raw.geometry);
+        }
+        if (raw.properties.has_value()) {
+            res.properties.reserve(raw.properties->size());
+            for (auto& [key, value] : *raw.properties) {
+                res.properties.emplace_back(key, parsePropertyValue(value.str));
+            }
+        }
+        return res;
     }
-    return seq;
-}
 
-std::unique_ptr<geos::geom::Polygon> makePolygon(
-                          const std::vector<std::vector<geojson::Position>>& polygonRings,
-                          const geos::geom::GeometryFactory& factory)
-{
-    std::unique_ptr<geos::geom::LinearRing> shell;
-    std::vector<std::unique_ptr<geos::geom::LinearRing>> holes;
-    holes.reserve(polygonRings.size());
-    for (const std::vector<geojson::Position>& ring : polygonRings) {
-        auto seq = makeCoordinateSequence(ring);
+    std::unique_ptr<geos::geom::CoordinateSequence> makeCoordinateSequence(
+                                             const std::vector<geojson::Position>& points)
+    {
+        auto seq = std::make_unique<geos::geom::CoordinateSequence>();
+        seq->reserve(points.size());
+        for (const geojson::Position& p : points) {
+            seq->add(geos::geom::Coordinate(p.x, p.y, p.z));
+        }
+        return seq;
+    }
+
+    std::unique_ptr<geos::geom::Polygon> makePolygon(
+                        const std::vector<std::vector<geojson::Position>>& polygonRings,
+                        const geos::geom::GeometryFactory& factory)
+    {
+        std::unique_ptr<geos::geom::LinearRing> shell;
+        std::vector<std::unique_ptr<geos::geom::LinearRing>> holes;
+        holes.reserve(polygonRings.size());
+        for (const std::vector<geojson::Position>& ring : polygonRings) {
+            auto seq = makeCoordinateSequence(ring);
+            if (!shell) {
+                shell = factory.createLinearRing(std::move(seq));
+            }
+            else {
+                holes.push_back(factory.createLinearRing(std::move(seq)));
+            }
+        }
         if (!shell) {
-            shell = factory.createLinearRing(std::move(seq));
+            return factory.createPolygon(2);
+        }
+        else if (holes.empty()) {
+            return factory.createPolygon(std::move(shell));
         }
         else {
-            holes.push_back(factory.createLinearRing(std::move(seq)));
+            return factory.createPolygon(std::move(shell), std::move(holes));
         }
     }
-    if (!shell) {
-        return factory.createPolygon(2);
-    }
-    else if (holes.empty()) {
-        return factory.createPolygon(std::move(shell));
-    }
-    else {
-        return factory.createPolygon(std::move(shell), std::move(holes));
-    }
-}
 
 } // namespace
 

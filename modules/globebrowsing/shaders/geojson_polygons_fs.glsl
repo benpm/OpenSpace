@@ -38,6 +38,8 @@ uniform uint nLightSources;
 uniform vec3 lightDirectionsViewSpace[8];
 uniform float lightIntensities[8];
 
+// Keep in sync with geojson_drawdata.glsl and the GeoJsonDrawRecord struct in
+// globegeometryfeature.h (this stage only needs the flag, not the whole SSBO include)
 const uint FlagPerformShading = 16u;
 
 const vec3 LightColor = vec3(1.0);

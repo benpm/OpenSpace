@@ -31,7 +31,6 @@
 #include <openspace/rendering/texturecomponent.h>
 #include <ghoul/glm.h>
 #include <ghoul/opengl/ghoul_gl.h>
-#include <chrono>
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -60,7 +59,7 @@ class RenderableGlobe;
 /**
  * Per-draw data for batched points and lines, stored in an SSBO and indexed with
  * `baseDrawId + gl_DrawID` in the shaders. Must be kept in sync with the DrawElement
- * struct in geojson_drawdata.glsl (std430 layout)
+ * struct in geojson_drawdata.glsl (std430 layout).
  */
 struct GeoJsonDrawRecord {
     static constexpr uint32_t FlagUseHeightMap = 1;
@@ -70,21 +69,27 @@ struct GeoJsonDrawRecord {
 
     /// Draw group key bit marking wireframe groups. Group keys otherwise hold the GL
     /// texture name for points, so this bit is kept well clear of that range
-    static constexpr int64_t WireframeGroupBit = int64_t(1) << 40;
+    static constexpr int64_t WireframeGroupBit = static_cast<int64_t>(1) << 40;
 
-    // Polygon group keys: bits 0-1 hold the cull pass, bit 40 wireframe and the bits
-    // from PolygonComponentShift up the owning component's index. Component-major key
-    // ordering keeps the current per-component draw order: single-pass draws, then the
-    // two culled passes of transparent extruded features, then the next component
+    /// Polygon group keys: bits 0-1 hold the cull pass, bit 40 wireframe and the bits
+    /// from PolygonComponentShift up the owning component's index. Component-major key
+    /// ordering keeps the current per-component draw order: single-pass draws, then the
+    /// two culled passes of transparent extruded features, then the next component
     static constexpr int64_t PolygonCullPassMask = 3;
-    static constexpr int64_t PolygonBackFacePass = 1;  // glCullFace(GL_FRONT)
-    static constexpr int64_t PolygonFrontFacePass = 2; // glCullFace(GL_BACK)
+    /// Cull pass value for the glCullFace(GL_FRONT) pass
+    static constexpr int64_t PolygonBackFacePass = 1;
+    /// Cull pass value for the glCullFace(GL_BACK) pass
+    static constexpr int64_t PolygonFrontFacePass = 2;
     static constexpr int PolygonComponentShift = 41;
 
-    glm::vec4 color = glm::vec4(1.f); // rgb + final opacity, fades folded in
-    float heightOffset = 0.f; // meters
-    float sizeOrWidth = 0.f; // point size (world units) or line width (pixels)
-    float textureWidthFactor = 1.f; // points only
+    /// rgb + final opacity, fades folded in
+    glm::vec4 color = glm::vec4(1.f);
+    /// In meters
+    float heightOffset = 0.f;
+    /// Point size (world units) or line width (pixels)
+    float sizeOrWidth = 0.f;
+    /// Points only
+    float textureWidthFactor = 1.f;
     uint32_t flags = 0;
 };
 static_assert(sizeof(GeoJsonDrawRecord) == 32);
@@ -156,7 +161,7 @@ public:
         float lineWidthScale;
         PointRenderMode& pointRenderMode;
         rendering::LightSourceRenderData& lightSourceData;
-        /// Base group key for polygon draws: component index and wireframe bit
+        /// Base group key for polygon draws: component index and wireframe bit.
         int64_t polygonGroupBase;
     };
 
@@ -208,47 +213,61 @@ public:
      * the reference heights they were sampled against. They are consumed, in render
      * feature build order, by the next geometry build; each vector is validated by
      * vertex count and any mismatch discards the rest (alignment is positional).
-     * Later rebuilds are unaffected
+     * Later rebuilds are unaffected.
      */
     void setPendingCachedHeights(std::vector<std::vector<float>> heights,
         std::vector<double> controlHeights);
 
-    /// Copies of each render feature's heights, in build order (for the heights cache)
+    /**
+     * Returns copies of each render feature's heights, in build order (for the
+     * heights cache).
+     */
     std::vector<std::vector<float>> currentHeights() const;
 
-    /// The reference heights the current per-vertex heights were computed with
+    /**
+     * Returns the reference heights the current per-vertex heights were computed
+     * with.
+     */
     const std::vector<double>& lastControlHeights() const;
 
     /**
      * Check whether the height map heights at the feature's reference points differ
-     * from the values the current per-vertex heights were computed with. Returns the
-     * new reference heights when they differ (pass them to applyHeightUpdate), or
-     * nullopt when nothing changed or the feature does not use the height map. With
-     * \p force, the new heights are returned without comparing. The polling cadence
-     * is owned by the GeoJsonComponent's refinement sweep
+     * from the values the current per-vertex heights were computed with. The polling
+     * cadence is owned by the GeoJsonComponent's refinement sweep.
+     *
+     * \param force If true, the new heights are returned without comparing
+     * \return The new reference heights when they differ (pass them to
+     *         applyHeightUpdate), or nullopt when nothing changed or the feature does
+     *         not use the height map
      */
     std::optional<std::vector<double>> checkHeightMapChange(bool force = false) const;
 
     /**
      * Re-sample the height map for all of the feature's vertices, upload the new
      * heights and store \p newControlHeights as the reference state that
-     * checkHeightMapChange compares against
+     * checkHeightMapChange compares against.
      */
     void applyHeightUpdate(std::vector<double> newControlHeights);
 
-    /// Number of vertices that a height re-sample has to query the globe for.
-    /// Used by the component to budget its refinement sweep
+    /**
+     * Returns the number of vertices that a height re-sample has to query the globe
+     * for. Used by the component to budget its refinement sweep.
+     */
     size_t heightVertexCount() const;
 
-    /// Returns true if the geometry was rebuilt, i.e. draws were added to or removed
-    /// from the shared batches, so that the owner knows to re-commit them
+    /**
+     * Returns true if the geometry was rebuilt, i.e. draws were added to or removed
+     * from the shared batches, so that the owner knows to re-commit them.
+     */
     bool update(bool dataIsDirty);
     void updateGeometry();
 
 private:
     rendering::MultiDrawBatch* batchForRenderType(RenderType type) const;
 
-    /// Remove all render features, releasing their batch draws
+    /**
+     * Remove all render features, releasing their batch draws.
+     */
     void clearRenderFeatures();
 
     /**

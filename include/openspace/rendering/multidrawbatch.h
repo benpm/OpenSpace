@@ -88,11 +88,15 @@ public:
         std::span<const std::span<const std::byte>> streamData);
     void removeDraw(DrawHandle handle);
 
-    /// Re-concatenate all retained draw data and upload each stream's VBO
+    /**
+     * Re-concatenate all retained draw data and upload each stream's VBO.
+     */
     void commit();
 
-    /// Overwrite one stream's retained data for a draw and upload just that range.
-    /// The data size must match the size given to #addDraw
+    /**
+     * Overwrite one stream's retained data for a draw and upload just that range. The
+     * data size must match the size given to #addDraw.
+     */
     void updateStreamRange(DrawHandle handle, GLuint streamIndex,
         std::span<const std::byte> data);
 
@@ -106,24 +110,43 @@ public:
     void setCoalescingEnabled(bool enabled);
 
     void beginFrame();
-    /// Queue a draw for this frame. \p record must point at drawRecordSize bytes
+
+    /**
+     * Queue a draw for this frame.
+     *
+     * \param handle The draw to queue
+     * \param record Must point at drawRecordSize bytes of per-draw data
+     * \param groupKey The group under which the draw is rendered
+     */
     void emitDraw(DrawHandle handle, const void* record, int64_t groupKey);
-    /// Sort queued draws by group key, build first/count arrays and upload the SSBO
+
+    /**
+     * Sort queued draws by group key, build first/count arrays and upload the SSBO.
+     */
     void endFrame();
 
-    /// Groups queued this frame, in ascending group-key order
+    /**
+     * Returns the groups queued this frame, in ascending group-key order.
+     */
     std::span<const Group> groups() const;
     void bindVertexArray() const;
     void renderGroup(GLenum mode, const Group& group) const;
     GLuint ssboId() const;
-    /// Number of sub-draws after coalescing (what glMultiDrawArrays receives)
+
+    /**
+     * Returns the number of sub-draws after coalescing (what glMultiDrawArrays
+     * receives).
+     */
     size_t nDrawsThisFrame() const;
-    /// Number of draws queued via #emitDraw this frame, before coalescing
+
+    /**
+     * Returns the number of draws queued via #emitDraw this frame, before coalescing.
+     */
     size_t nEmittedThisFrame() const;
 
 private:
     struct DrawEntry {
-        bool active = false;
+        bool isActive = false;
         GLsizei nVertices = 0;
         GLint first = 0;
         std::vector<std::vector<std::byte>> streamData;
@@ -143,7 +166,7 @@ private:
     std::vector<DrawEntry> _draws;
     std::vector<DrawHandle> _freeSlots;
     bool _isCommitted = false;
-    bool _coalesce = false;
+    bool _shouldCoalesce = false;
 
     // Per-frame state
     std::vector<PendingDraw> _pending;

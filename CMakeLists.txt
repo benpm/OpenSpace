@@ -160,9 +160,9 @@ endif ()
 
 ##########################################################################################
 # clang/LLVM (clang-cl) build fixup for the spice submodule.                             #
-# Guarded on the Clang compiler id so the MSVC build is unaffected. The assimp and        #
-# tiny-process-library fixups live in ghoul (ext/ghoul/ext/CMakeLists.txt) and the sgct   #
-# image.cpp fix lives in the sgct submodule, since those repos own those sources.         #
+# Guarded on the Clang compiler id so the MSVC build is unaffected. The assimp and       #
+# tiny-process-library fixups live in ghoul (ext/ghoul/ext/CMakeLists.txt) and the sgct  #
+# image.cpp fix lives in the sgct submodule, since those repos own those sources.        #
 ##########################################################################################
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # spice is legacy f2c-generated K&R C that trips clang diagnostics which default to

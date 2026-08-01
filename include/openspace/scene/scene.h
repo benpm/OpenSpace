@@ -341,8 +341,9 @@ private:
     };
     std::vector<PropertyInterpolationInfo> _propertyInterpolationInfos;
 
-    // When set, this time is used for property interpolations instead of the real clock
-    // (see setInterpolationTimeReference). Used to make interpolation deterministic
+    /// When set, this time is used for property interpolations instead of the real
+    /// clock (see setInterpolationTimeReference). Used to make interpolation
+    /// deterministic
     std::optional<std::chrono::steady_clock::time_point> _interpolationTimeOverride;
 
     std::unordered_map<std::string, std::vector<std::string>> _guiTreeOrderMap;

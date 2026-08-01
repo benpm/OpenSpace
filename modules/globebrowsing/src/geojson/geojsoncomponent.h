@@ -89,12 +89,16 @@ public:
     bool styleIsDirty() const;
     void clearStyleDirty();
 
-    /// Returns true if any feature of this component can currently draw polygon
-    /// geometry (fill triangles or extrusion walls)
+    /**
+     * Returns true if any feature of this component can currently draw polygon
+     * geometry (fill triangles or extrusion walls).
+     */
     bool hasPolygonsToDraw() const;
 
-    /// Update the view-dependent light source data used by the polygon shading.
-    /// Called by the owning GeoJsonManager once per frame when polygons are drawn
+    /**
+     * Update the view-dependent light source data used by the polygon shading. Called
+     * by the owning GeoJsonManager once per frame when polygons are drawn.
+     */
     void updateLightSources(const RenderData& data);
     const rendering::LightSourceRenderData& lightSourceRenderData() const;
 
@@ -106,8 +110,10 @@ public:
     void emitBatchedDraws(std::map<int64_t, ghoul::opengl::Texture*>& pointTextures,
         int componentIndex);
 
-    /// Returns true if any feature's geometry was rebuilt, so that the owner knows to
-    /// re-commit the shared batches
+    /**
+     * Returns true if any feature's geometry was rebuilt, so that the owner knows to
+     * re-commit the shared batches.
+     */
     bool update();
 
     static openspace::Documentation Documentation();
@@ -122,7 +128,10 @@ private:
     public:
         SubFeatureProps(PropertyOwner::PropertyOwnerInfo info);
 
-        /// Register \p callback on every property that affects how the feature is drawn
+        /**
+         * Register \p callback on every property that affects how the feature is
+         * drawn.
+         */
         void onStyleChange(std::function<void()> callback);
 
         BoolProperty enabled;
@@ -132,7 +141,9 @@ private:
         float boundingBoxDiagonal = 0.f;
     };
 
-    /// Accumulated load phase durations, for the load-time summary log
+    /**
+     * Accumulated load phase durations, for the load-time summary log.
+     */
     struct LoadStats {
         std::chrono::steady_clock::duration parse{};
         std::chrono::steady_clock::duration validate{};
@@ -143,7 +154,7 @@ private:
     /**
      * Per-feature meta data, always kept 1:1 with _geometryFeatures. The
      * SubFeatureProps property owners are only created when the number of features is
-     * at most the per-feature-properties threshold; everything else reads from here
+     * at most the per-feature-properties threshold; everything else reads from here.
      */
     struct FeatureMeta {
         glm::vec2 centroidLatLong = glm::vec2(0.f);
@@ -155,28 +166,42 @@ private:
     void parseSingleFeature(const geojson::ParsedFeature& feature, int indexInFile,
         LoadStats& stats, geojson::GeoJsonCacheFile& cacheOut);
 
-    /// Decide whether per-feature property owners are created, based on the feature
-    /// count and the configured threshold
+    /**
+     * Decide whether per-feature property owners are created, based on the feature
+     * count and the configured threshold.
+     */
     void decidePerFeatureProps(size_t nFeatures);
 
-    /// Recount how many features own a point texture (needing per-frame updates)
+    /**
+     * Recount how many features own a point texture (needing per-frame updates).
+     */
     void countPointTextureFeatures();
 
-    /// Hand the most recently created geometry feature its cached heights (if the
-    /// heights sidecar cache was loaded and has an entry for \p index)
+    /**
+     * Hand the most recently created geometry feature its cached heights (if the
+     * heights sidecar cache was loaded and has an entry for \p index).
+     */
     void installCachedHeights(int index);
 
-    /// Construct all features from a load cache, skipping JSON parsing and GEOS work
+    /**
+     * Construct all features from a load cache, skipping JSON parsing and GEOS work.
+     */
     void loadFromCache(const geojson::GeoJsonCacheFile& cache);
 
-    /// Compute the bounding box diagonal from the meta's boundingboxLatLong. Depends
-    /// on the globe's ellipsoid, which is why it is not part of the load cache
+    /**
+     * Compute the bounding box diagonal from the meta's boundingboxLatLong. Depends
+     * on the globe's ellipsoid, which is why it is not part of the load cache.
+     */
     void computeFeatureDiagonal(FeatureMeta& meta) const;
 
-    /// Compute the centroid, bounding box and diagonal of the geometry
+    /**
+     * Compute the centroid, bounding box and diagonal of the geometry.
+     */
     FeatureMeta computeFeatureMeta(const geos::geom::Geometry* geometry) const;
 
-    /// Copy the meta values into the feature's properties and hook up its fly-to
+    /**
+     * Copy the meta values into the feature's properties and hook up its fly-to.
+     */
     void applyMetaToFeature(SubFeatureProps& feature, const FeatureMeta& meta,
         int index);
 
@@ -218,23 +243,23 @@ private:
     bool _styleIsDirty = true;
     mutable bool _isReadyCached = false;
 
-    // Height refinement sweep: a budgeted round-robin over the features that checks
-    // whether streamed height map data changed and re-samples where it did. Replaces
-    // per-feature timers, which all fired in the same frame
+    /// Height refinement sweep: a budgeted round-robin over the features that checks
+    /// whether streamed height map data changed and re-samples where it did. Replaces
+    /// per-feature timers, which all fired in the same frame
     size_t _heightSweepCursor = 0;
     bool _heightSweepActive = false;
     std::chrono::steady_clock::time_point _lastSweepStart;
     bool _forceResampleAll = false;
 
-    // Sidecar cache holding the refined heights across runs; written on
-    // deinitialization when any heights changed
+    /// Sidecar cache holding the refined heights across runs; written on
+    /// deinitialization when any heights changed
     std::filesystem::path _heightsCacheFile;
     bool _heightsDirtyForCache = false;
     std::optional<geojson::GeoJsonHeightsCacheFile> _loadedHeightsCache;
 
-    // Cached facts about the loaded features, used to skip per-feature work when no
-    // feature can possibly need it. Property overrides are static after load; only the
-    // default properties are live
+    /// Cached facts about the loaded features, used to skip per-feature work when no
+    /// feature can possibly need it. Property overrides are static after load; only the
+    /// default properties are live
     int _nFillPolygonFeatures = 0;
     int _nExtrudeTrueOverride = 0;
     int _nExtrudableNoOverride = 0;
@@ -265,7 +290,7 @@ private:
     bool _createPerFeatureProps = true;
     int _perFeaturePropertiesThreshold = 10000;
 
-    // Owned by the GeoJsonManager and shared between all components on the globe
+    /// Owned by the GeoJsonManager and shared between all components on the globe
     rendering::MultiDrawBatch* _pointsBatch = nullptr;
     rendering::MultiDrawBatch* _linesBatch = nullptr;
     rendering::MultiDrawBatch* _polygonsBatch = nullptr;

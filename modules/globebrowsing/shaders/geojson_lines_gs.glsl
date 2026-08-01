@@ -49,6 +49,9 @@ out Data {
 uniform dmat4 projectionTransform;
 uniform vec2 resolution; // framebuffer resolution in pixels
 
+// Segments shorter than this (in pixels) have no usable direction
+const float MinSegmentLength = 0.0001;
+
 
 void main() {
   DrawElement element = drawElements[in_data[0].drawIndex];
@@ -66,8 +69,10 @@ void main() {
   vec2 screen1 = (clip1.xy / clip1.w * 0.5 + 0.5) * resolution;
 
   vec2 direction = screen1 - screen0;
-  float len = length(direction);
-  direction = (len > 0.0001) ? direction / len : vec2(1.0, 0.0);
+  float segmentLength = length(direction);
+  direction = (segmentLength > MinSegmentLength) ?
+    direction / segmentLength :
+    vec2(1.0, 0.0);
   vec2 normal = vec2(-direction.y, direction.x);
 
   float halfWidth = 0.5 * element.sizeOrWidth;

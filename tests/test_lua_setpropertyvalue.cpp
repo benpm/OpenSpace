@@ -390,9 +390,7 @@ TEST_CASE("SetPropertyValueSingle: Bouncing", "[setpropertyvalue]") {
         // Stop the bouncing. The value eases back to its original value over the original
         // duration; once it settles the interpolation expires and runs the post-script,
         // which sets 'base.p2'
-        global::scriptEngine->queueScript(
-            "openspace.stopPropertyBouncing('base.p1')"
-        );
+        global::scriptEngine->queueScript("openspace.stopPropertyBouncing('base.p1')");
         triggerScriptRun();
 
         // First tick latches the abort; a tick a full duration later completes the

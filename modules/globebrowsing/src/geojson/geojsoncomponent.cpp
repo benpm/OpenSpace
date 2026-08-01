@@ -24,6 +24,7 @@
 
 #include <modules/globebrowsing/src/geojson/geojsoncomponent.h>
 
+#include <modules/globebrowsing/src/geojson/geojsonparser.h>
 #include <modules/globebrowsing/src/layergroup.h>
 #include <modules/globebrowsing/src/layermanager.h>
 #include <modules/globebrowsing/src/renderableglobe.h>
@@ -40,13 +41,15 @@
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/format.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/opengl/openglstatecache.h>
 #include <ghoul/misc/defer.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/exception.h>
 #include <ghoul/misc/profiling.h>
+#include <ghoul/opengl/openglstatecache.h>
 #include <geos/geom/CoordinateSequence.h>
+#include <geos/geom/Geometry.h>
 #include <geos/geom/Point.h>
+#include <geos/operation/valid/MakeValid.h>
 #include <geos/util/GEOSException.h>
 #include <algorithm>
 #include <chrono>
@@ -56,11 +59,6 @@
 #include <functional>
 #include <iterator>
 #include <utility>
-
-#include <modules/globebrowsing/src/geojson/geojsoncache.h>
-#include <modules/globebrowsing/src/geojson/geojsonparser.h>
-#include <geos/geom/Geometry.h>
-#include <geos/operation/valid/MakeValid.h>
 
 namespace {
     using namespace openspace;
@@ -256,7 +254,7 @@ namespace {
         // thousands of per-feature properties use a lot of memory and make the user
         // interface unusably slow. The count refers to the number of features in the
         // file; multi-geometries may render as more features than that. Defaults to
-        // 10000
+        // 10000.
         std::optional<int> perFeaturePropertiesThreshold [[codegen::greaterequal(0)]];
 
         // These properties will be used as default values for the geoJson rendering,
@@ -475,8 +473,8 @@ GeoJsonComponent::GeoJsonComponent(const ghoul::Dictionary& dictionary,
     _lineWidthScale.onChange(markStyleDirty);
     _pointRenderModeOption.onChange(markStyleDirty);
     _drawWireframe.onChange(markStyleDirty);
-    for (Property* p : _defaultProperties.propertiesRecursive()) {
-        p->onChange(markStyleDirty);
+    for (Property* prop : _defaultProperties.propertiesRecursive()) {
+        prop->onChange(markStyleDirty);
     }
 
     readFile();
@@ -606,8 +604,8 @@ const rendering::LightSourceRenderData& GeoJsonComponent::lightSourceRenderData(
 }
 
 void GeoJsonComponent::emitBatchedDraws(
-                                std::map<int64_t, ghoul::opengl::Texture*>& pointTextures,
-                                                                        int componentIndex)
+                              std::map<int64_t, ghoul::opengl::Texture*>& pointTextures,
+                                                                      int componentIndex)
 {
     if (!_enabled || !isVisible()) {
         return;
@@ -797,7 +795,7 @@ void GeoJsonComponent::readFile() {
     std::filesystem::path cacheFile;
     std::string cacheInfo;
     if (FileSys.cacheManager()) {
-        const auto lastWrite =
+        const int64_t lastWrite =
             std::filesystem::last_write_time(source).time_since_epoch().count();
         cacheInfo = std::format(
             "geojson|v{}|ih{}|{}",
@@ -880,7 +878,7 @@ void GeoJsonComponent::readFile() {
     defer { std::filesystem::current_path(cwd); };
 
     LoadStats stats;
-    int count = 0;
+    int nFeatures = 0;
     geojson::GeoJsonCacheFile cacheOut;
     cacheOut.ignoreHeights = _ignoreHeightsFromFile;
 
@@ -893,8 +891,8 @@ void GeoJsonComponent::readFile() {
         decidePerFeatureProps(parsed.features.size());
 
         for (const geojson::ParsedFeature& feature : parsed.features) {
-            count++;
-            parseSingleFeature(feature, count, stats, cacheOut);
+            nFeatures++;
+            parseSingleFeature(feature, nFeatures, stats, cacheOut);
         }
 
         if (_geometryFeatures.empty()) {
@@ -932,7 +930,7 @@ void GeoJsonComponent::readFile() {
     LINFO(std::format(
         "Loaded '{}': {} features ({} rendered) in {:.2f} s (parse {:.2f} s, validate "
         "{:.2f} s, derive {:.2f} s, register {:.2f} s, cache write {:.2f} s)",
-        _geoJsonFile.value(), count, _geometryFeatures.size(),
+        _geoJsonFile.value(), nFeatures, _geometryFeatures.size(),
         secs(Clock::now() - startTime), secs(stats.parse), secs(stats.validate),
         secs(stats.derive), secs(stats.registration), secs(cacheWrite)
     ));

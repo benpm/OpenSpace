@@ -34,13 +34,13 @@
 #include <openspace/scripting/lualibrary.h>
 #include <openspace/util/resourcesynchronization.h>
 #include <ghoul/filesystem/filesystem.h>
+#include <ghoul/logging/logmanager.h>
+#include <ghoul/lua/lua_helper.h>
+#include <ghoul/lua/luastate.h>
 #include <ghoul/misc/defer.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/exception.h>
 #include <ghoul/misc/stringhelper.h>
-#include <ghoul/logging/logmanager.h>
-#include <ghoul/lua/lua_helper.h>
-#include <ghoul/lua/luastate.h>
 #include <algorithm>
 #include <string_view>
 #include <utility>
@@ -134,7 +134,8 @@ local Globe = "Earth"
 local Identifier = openspace.makeIdentifier([[{0}]])
 asset.onInitialize(function()
   if not openspace.hasSceneGraphNode(Globe) then
-    error("Cannot load '{1}': No 'Earth' scene graph node exists. A globe asset must be loaded before this file")
+    error("Cannot load '{1}': No 'Earth' scene graph node exists. " ..
+      "A globe asset must be loaded before this file")
   end
   {2}
 end)

@@ -43,10 +43,12 @@ namespace openspace { struct Geodetic3; }
  */
 namespace openspace::geojson {
 
-/// Bump to invalidate all existing GeoJSON caches (part of the cache key)
+/// Bump to invalidate all existing GeoJSON caches (part of the cache key).
 inline constexpr int32_t CacheVersion = 1;
 
-/// Radians / meters, decoupled from the engine's Geodetic3 layout
+/**
+ * Radians / meters, decoupled from the engine's Geodetic3 layout.
+ */
 struct CachedGeodetic3 {
     double lat = 0.0;
     double lon = 0.0;
@@ -67,33 +69,42 @@ struct CachedOverrideProperties {
     std::optional<float> lineWidth;
     std::optional<float> pointSize;
     std::optional<std::string> pointTexture;
-    std::optional<int32_t> pointTextureAnchor; // GeoJsonProperties::PointTextureAnchor
+    /// GeoJsonProperties::PointTextureAnchor
+    std::optional<int32_t> pointTextureAnchor;
     std::optional<bool> extrude;
     std::optional<bool> performShading;
-    std::optional<int32_t> altitudeMode;       // GeoJsonProperties::AltitudeMode
+    /// GeoJsonProperties::AltitudeMode
+    std::optional<int32_t> altitudeMode;
     std::optional<bool> tessellationEnabled;
     std::optional<bool> useTessellationLevel;
     std::optional<int32_t> tessellationLevel;
     std::optional<float> tessellationDistance;
 };
 
-/// One rendered GlobeGeometryFeature plus its SubFeatureProps metadata
+/**
+ * One rendered GlobeGeometryFeature plus its SubFeatureProps metadata.
+ */
 struct CachedRenderedFeature {
-    int32_t geometryType = 0; // GlobeGeometryFeature::GeometryType
+    /// GlobeGeometryFeature::GeometryType
+    int32_t geometryType = 0;
     std::vector<std::vector<CachedGeodetic3>> geoCoordinates;
     std::vector<CachedGeodetic3> triangleCoordinates;
     std::vector<CachedGeodetic3> heightUpdateReferencePoints;
     std::string key;
-    // SubFeatureProps metadata, in degrees as stored in the properties today.
-    // boundingBoxDiagonal is ellipsoid-dependent and recomputed on load
+    /// SubFeatureProps metadata, in degrees as stored in the properties today.
+    /// boundingBoxDiagonal is ellipsoid-dependent and recomputed on load
     std::array<float, 2> centroidLatLong = { 0.f, 0.f };
     std::array<float, 4> boundingboxLatLong = { 0.f, 0.f, 0.f, 0.f };
-    std::string identifier; // final, de-duplicated identifier
-    std::string name;       // gui name
+    /// The final, de-duplicated identifier
+    std::string identifier;
+    /// The gui name
+    std::string name;
 };
 
-/// One source GeoJSON feature; its override properties are shared by all the rendered
-/// features it was split into
+/**
+ * One source GeoJSON feature; its override properties are shared by all the rendered
+ * features it was split into.
+ */
 struct CachedSourceFeature {
     CachedOverrideProperties overrides;
     std::vector<CachedRenderedFeature> rendered;
@@ -101,12 +112,12 @@ struct CachedSourceFeature {
 
 struct GeoJsonCacheFile {
     int32_t version = CacheVersion;
-    /// Belt-and-braces: the flag is also part of the cache key
+    /// Belt-and-braces: the flag is also part of the cache key.
     bool ignoreHeights = false;
     std::vector<CachedSourceFeature> features;
 };
 
-/// Bump to invalidate all existing heights sidecar caches (part of its cache key)
+/// Bump to invalidate all existing heights sidecar caches (part of its cache key).
 inline constexpr int32_t HeightsCacheVersion = 1;
 
 /**
@@ -117,9 +128,9 @@ inline constexpr int32_t HeightsCacheVersion = 1;
 struct CachedFeatureHeights {
     /// The reference-point heights the per-vertex heights were sampled against
     /// (GlobeGeometryFeature's control heights). Installing these makes the
-    /// refinement sweep a no-op until the height map actually differs
+    /// refinement sweep a no-op until the height map actually differs.
     std::vector<double> controlHeights;
-    /// One entry per render feature, in build order; inner size == vertex count
+    /// One entry per render feature, in build order; inner size == vertex count.
     std::vector<std::vector<float>> perRenderFeatureHeights;
 };
 
@@ -132,19 +143,23 @@ struct CachedFeatureHeights {
 struct GeoJsonHeightsCacheFile {
     int32_t version = HeightsCacheVersion;
     /// One entry per rendered feature, aligned with the flattened rendered-feature
-    /// order of the geometry cache (i.e. the component's feature order)
+    /// order of the geometry cache (i.e. the component's feature order).
     std::vector<CachedFeatureHeights> features;
 };
 
-/// Returns std::nullopt when the file is missing, corrupt, or truncated, in which case
-/// the caller falls back to the cold path
+/**
+ * Returns std::nullopt when the file is missing, corrupt, or truncated, in which case
+ * the caller falls back to the cold path.
+ */
 std::optional<GeoJsonCacheFile> loadGeoJsonCache(const std::filesystem::path& cacheFile);
 
 bool saveGeoJsonCache(const GeoJsonCacheFile& data,
     const std::filesystem::path& cacheFile);
 
-/// Returns std::nullopt when the file is missing, corrupt, or truncated, in which case
-/// heights simply start at zero and refine at runtime
+/**
+ * Returns std::nullopt when the file is missing, corrupt, or truncated, in which case
+ * heights simply start at zero and refine at runtime.
+ */
 std::optional<GeoJsonHeightsCacheFile> loadGeoJsonHeightsCache(
     const std::filesystem::path& cacheFile);
 

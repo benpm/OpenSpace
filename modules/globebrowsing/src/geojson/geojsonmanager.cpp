@@ -48,6 +48,9 @@
 
 namespace {
     constexpr std::string_view _loggerCat = "GeoJsonManager";
+
+    // How often the rolling performance counters are logged at debug level
+    constexpr std::chrono::seconds PerfLogInterval(10);
 } // namespace
 
 namespace openspace {
@@ -238,7 +241,7 @@ void GeoJsonManager::render(const RenderData& data) {
     _perfRenderTime += end - emitted;
     _perfFrameCount++;
 
-    if (end - _perfLastLog > std::chrono::seconds(10)) {
+    if (end - _perfLastLog > PerfLogInterval) {
         if (_perfFrameCount > 0 && _perfLastLog.time_since_epoch().count() != 0) {
             const auto avgMs = [this](Clock::duration d) {
                 return std::chrono::duration<double, std::milli>(d).count() /
@@ -297,12 +300,27 @@ void GeoJsonManager::initializeGLResources() {
         { .stride = sizeof(float), .usage = GL_DYNAMIC_DRAW }
     };
     const std::vector<rendering::MultiDrawBatch::AttributeSpec> attributes = {
-        { .location = 0, .nComponents = 3, .type = GL_FLOAT, .streamIndex = 0,
-          .offsetInStream = 0 },
-        { .location = 1, .nComponents = 3, .type = GL_FLOAT, .streamIndex = 0,
-          .offsetInStream = 3 * sizeof(float) },
-        { .location = 2, .nComponents = 1, .type = GL_FLOAT, .streamIndex = 1,
-          .offsetInStream = 0 }
+        {
+            .location = 0,
+            .nComponents = 3,
+            .type = GL_FLOAT,
+            .streamIndex = 0,
+            .offsetInStream = 0
+        },
+        {
+            .location = 1,
+            .nComponents = 3,
+            .type = GL_FLOAT,
+            .streamIndex = 0,
+            .offsetInStream = 3 * sizeof(float)
+        },
+        {
+            .location = 2,
+            .nComponents = 1,
+            .type = GL_FLOAT,
+            .streamIndex = 1,
+            .offsetInStream = 0
+        }
     };
     _pointsBatch.initialize(streams, attributes, sizeof(GeoJsonDrawRecord));
     _linesBatch.initialize(streams, attributes, sizeof(GeoJsonDrawRecord));
@@ -314,10 +332,20 @@ void GeoJsonManager::initializeGLResources() {
         { .stride = sizeof(float), .usage = GL_DYNAMIC_DRAW }
     };
     const std::vector<rendering::MultiDrawBatch::AttributeSpec> polygonAttributes = {
-        { .location = 0, .nComponents = 3, .type = GL_FLOAT, .streamIndex = 0,
-          .offsetInStream = 0 },
-        { .location = 2, .nComponents = 1, .type = GL_FLOAT, .streamIndex = 1,
-          .offsetInStream = 0 }
+        {
+            .location = 0,
+            .nComponents = 3,
+            .type = GL_FLOAT,
+            .streamIndex = 0,
+            .offsetInStream = 0
+        },
+        {
+            .location = 2,
+            .nComponents = 1,
+            .type = GL_FLOAT,
+            .streamIndex = 1,
+            .offsetInStream = 0
+        }
     };
     _polygonsBatch.initialize(
         polygonStreams,
@@ -400,7 +428,7 @@ void GeoJsonManager::renderBatchedPoints(const RenderData& data) {
     if (orthoRight == glm::dvec3(0.0)) {
         // For some reason, the up vector and camera view vector were the same. Use a
         // slightly different vector
-        const glm::dvec3 otherVector = glm::vec3(
+        const glm::dvec3 otherVector = glm::dvec3(
             cameraUpDirWorld.y,
             cameraUpDirWorld.x,
             cameraUpDirWorld.z

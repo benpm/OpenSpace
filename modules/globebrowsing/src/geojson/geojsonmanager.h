@@ -69,8 +69,10 @@ private:
         ghoul::opengl::bufferbinding::Buffer::ShaderStorage
     >;
 
-    /// Create the shared shader programs and batches. Called lazily when the first
-    /// layer is added, since that is when a GL context is guaranteed
+    /**
+     * Create the shared shader programs and batches. Called lazily when the first
+     * layer is added, since that is when a GL context is guaranteed.
+     */
     void initializeGLResources();
 
     void renderBatchedLines(const RenderData& data);
@@ -80,8 +82,8 @@ private:
     std::vector<std::unique_ptr<GeoJsonComponent>> _geoJsonObjects;
     RenderableGlobe* _parentGlobe = nullptr;
 
-    // All geometry of all components on the globe is batched by type into these and
-    // rendered with a few multidraw calls, with per-draw data in an SSBO
+    /// All geometry of all components on the globe is batched by type into these and
+    /// rendered with a few multidraw calls, with per-draw data in an SSBO
     rendering::MultiDrawBatch _pointsBatch;
     rendering::MultiDrawBatch _linesBatch;
     rendering::MultiDrawBatch _polygonsBatch;
@@ -99,7 +101,7 @@ private:
     /// Forces a rebuild of the emitted draw lists (set when batch geometry changes)
     bool _emitIsDirty = true;
 
-    // Rolling performance counters, logged periodically at debug level
+    /// Rolling performance counters, logged periodically at debug level
     std::chrono::steady_clock::duration _perfFrameInterval{};
     std::chrono::steady_clock::duration _perfEmitTime{};
     std::chrono::steady_clock::duration _perfRenderTime{};

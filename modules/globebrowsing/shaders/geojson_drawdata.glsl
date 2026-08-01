@@ -43,4 +43,20 @@ uniform int baseDrawId;
 const uint FlagUseHeightMap = 1u;
 const uint FlagBottomAnchor = 2u;
 const uint FlagsRenderModeShift = 2u;
-const uint FlagsRenderModeMask = 12u; // bits 2-3
+const uint FlagsRenderModeMask = 3u << FlagsRenderModeShift; // bits 2-3
+const uint FlagPerformShading = 16u;
+
+// Displace a model-space position along its outward direction by the draw's height
+// offset, plus the height map sample when the draw uses the height map
+dvec4 offsetByHeight(vec3 position, float height, DrawElement element) {
+  dvec4 modelPos = dvec4(position, 1.0);
+  if (length(position) > 0.0) {
+    dvec3 outDirection = normalize(dvec3(position));
+    bool useHeightMapData = (element.flags & FlagUseHeightMap) != 0u;
+    double h = useHeightMapData ?
+      height + element.heightOffset :
+      element.heightOffset;
+    modelPos += dvec4(outDirection * h, 0.0);
+  }
+  return modelPos;
+}

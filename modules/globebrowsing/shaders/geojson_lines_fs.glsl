@@ -35,9 +35,12 @@ in Data {
 
 Fragment getFragment() {
   // Anti-alias with a one pixel feather across the line, replacing GL_LINE_SMOOTH
-  float alpha = in_data.color.a *
-    (1.0 - smoothstep(in_data.halfWidth - 0.5, in_data.halfWidth + 0.5,
-      abs(in_data.acrossLine)));
+  float feather = smoothstep(
+    in_data.halfWidth - 0.5,
+    in_data.halfWidth + 0.5,
+    abs(in_data.acrossLine)
+  );
+  float alpha = in_data.color.a * (1.0 - feather);
 
   if (alpha <= 0.001) {
     discard;

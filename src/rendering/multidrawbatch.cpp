@@ -25,6 +25,7 @@
 #include <openspace/rendering/multidrawbatch.h>
 
 #include <ghoul/misc/assert.h>
+#include <ghoul/misc/profiling.h>
 #include <algorithm>
 #include <cstring>
 
@@ -92,6 +93,7 @@ void MultiDrawBatch::deinitialize() {
     _freeSlots.clear();
     _pending.clear();
     _recordStaging.clear();
+    _sortedRecordStaging.clear();
     _firsts.clear();
     _counts.clear();
     _groups.clear();
@@ -110,7 +112,7 @@ MultiDrawBatch::DrawHandle MultiDrawBatch::addDraw(GLsizei nVertices,
     ghoul_assert(streamData.size() == _streams.size(), "One data span per stream");
 
     DrawEntry entry;
-    entry.active = true;
+    entry.isActive = true;
     entry.nVertices = nVertices;
     entry.streamData.reserve(streamData.size());
     for (size_t i = 0; i < streamData.size(); i++) {
@@ -122,8 +124,9 @@ MultiDrawBatch::DrawHandle MultiDrawBatch::addDraw(GLsizei nVertices,
         entry.streamData.emplace_back(streamData[i].begin(), streamData[i].end());
     }
 
-    // Reuse a freed slot if one exists, to keep handles small
     _isCommitted = false;
+
+    // Reuse a freed slot if one exists, to keep handles small
     if (!_freeSlots.empty()) {
         const size_t i = _freeSlots.back();
         _freeSlots.pop_back();
@@ -135,18 +138,23 @@ MultiDrawBatch::DrawHandle MultiDrawBatch::addDraw(GLsizei nVertices,
 }
 
 void MultiDrawBatch::removeDraw(DrawHandle handle) {
-    ghoul_assert(handle < _draws.size() && _draws[handle].active, "Invalid draw handle");
+    ghoul_assert(
+        handle < _draws.size() && _draws[handle].isActive,
+        "Invalid draw handle"
+    );
     _draws[handle] = DrawEntry();
     _freeSlots.push_back(handle);
     _isCommitted = false;
 }
 
 void MultiDrawBatch::commit() {
+    ZoneScoped;
+
     ghoul_assert(isInitialized(), "MultiDrawBatch must be initialized");
 
     GLint first = 0;
     for (DrawEntry& d : _draws) {
-        if (d.active) {
+        if (d.isActive) {
             d.first = first;
             first += d.nVertices;
         }
@@ -154,23 +162,23 @@ void MultiDrawBatch::commit() {
     const size_t totalVertices = static_cast<size_t>(first);
 
     std::vector<std::byte> staging;
-    for (size_t s = 0; s < _streams.size(); s++) {
+    for (size_t i = 0; i < _streams.size(); i++) {
         staging.clear();
-        staging.reserve(totalVertices * _streams[s].stride);
+        staging.reserve(totalVertices * _streams[i].stride);
         for (const DrawEntry& d : _draws) {
-            if (d.active) {
+            if (d.isActive) {
                 staging.insert(
                     staging.end(),
-                    d.streamData[s].begin(),
-                    d.streamData[s].end()
+                    d.streamData[i].begin(),
+                    d.streamData[i].end()
                 );
             }
         }
         glNamedBufferData(
-            _streamVbos[s],
+            _streamVbos[i],
             static_cast<GLsizeiptr>(staging.size()),
             staging.empty() ? nullptr : staging.data(),
-            _streams[s].usage
+            _streams[i].usage
         );
     }
     _isCommitted = true;
@@ -179,7 +187,10 @@ void MultiDrawBatch::commit() {
 void MultiDrawBatch::updateStreamRange(DrawHandle handle, GLuint streamIndex,
                                        std::span<const std::byte> data)
 {
-    ghoul_assert(handle < _draws.size() && _draws[handle].active, "Invalid draw handle");
+    ghoul_assert(
+        handle < _draws.size() && _draws[handle].isActive,
+        "Invalid draw handle"
+    );
     ghoul_assert(streamIndex < _streams.size(), "Invalid stream index");
 
     DrawEntry& d = _draws[handle];
@@ -203,7 +214,7 @@ void MultiDrawBatch::updateStreamRange(DrawHandle handle, GLuint streamIndex,
 }
 
 void MultiDrawBatch::setCoalescingEnabled(bool enabled) {
-    _coalesce = enabled;
+    _shouldCoalesce = enabled;
 }
 
 void MultiDrawBatch::beginFrame() {
@@ -212,21 +223,25 @@ void MultiDrawBatch::beginFrame() {
 }
 
 void MultiDrawBatch::emitDraw(DrawHandle handle, const void* record, int64_t groupKey) {
-    ghoul_assert(handle < _draws.size() && _draws[handle].active, "Invalid draw handle");
+    ghoul_assert(
+        handle < _draws.size() && _draws[handle].isActive,
+        "Invalid draw handle"
+    );
     ghoul_assert(_isCommitted, "commit() must be called before emitting draws");
 
     const size_t offset = _recordStaging.size();
     _recordStaging.resize(offset + _drawRecordSize);
-    std::memcpy(
-        _recordStaging.data() + offset,
-        record,
-        _drawRecordSize
-    );
-    _pending.push_back({ .groupKey = groupKey, .handle = handle,
-        .recordOffset = offset });
+    std::memcpy(_recordStaging.data() + offset, record, _drawRecordSize);
+    _pending.push_back({
+        .groupKey = groupKey,
+        .handle = handle,
+        .recordOffset = offset
+    });
 }
 
 void MultiDrawBatch::endFrame() {
+    ZoneScoped;
+
     _firsts.clear();
     _counts.clear();
     _groups.clear();
@@ -257,7 +272,7 @@ void MultiDrawBatch::endFrame() {
 
     // Coalescing merges sub-draws, so the records can no longer be uploaded 1:1 with
     // _pending and must be compacted alongside the draw list (as must sorted emission)
-    const bool compactRecords = _coalesce || !alreadyGrouped;
+    const bool compactRecords = _shouldCoalesce || !alreadyGrouped;
     if (compactRecords) {
         _sortedRecordStaging.clear();
         _sortedRecordStaging.reserve(_recordStaging.size());
@@ -273,15 +288,14 @@ void MultiDrawBatch::endFrame() {
 
         // Merge into the previous sub-draw when this draw continues it in the vertex
         // buffer and shares its record, so both index the same SSBO entry
-        if (_coalesce && !newGroup &&
-            _firsts.back() + _counts.back() == d.first &&
-            std::memcmp(
-                rec,
-                _sortedRecordStaging.data() + _sortedRecordStaging.size() -
-                    _drawRecordSize,
-                _drawRecordSize
-            ) == 0)
-        {
+        const bool continuesPrevious = _shouldCoalesce && !newGroup &&
+            _firsts.back() + _counts.back() == d.first;
+        const bool sharesRecord = continuesPrevious && std::memcmp(
+            rec,
+            _sortedRecordStaging.data() + _sortedRecordStaging.size() - _drawRecordSize,
+            _drawRecordSize
+        ) == 0;
+        if (sharesRecord) {
             _counts.back() += d.nVertices;
             continue;
         }
@@ -298,8 +312,11 @@ void MultiDrawBatch::endFrame() {
         _firsts.push_back(d.first);
         _counts.push_back(d.nVertices);
         if (compactRecords) {
-            _sortedRecordStaging.insert(_sortedRecordStaging.end(),
-                rec, rec + _drawRecordSize);
+            _sortedRecordStaging.insert(
+                _sortedRecordStaging.end(),
+                rec,
+                rec + _drawRecordSize
+            );
         }
     }
 
@@ -326,7 +343,7 @@ void MultiDrawBatch::renderGroup(GLenum mode, const Group& group) const {
         &group >= _groups.data() && &group < _groups.data() + _groups.size(),
         "Group must be an element of groups()"
     );
-    const size_t groupIndex = &group - _groups.data();
+    const size_t groupIndex = static_cast<size_t>(&group - _groups.data());
     glMultiDrawArrays(
         mode,
         _firsts.data() + group.baseDrawId,

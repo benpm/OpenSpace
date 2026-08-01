@@ -316,9 +316,9 @@ void GlobeGeometryFeature::setFromCachedData(GeometryType type,
 }
 
 void GlobeGeometryFeature::emitBatchedDraws(float mainOpacity,
-                                        const ExtraRenderData& extraRenderData,
-                                        bool wireframe,
-                                        std::map<int64_t, ghoul::opengl::Texture*>& pointTextures)
+                                            const ExtraRenderData& extraRenderData,
+                                            bool wireframe,
+                              std::map<int64_t, ghoul::opengl::Texture*>& pointTextures)
 {
     const float opacity = mainOpacity * _properties.opacity();
     const float fillOpacity = mainOpacity * _properties.fillOpacity();
@@ -369,7 +369,8 @@ void GlobeGeometryFeature::emitBatchedDraws(float mainOpacity,
                 static_cast<uint32_t>(extraRenderData.pointRenderMode) <<
                 GeoJsonDrawRecord::FlagsRenderModeShift;
 
-            int64_t key = texture ? static_cast<int64_t>(GLuint(*texture)) : 0;
+            int64_t key =
+                texture ? static_cast<int64_t>(static_cast<GLuint>(*texture)) : 0;
             if (wireframe) {
                 key |= WireframeBit;
             }
@@ -408,7 +409,7 @@ void GlobeGeometryFeature::emitBatchedDraws(float mainOpacity,
 
 void GlobeGeometryFeature::setPendingCachedHeights(
                                                  std::vector<std::vector<float>> heights,
-                                                   std::vector<double> controlHeights)
+                                                       std::vector<double> controlHeights)
 {
     _pendingCachedHeights = std::move(heights);
     _pendingControlHeights = std::move(controlHeights);
@@ -767,7 +768,7 @@ void GlobeGeometryFeature::initializeRenderFeature(RenderFeature& feature,
         }
         else {
             // No cached heights, or the cached build configuration drifted. Start at
-            // zero — what an unstreamed height map reports — and let the component's
+            // zero, which is what an unstreamed height map reports, and let the
             // refinement sweep fill in real values once tiles stream in. This avoids
             // one globe height query per vertex at load time. Alignment with the
             // cached vectors is positional, so a mismatch discards the rest
@@ -825,8 +826,10 @@ rendering::MultiDrawBatch* GlobeGeometryFeature::batchForRenderType(
             return _pointsBatch;
         case RenderType::Lines:
             return _linesBatch;
-        default:
+        case RenderType::Polygon:
             return _polygonsBatch;
+        default:
+            throw ghoul::MissingCaseException();
     }
 }
 

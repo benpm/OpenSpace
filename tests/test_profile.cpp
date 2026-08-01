@@ -85,6 +85,8 @@ TEST_CASE("Minimal", "[profile]") {
     constexpr std::string_view File = "${TESTDIR}/profile/minimal.profile";
     PathTokenPushPopStack pushpop(absPath("${TESTDIR}/profile"));
     Profile profile = Profile(absPath(File));
+    // Removing the general addons (here and in the tests below) since we only want to
+    // consider the contents of the profile file itself and not depend on other tests
     profile.addons.general.clear();
 
     Profile ref;
