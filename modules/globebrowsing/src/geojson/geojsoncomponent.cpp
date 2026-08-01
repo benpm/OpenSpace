@@ -53,6 +53,7 @@
 #include <geos/util/GEOSException.h>
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -605,10 +606,25 @@ const rendering::LightSourceRenderData& GeoJsonComponent::lightSourceRenderData(
 
 void GeoJsonComponent::emitBatchedDraws(
                               std::map<int64_t, ghoul::opengl::Texture*>& pointTextures,
-                                                                      int componentIndex)
+                                       int componentIndex,
+                                       const geojson::GeoJsonCullContext* cullContext)
 {
     if (!_enabled || !isVisible()) {
         return;
+    }
+
+    // Slack that grows the bounding spheres in the cull tests: the draw-time height
+    // displacements plus the camera motion the cull result must stay valid for
+    double slackBase = 0.0;
+    if (cullContext) {
+        slackBase = std::abs(_heightOffset.value()) + _maxSampledHeight +
+            geojson::HeightSlackPadding + cullContext->posThreshold;
+        _heightSlackAtLastEmit = _maxSampledHeight +
+            static_cast<float>(geojson::HeightSlackPadding);
+    }
+    else {
+        // Without culling there is no height bound the sweep could invalidate
+        _heightSlackAtLastEmit = std::numeric_limits<float>::max();
     }
 
     using PointRenderMode = GlobeGeometryFeature::PointRenderMode;
@@ -634,6 +650,35 @@ void GeoJsonComponent::emitBatchedDraws(
         {
             continue;
         }
+
+        if (cullContext && i < _featureCullSpheres.size()) {
+            const geojson::FeatureCullSphere& sphere = _featureCullSpheres[i];
+            const double slack = sphere.isPoints ?
+                slackBase + _geometryFeatures[i].pointCullSlack(_pointSizeScale) :
+                slackBase;
+
+            geojson::GeoJsonCullStats* stats = cullContext->stats;
+            if (stats) {
+                stats->nTested++;
+            }
+            if (cullContext->frustumEnabled &&
+                geojson::isSphereOutsideFrustum(sphere, *cullContext, slack))
+            {
+                if (stats) {
+                    stats->nCulledFrustum++;
+                }
+                continue;
+            }
+            if (cullContext->horizonEnabled &&
+                geojson::isSphereBeyondHorizon(sphere, *cullContext, slack))
+            {
+                if (stats) {
+                    stats->nCulledHorizon++;
+                }
+                continue;
+            }
+        }
+
         const float featureOpacity =
             _createPerFeatureProps ? _features[i]->opacity() : 1.f;
         _geometryFeatures[i].emitBatchedDraws(
@@ -741,6 +786,14 @@ bool GeoJsonComponent::update() {
                 g.applyHeightUpdate(std::move(*newHeights));
                 _heightsDirtyForCache = true;
                 resampledVertices += g.heightVertexCount();
+
+                _maxSampledHeight =
+                    std::max(_maxSampledHeight, g.maxAbsSampledHeight());
+                if (_maxSampledHeight > _heightSlackAtLastEmit) {
+                    // The grown heights may exceed what the last cull results
+                    // covered, so force a re-emit with fresh culling
+                    _styleIsDirty = true;
+                }
             }
             _heightSweepCursor++;
 
@@ -754,7 +807,30 @@ bool GeoJsonComponent::update() {
         }
     }
 
+    if (geometryChanged) {
+        rebuildCullSpheres();
+    }
+
     return geometryChanged;
+}
+
+void GeoJsonComponent::rebuildCullSpheres() {
+    _featureCullSpheres.clear();
+    _featureCullSpheres.reserve(_geometryFeatures.size());
+
+    float maxHeight = 0.f;
+    for (const GlobeGeometryFeature& g : _geometryFeatures) {
+        geojson::FeatureCullSphere sphere;
+        if (g.hasCullSphere()) {
+            sphere.center = g.cullSphereCenter();
+            sphere.radius = g.cullSphereRadius() + geojson::SphereEpsilon;
+            sphere.distSq = glm::dot(sphere.center, sphere.center);
+            sphere.isPoints = g.isPoints();
+        }
+        _featureCullSpheres.push_back(sphere);
+        maxHeight = std::max(maxHeight, g.maxAbsSampledHeight());
+    }
+    _maxSampledHeight = maxHeight;
 }
 
 void GeoJsonComponent::readFile() {

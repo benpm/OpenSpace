@@ -50,6 +50,7 @@
 #include <geos/util/IllegalStateException.h>
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdlib>
 #include <filesystem>
 #include <limits>
@@ -465,6 +466,9 @@ void GlobeGeometryFeature::applyHeightUpdate(std::vector<double> newControlHeigh
             continue;
         }
         f.heights = heightMapHeightsFromGeodetic2List(_globe, f.vertices);
+        for (const float h : f.heights) {
+            _maxAbsSampledHeight = std::max(_maxAbsSampledHeight, std::abs(h));
+        }
         bufferDynamicHeightData(f);
     }
 
@@ -479,6 +483,44 @@ size_t GlobeGeometryFeature::heightVertexCount() const {
         count += f.vertices.size();
     }
     return count;
+}
+
+bool GlobeGeometryFeature::hasCullSphere() const {
+    return _cullAabbMin.x <= _cullAabbMax.x;
+}
+
+glm::dvec3 GlobeGeometryFeature::cullSphereCenter() const {
+    return 0.5 * (glm::dvec3(_cullAabbMin) + glm::dvec3(_cullAabbMax));
+}
+
+double GlobeGeometryFeature::cullSphereRadius() const {
+    return 0.5 * glm::length(glm::dvec3(_cullAabbMax) - glm::dvec3(_cullAabbMin));
+}
+
+float GlobeGeometryFeature::maxAbsSampledHeight() const {
+    return _maxAbsSampledHeight;
+}
+
+double GlobeGeometryFeature::pointCullSlack(float pointSizeScale) const {
+    if (_type != GeometryType::Point) {
+        return 0.0;
+    }
+
+    // Must match the size computation in emitBatchedDraws
+    const double size =
+        0.001 * pointSizeScale * _properties.pointSize() * _globe.boundingSphere();
+
+    double aspect = 1.0;
+    if (_pointTexture && _pointTexture->texture()) {
+        const glm::uvec3 dimensions = _pointTexture->texture()->dimensions();
+        if (dimensions.y > 0) {
+            aspect = static_cast<double>(dimensions.x) / dimensions.y;
+        }
+    }
+
+    // The billboard extends at most half its (aspect-scaled) width sideways and, with
+    // a bottom anchor, its full height up from the anchor vertex
+    return size * (1.0 + 0.5 * aspect);
 }
 
 bool GlobeGeometryFeature::update(bool dataIsDirty) {
@@ -497,6 +539,10 @@ bool GlobeGeometryFeature::update(bool dataIsDirty) {
 void GlobeGeometryFeature::updateGeometry() {
     // Update vertex data and compute model coordinates based on globe
     clearRenderFeatures();
+
+    _cullAabbMin = glm::vec3(std::numeric_limits<float>::max());
+    _cullAabbMax = glm::vec3(std::numeric_limits<float>::lowest());
+    _maxAbsSampledHeight = 0.f;
 
     if (_type == GeometryType::Point) {
         createPointGeometry();
@@ -755,6 +801,11 @@ void GlobeGeometryFeature::createPolygonGeometry() {
 void GlobeGeometryFeature::initializeRenderFeature(RenderFeature& feature,
                                                    const std::vector<Vertex>& vertices)
 {
+    for (const Vertex& v : vertices) {
+        _cullAabbMin = glm::min(_cullAabbMin, v.position);
+        _cullAabbMax = glm::max(_cullAabbMax, v.position);
+    }
+
     if (useHeightMap()) {
         feature.vertices = geodetic2FromVertexList(_globe, vertices);
 
@@ -781,6 +832,10 @@ void GlobeGeometryFeature::initializeRenderFeature(RenderFeature& feature,
         // skip the retained geodetic copies. A change of the altitude mode marks the
         // component's data dirty, which rebuilds the geometry
         feature.heights.assign(vertices.size(), 0.f);
+    }
+
+    for (const float h : feature.heights) {
+        _maxAbsSampledHeight = std::max(_maxAbsSampledHeight, std::abs(h));
     }
 
     if (feature.type == RenderType::Polygon) {

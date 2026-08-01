@@ -43,6 +43,7 @@
 #include <ghoul/opengl/textureunit.h>
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <functional>
 #include <utility>
 
@@ -51,13 +52,42 @@ namespace {
 
     // How often the rolling performance counters are logged at debug level
     constexpr std::chrono::seconds PerfLogInterval(10);
+
+    constexpr openspace::Property::PropertyInfo FrustumCullingInfo = {
+        "PerformFrustumCulling",
+        "Perform Frustum Culling",
+        "If enabled, GeoJson features whose bounds are outside the view frustum are "
+        "skipped when the draw lists are built. The culling is conservative: a guard "
+        "band around the frustum prevents visible features from ever being skipped.",
+        openspace::Property::Visibility::AdvancedUser
+    };
+
+    constexpr openspace::Property::PropertyInfo HorizonCullingInfo = {
+        "PerformHorizonCulling",
+        "Perform Horizon Culling",
+        "If enabled, GeoJson features that are entirely occluded by the globe are "
+        "skipped when the draw lists are built. The culling is conservative: features "
+        "near the horizon are always kept.",
+        openspace::Property::Visibility::AdvancedUser
+    };
 } // namespace
 
 namespace openspace {
 
 GeoJsonManager::GeoJsonManager()
     : PropertyOwner({ "GeographicOverlays", "Geographic Overlays" })
-{}
+    , _performFrustumCulling(FrustumCullingInfo, true)
+    , _performHorizonCulling(HorizonCullingInfo, true)
+{
+    const auto invalidateCulling = [this]() {
+        _emitIsDirty = true;
+        _cullStateValid = false;
+    };
+    _performFrustumCulling.onChange(invalidateCulling);
+    _performHorizonCulling.onChange(invalidateCulling);
+    addProperty(_performFrustumCulling);
+    addProperty(_performHorizonCulling);
+}
 
 void GeoJsonManager::initialize(RenderableGlobe* globe) {
     ghoul_assert(globe, "No globe provided");
@@ -159,6 +189,13 @@ void GeoJsonManager::update() {
     const std::chrono::steady_clock::time_point start =
         std::chrono::steady_clock::now();
 
+    // The scene can be updated more than once per frame, so the render pass count is
+    // only latched when render calls have actually happened since the last update
+    if (_renderCallsSinceUpdate > 0) {
+        _renderCallsLastFrame = _renderCallsSinceUpdate;
+        _renderCallsSinceUpdate = 0;
+    }
+
     bool geometryChanged = false;
     for (std::unique_ptr<GeoJsonComponent>& obj : _geoJsonObjects) {
         if (obj->enabled()) {
@@ -190,14 +227,75 @@ void GeoJsonManager::render(const RenderData& data) {
     }
     _perfLastRender = start;
 
-    // The emitted draw lists and per-draw data only depend on properties, not on the
-    // camera, so they are rebuilt only when something changed since the last frame
+    _renderCallsSinceUpdate++;
+
+    // With several render passes per frame (stereo, multiple viewports) the emitted
+    // draw lists are shared between different view frusta, so frustum culling is
+    // suppressed. Horizon culling stays on: the pass camera positions differ far less
+    // than the translation slack of the cull tests
+    const bool multiPass = _renderCallsLastFrame != 1;
+    const bool frustumCulling = _performFrustumCulling && !multiPass;
+    const bool horizonCulling = _performHorizonCulling;
+    const bool cullingEnabled = frustumCulling || horizonCulling;
+
+    // The emitted draw lists and per-draw data depend on properties and, with culling
+    // enabled, on the camera. They are rebuilt when something changed since the last
+    // frame or when the camera left the guard band that keeps the last cull results
+    // conservative
     bool needEmit = _emitIsDirty;
     for (const std::unique_ptr<GeoJsonComponent>& obj : _geoJsonObjects) {
         needEmit |= obj->styleIsDirty();
     }
 
+    if (cullingEnabled && !needEmit) {
+        if (!_cullStateValid || frustumCulling != _cullUsedFrustum) {
+            needEmit = true;
+        }
+        else {
+            const glm::dvec3 cameraPosModel = glm::dvec3(
+                _parentGlobe->inverseModelTransform() *
+                glm::dvec4(data.camera.position(), 1.0)
+            );
+            const glm::dvec3 posDelta = cameraPosModel - _cullCameraPosModel;
+            needEmit = glm::dot(posDelta, posDelta) > _cullPosThresholdSq;
+
+            if (!needEmit && frustumCulling) {
+                const glm::dvec3 viewDirModel = glm::normalize(glm::dvec3(
+                    _parentGlobe->inverseModelTransform() *
+                    glm::dvec4(data.camera.viewDirectionWorldSpace(), 0.0)
+                ));
+                needEmit =
+                    glm::dot(viewDirModel, _cullViewDirModel) < _cullRotThresholdCos ||
+                    glm::dmat4(data.camera.projectionMatrix()) != _cullProjection;
+            }
+        }
+    }
+    else if (!cullingEnabled) {
+        _cullStateValid = false;
+    }
+
     if (needEmit) {
+        geojson::GeoJsonCullContext cullContext;
+        if (cullingEnabled) {
+            cullContext = geojson::buildCullContext(
+                data,
+                _parentGlobe->modelTransform(),
+                _parentGlobe->inverseModelTransform(),
+                _parentGlobe->ellipsoid().minimumRadius(),
+                frustumCulling,
+                horizonCulling
+            );
+            cullContext.stats = &_perfCullStats;
+
+            _cullCameraPosModel = cullContext.cameraPosModel;
+            _cullViewDirModel = cullContext.viewDirModel;
+            _cullRotThresholdCos = std::cos(cullContext.rotThreshold);
+            _cullPosThresholdSq = cullContext.posThreshold * cullContext.posThreshold;
+            _cullProjection = glm::dmat4(data.camera.projectionMatrix());
+            _cullUsedFrustum = frustumCulling;
+            _cullStateValid = true;
+        }
+
         // Collect this frame's draws from all components
         _pointsBatch.beginFrame();
         _linesBatch.beginFrame();
@@ -206,7 +304,11 @@ void GeoJsonManager::render(const RenderData& data) {
         for (size_t i = 0; i < _geoJsonObjects.size(); i++) {
             GeoJsonComponent* obj = _geoJsonObjects[i].get();
             if (obj->enabled()) {
-                obj->emitBatchedDraws(_pointTextures, static_cast<int>(i));
+                obj->emitBatchedDraws(
+                    _pointTextures,
+                    static_cast<int>(i),
+                    cullingEnabled ? &cullContext : nullptr
+                );
             }
             obj->clearStyleDirty();
         }
@@ -214,6 +316,7 @@ void GeoJsonManager::render(const RenderData& data) {
         _linesBatch.endFrame();
         _polygonsBatch.endFrame();
         _emitIsDirty = false;
+        _perfEmitPasses++;
     }
 
     const Clock::time_point emitted = Clock::now();
@@ -250,12 +353,15 @@ void GeoJsonManager::render(const RenderData& data) {
             LDEBUG(std::format(
                 "GeoJson perf over {} frames: frame interval {:.2f} ms, emit {:.2f} ms, "
                 "draw submit {:.2f} ms, update {:.2f} ms, sub-draws {}/{} pts, "
-                "{}/{} lines, {}/{} polys (after/before merge)",
+                "{}/{} lines, {}/{} polys (after/before merge), {} emit passes, "
+                "culled {} frustum + {} horizon of {} tested",
                 _perfFrameCount, avgMs(_perfFrameInterval), avgMs(_perfEmitTime),
                 avgMs(_perfRenderTime), avgMs(_perfUpdateTime),
                 _pointsBatch.nDrawsThisFrame(), _pointsBatch.nEmittedThisFrame(),
                 _linesBatch.nDrawsThisFrame(), _linesBatch.nEmittedThisFrame(),
-                _polygonsBatch.nDrawsThisFrame(), _polygonsBatch.nEmittedThisFrame()
+                _polygonsBatch.nDrawsThisFrame(), _polygonsBatch.nEmittedThisFrame(),
+                _perfEmitPasses, _perfCullStats.nCulledFrustum,
+                _perfCullStats.nCulledHorizon, _perfCullStats.nTested
             ));
         }
         _perfFrameCount = 0;
@@ -263,6 +369,8 @@ void GeoJsonManager::render(const RenderData& data) {
         _perfEmitTime = {};
         _perfRenderTime = {};
         _perfUpdateTime = {};
+        _perfEmitPasses = 0;
+        _perfCullStats = geojson::GeoJsonCullStats();
         _perfLastLog = end;
     }
 }

@@ -32,6 +32,7 @@
 #include <ghoul/glm.h>
 #include <ghoul/opengl/ghoul_gl.h>
 #include <cstdint>
+#include <limits>
 #include <map>
 #include <memory>
 #include <optional>
@@ -256,6 +257,39 @@ public:
     size_t heightVertexCount() const;
 
     /**
+     * Returns true when bounds over the built render features are available, i.e.
+     * cullSphereCenter and cullSphereRadius may be used.
+     */
+    bool hasCullSphere() const;
+
+    /**
+     * Center of a bounding sphere over all built render feature vertices (including
+     * extrusion walls when built), in globe model space.
+     */
+    glm::dvec3 cullSphereCenter() const;
+
+    /**
+     * Radius of the bounding sphere around cullSphereCenter, in meters. Excludes the
+     * dynamic displacements applied at draw time (height offset and height map
+     * samples); those are covered by the cull slack.
+     */
+    double cullSphereRadius() const;
+
+    /**
+     * The largest absolute height map sample applied to any of the feature's
+     * vertices, in meters. Only ever grows between geometry rebuilds.
+     */
+    float maxAbsSampledHeight() const;
+
+    /**
+     * Conservative bound on how far a point feature's billboard geometry can extend
+     * from its anchor vertex, in meters. Zero for non-point features.
+     *
+     * \param pointSizeScale The owning component's point size scale factor
+     */
+    double pointCullSlack(float pointSizeScale) const;
+
+    /**
      * Returns true if the geometry was rebuilt, i.e. draws were added to or removed
      * from the shared batches, so that the owner knows to re-commit them.
      */
@@ -332,6 +366,12 @@ private:
 
     std::vector<Geodetic3> _heightUpdateReferencePoints;
     std::vector<double> _lastControlHeights;
+
+    /// Axis-aligned bounds over all built render feature vertices in globe model
+    /// space, accumulated during geometry builds to derive the feature's cull sphere
+    glm::vec3 _cullAabbMin = glm::vec3(std::numeric_limits<float>::max());
+    glm::vec3 _cullAabbMax = glm::vec3(std::numeric_limits<float>::lowest());
+    float _maxAbsSampledHeight = 0.f;
 
     // Heights installed from the heights cache, consumed by the next geometry build
     std::vector<std::vector<float>> _pendingCachedHeights;

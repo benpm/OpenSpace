@@ -29,6 +29,7 @@
 #include <openspace/rendering/fadeable.h>
 
 #include <modules/globebrowsing/src/geojson/geojsoncache.h>
+#include <modules/globebrowsing/src/geojson/geojsonculling.h>
 #include <modules/globebrowsing/src/geojson/geojsonproperties.h>
 #include <modules/globebrowsing/src/geojson/globegeometryfeature.h>
 #include <openspace/properties/misc/optionproperty.h>
@@ -42,6 +43,7 @@
 #include <chrono>
 #include <filesystem>
 #include <functional>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <unordered_set>
@@ -105,10 +107,12 @@ public:
     /**
      * Queue this component's draws into the shared batches for the current frame (see
      * GlobeGeometryFeature::emitBatchedDraws). \p componentIndex is this component's
-     * index in the manager's list and becomes part of the polygon draw group keys
+     * index in the manager's list and becomes part of the polygon draw group keys.
+     * When \p cullContext is set, features whose bounding spheres are outside the
+     * frustum or beyond the horizon are skipped.
      */
     void emitBatchedDraws(std::map<int64_t, ghoul::opengl::Texture*>& pointTextures,
-        int componentIndex);
+        int componentIndex, const geojson::GeoJsonCullContext* cullContext);
 
     /**
      * Returns true if any feature's geometry was rebuilt, so that the owner knows to
@@ -208,6 +212,12 @@ private:
     void computeMainFeatureMetaPropeties();
 
     /**
+     * Rebuild the per-feature bounding spheres used for culling, from the features'
+     * built geometry. Called whenever any feature's geometry was rebuilt.
+     */
+    void rebuildCullSpheres();
+
+    /**
      * Trigger a flight to a feature in the collection. No index means to fly to an
      * overview of all features in the collection.
      */
@@ -281,6 +291,18 @@ private:
 
     PropertyOwner _lightSourcePropertyOwner;
     PropertyOwner _featuresPropertyOwner;
+
+    /// Bounding spheres for culling, kept 1:1 with _geometryFeatures and rebuilt
+    /// whenever any feature's geometry is rebuilt
+    std::vector<geojson::FeatureCullSphere> _featureCullSpheres;
+
+    /// Largest absolute height map sample over all features (meters)
+    float _maxSampledHeight = 0.f;
+
+    /// The sampled-height magnitude covered by the cull slack of the last emit; when
+    /// the refinement sweep grows heights beyond it, a re-emit is forced. Infinite
+    /// while no culled emit has happened
+    float _heightSlackAtLastEmit = std::numeric_limits<float>::max();
 
     /// Only filled when _createPerFeatureProps; otherwise features are always enabled
     /// with full opacity and meta data is read from _featureMeta

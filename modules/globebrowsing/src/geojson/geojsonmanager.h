@@ -28,6 +28,8 @@
 #include <openspace/properties/propertyowner.h>
 
 #include <modules/globebrowsing/src/geojson/geojsoncomponent.h>
+#include <modules/globebrowsing/src/geojson/geojsonculling.h>
+#include <openspace/properties/scalar/boolproperty.h>
 #include <openspace/rendering/multidrawbatch.h>
 #include <ghoul/opengl/bufferbinding.h>
 #include <chrono>
@@ -101,6 +103,29 @@ private:
     /// Forces a rebuild of the emitted draw lists (set when batch geometry changes)
     bool _emitIsDirty = true;
 
+    BoolProperty _performFrustumCulling;
+    BoolProperty _performHorizonCulling;
+
+    /// Camera state captured at the last culled emit. The cull tests carry enough
+    /// slack that their results stay correct while the camera stays within these
+    /// thresholds; crossing either one forces a re-emit with fresh culling
+    bool _cullStateValid = false;
+    bool _cullUsedFrustum = false;
+    glm::dvec3 _cullCameraPosModel = glm::dvec3(0.0);
+    glm::dvec3 _cullViewDirModel = glm::dvec3(0.0);
+    double _cullRotThresholdCos = 1.0;
+    double _cullPosThresholdSq = 0.0;
+    glm::dmat4 _cullProjection = glm::dmat4(1.0);
+
+    /// Render passes per frame; with more than one (stereo, multiple viewports) the
+    /// emitted draw lists are shared between different view frusta, so frustum
+    /// culling is suppressed. Horizon culling stays on: the eye positions differ far
+    /// less than the translation slack
+    int _renderCallsSinceUpdate = 0;
+    /// Starts at zero so the first emit never frustum culls before the pass count of
+    /// a full frame has been observed
+    int _renderCallsLastFrame = 0;
+
     /// Rolling performance counters, logged periodically at debug level
     std::chrono::steady_clock::duration _perfFrameInterval{};
     std::chrono::steady_clock::duration _perfEmitTime{};
@@ -109,6 +134,8 @@ private:
     std::chrono::steady_clock::time_point _perfLastRender{};
     std::chrono::steady_clock::time_point _perfLastLog{};
     int _perfFrameCount = 0;
+    int _perfEmitPasses = 0;
+    geojson::GeoJsonCullStats _perfCullStats;
 };
 
 } // namespace openspace

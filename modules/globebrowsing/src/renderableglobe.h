@@ -118,6 +118,7 @@ public:
     GeoJsonManager& geoJsonManager();
 
     const glm::dmat4& modelTransform() const;
+    const glm::dmat4& inverseModelTransform() const;
 
     // Will cause the shaders to be recompiled
     void invalidateShader();

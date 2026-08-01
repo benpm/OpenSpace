@@ -59,6 +59,7 @@ set(HEADER_FILES
   src/timequantizer.h
   src/geojson/geojsoncache.h
   src/geojson/geojsoncomponent.h
+  src/geojson/geojsonculling.h
   src/geojson/geojsonmanager.h
   src/geojson/geojsonparser.h
   src/geojson/geojsonproperties.h
@@ -105,6 +106,7 @@ set(SOURCE_FILES
   src/timequantizer.cpp
   src/geojson/geojsoncache.cpp
   src/geojson/geojsoncomponent.cpp
+  src/geojson/geojsonculling.cpp
   src/geojson/geojsonmanager.cpp
   src/geojson/geojsonparser.cpp
   src/geojson/geojsonproperties.cpp
