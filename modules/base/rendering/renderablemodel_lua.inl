@@ -22,66 +22,60 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include <openspace/interaction/tasks/convertrecformattask.h>
-
-#include <openspace/documentation/documentation.h>
-#include <ghoul/format.h>
+#include <ghoul/io/model/modelreader.h>
+#include <ghoul/io/model/modelreaderassimp.h>
+#include <ghoul/io/model/modelreaderbase.h>
 #include <ghoul/logging/logmanager.h>
-#include <ghoul/misc/dictionary.h>
-#include <string_view>
+#include <ghoul/misc/assert.h>
 
 namespace {
-    constexpr std::string_view _loggerCat = "ConvertRecFormatTask";
 
-    struct [[codegen::Dictionary(ConvertRecFormatTask)]] Parameters {
-        std::filesystem::path inputFilePath;
-        std::filesystem::path outputFilePath [[codegen::mustexist(false)]];
+    /**
+     * Prints the model tree of the given filepath model file. The node names detected
+     * during reading and the hierarchy of the nodes will be printed. This is useful for
+     * debugging and finding correct node names for applying custom transformations to
+     * internal model nodes.
+     *
+     * The given filepath must not be empty, must contain an extension, and must be a
+     * valid model file that can be read with the `ModelReaderAssimp` reader. The
+     * `ModelReaderAssimp` reader must have been added to the `ModelReader` before calling
+     * this function. Will throw a `ModelLoadException` if there was an error reading the
+     * file, or a `MissingReaderException` if there was no reader for the specified
+     * filepath.
+     *
+     * \param filepath The model file on disk whose model tree should be printed.
+     */
+[[codegen::luawrap]] void printModelTree(std::filesystem::path filepath) {
+    ghoul_assert(!filepath.empty(), "Filepath must not be empty");
 
-        enum class DataMode {
-            Ascii,
-            Binary
-        };
-        DataMode outputMode;
-    };
+    std::string extension = filepath.extension().string();
+    if (!extension.empty()) {
+        extension = extension.substr(1);
+    }
+    ghoul_assert(!extension.empty(), "Filepath must have an extension");
+
+    ghoul::io::ModelReaderBase* reader =
+        ghoul::io::ModelReader::ref().readerForExtension(extension);
+
+    if (!reader) {
+        throw ghoul::io::ModelReader::MissingReaderException(extension, filepath);
+    }
+
+    // (malej 2026-05-29) Only the ModelReaderAssimp can print model trees
+    ghoul::io::ModelReaderAssimp* typedReader;
+    try {
+        typedReader = &dynamic_cast<ghoul::io::ModelReaderAssimp&>(*reader);
+    }
+    catch (std::exception& e) {
+        LERRORC("RenderableModel", std::format("Cannot find a suitable reader to print "
+            "the model tree for model {}", filepath)
+        );
+        return;
+    }
+
+    typedReader->printModelTree(filepath);
+}
+
 } // namespace
-#include "convertrecformattask_codegen.cpp"
 
-namespace openspace {
-
-Documentation ConvertRecFormatTask::Documentation() {
-    return codegen::doc<Parameters>(
-        "core_task_convertrecformat",
-        Task::Documentation()
-    );
-}
-
-ConvertRecFormatTask::ConvertRecFormatTask(const ghoul::Dictionary& dictionary) {
-    const Parameters p = codegen::bake<Parameters>(dictionary);
-
-    _inFilePath = p.inputFilePath;
-    _outFilePath = p.outputFilePath;
-
-    switch (p.outputMode) {
-        case Parameters::DataMode::Ascii:
-            _dataMode = DataMode::Ascii;
-            break;
-        case Parameters::DataMode::Binary:
-            _dataMode = DataMode::Binary;
-            break;
-    }
-
-    if (!std::filesystem::is_regular_file(_inFilePath)) {
-        LERROR(std::format("Failed to load session recording file: {}", _inFilePath));
-    }
-}
-
-std::string ConvertRecFormatTask::description() {
-    return "Convert session recording files between ASCII and Binary formats";
-}
-
-void ConvertRecFormatTask::perform(const Task::ProgressCallback&) {
-    SessionRecording sessionRecording = loadSessionRecording(_inFilePath);
-    saveSessionRecording(_outFilePath, sessionRecording, _dataMode);
-}
-
-} // namespace openspace
+#include "renderablemodel_lua_codegen.cpp"
