@@ -62,3 +62,10 @@
 [submodule "modules/globebrowsing/ext/glaze"]
 	path = modules/globebrowsing/ext/glaze
 	url = https://github.com/stephenberry/glaze.git
+[submodule "wiki"]
+	path = wiki
+	url = https://github.com/benpm/OpenSpace.wiki.git
+[submodule "notes"]
+	path = notes
+	url = git@github.com:benpm/notes.git
+	branch = OpenSpace
