@@ -236,3 +236,12 @@ When creating or modifying modules:
 - Main config: `openspace.cfg`
 - User settings: `settings.json`
 - Window/display configs in `config/` directory
+## Project Notes
+
+Working notes live in the `notes/` submodule (repo `benpm/notes`, branch `OpenSpace`),
+under [`notes/openspace/`](../notes/openspace/) — an Obsidian vault (keep its
+`.obsidian/` directory intact). Key entry points: `notes/openspace/TODO.md` (task list),
+`notes/openspace/Task Stack.md` and `Work Log.md` (contract tracking),
+`notes/openspace/geojson-perf-internals.md` (geojson_perf branch record). The GitHub
+wiki (`wiki/` submodule) mirrors these notes; after editing notes, follow the sync
+workflow in `notes/openspace/TASK_notes_migration.md`.
