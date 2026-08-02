@@ -69,6 +69,13 @@ public:
     bool contains(const Geodetic2& p) const;
 
     /**
+     * Returns `true` if this patch and \p other overlap with nonzero area. The test is
+     * not longitude-wrap aware; both patches are assumed to lie within [-pi, pi]
+     * longitude without crossing the antimeridian.
+     */
+    bool overlaps(const GeodeticPatch& other) const;
+
+    /**
      * Clamps a point to the patch region.
      */
     Geodetic2 clamp(const Geodetic2& p) const;
@@ -102,6 +109,24 @@ private:
     Geodetic2 _center;
     Geodetic2 _halfSize;
 };
+
+/**
+ * Computes the transform mapping a tile's local UV coordinates in [0,1]^2 into the UV
+ * space of a texture covering exactly the geodetic \p extent, such that
+ * `textureUV = uvOffset + uvScale * tileUV`. u=0 corresponds to `extent.minLon()` and
+ * v=0 to `extent.minLat()`, with v growing northwards. For tiles (partially) outside
+ * the extent the resulting UVs fall outside [0,1].
+ */
+TileUvTransform tileUvTransformForExtent(const GeodeticPatch& extent,
+    const TileIndex& tileIndex);
+
+/**
+ * Returns the highest tile level at which a tile still covers at least \p tileSize
+ * pixels of a texture with \p resolution pixels spanning \p extent. Subdividing beyond
+ * the returned level gains no additional detail from the texture.
+ */
+int maximumLevelForResolution(const GeodeticPatch& extent, const glm::ivec2& resolution,
+    int tileSize = 512);
 
 } // namespace openspace
 

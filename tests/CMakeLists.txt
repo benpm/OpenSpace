@@ -41,6 +41,7 @@ add_executable(
   test_lua_setpropertyvalue.cpp
   test_profile.cpp
   test_rawvolumeio.cpp
+  test_regionaltileuv.cpp
   test_scriptscheduler.cpp
   test_sessionrecording.cpp
   test_settings.cpp
@@ -56,6 +57,10 @@ add_executable(
 
   regression/517.cpp
 )
+
+if (OPENSPACE_MODULE_VIDEO)
+  target_sources(OpenSpaceTest PRIVATE test_texturevideotiming.cpp)
+endif ()
 
 set_openspace_compile_settings(OpenSpaceTest)
 

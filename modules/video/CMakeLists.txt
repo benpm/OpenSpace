@@ -27,8 +27,13 @@ include(${PROJECT_SOURCE_DIR}/support/cmake/module_definition.cmake)
 
 set(HEADER_FILES
   videomodule.h
+  include/asyncvideoframedecoder.h
+  include/regionalvideotileprovider.h
+  include/texturevideoplayer.h
+  include/texturevideostream.h
   include/videotileprovider.h
   include/videoplayer.h
+  include/videotiming.h
   include/screenspacevideo.h
   include/renderablevideosphere.h
   include/renderablevideoplane.h
@@ -37,8 +42,13 @@ source_group("Header Files" FILES ${HEADER_FILES})
 
 set(SOURCE_FILES
   videomodule.cpp
+  src/asyncvideoframedecoder.cpp
+  src/regionalvideotileprovider.cpp
+  src/texturevideoplayer.cpp
+  src/texturevideostream.cpp
   src/videotileprovider.cpp
   src/videoplayer.cpp
+  src/videotiming.cpp
   src/screenspacevideo.cpp
   src/renderablevideosphere.cpp
   src/renderablevideoplane.cpp
@@ -50,6 +60,26 @@ create_new_module(
   video_module
   ${HEADER_FILES} ${SOURCE_FILES}
 )
+
+# Basis Universal (transcoder only; the encoder is not part of the build)
+begin_dependency("BasisUniversal")
+add_library(basisu_transcoder STATIC
+  ext/basis_universal/transcoder/basisu_transcoder.cpp
+)
+target_include_directories(basisu_transcoder SYSTEM PUBLIC ext/basis_universal/transcoder)
+target_compile_definitions(basisu_transcoder PUBLIC
+  BASISD_SUPPORT_KTX2=1
+  # ETC1S uses BasisLZ; disabling Zstd avoids bundling zstd.c (UASTC files are rejected)
+  BASISD_SUPPORT_KTX2_ZSTD=0
+)
+if (MSVC)
+  target_compile_options(basisu_transcoder PRIVATE "/W0")
+else ()
+  target_compile_options(basisu_transcoder PRIVATE "-w")
+endif ()
+set_property(TARGET basisu_transcoder PROPERTY FOLDER "External")
+target_link_libraries(openspace-module-video PRIVATE basisu_transcoder)
+end_dependency("BasisUniversal")
 
 # Libmpv
 if (WIN32)

@@ -69,3 +69,6 @@
 	path = notes
 	url = git@github.com:benpm/notes.git
 	branch = OpenSpace
+[submodule "modules/video/ext/basis_universal"]
+	path = modules/video/ext/basis_universal
+	url = https://github.com/BinomialLLC/basis_universal.git

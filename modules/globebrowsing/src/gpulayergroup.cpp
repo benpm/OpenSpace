@@ -76,6 +76,7 @@ void GPULayerGroup::setValue(ghoul::opengl::ProgramObject& program,
             case layers::Layer::ID::SingleImageProvider:
             case layers::Layer::ID::SpoutImageProvider:
             case layers::Layer::ID::VideoTileProvider:
+            case layers::Layer::ID::RegionalVideoTileProvider:
             case layers::Layer::ID::ImageSequenceTileProvider:
             case layers::Layer::ID::SizeReferenceTileProvider:
             case layers::Layer::ID::TemporalTileProvider:
@@ -148,6 +149,7 @@ void GPULayerGroup::bind(ghoul::opengl::ProgramObject& p, const LayerGroup& laye
             case layers::Layer::ID::SingleImageProvider:
             case layers::Layer::ID::SpoutImageProvider:
             case layers::Layer::ID::VideoTileProvider:
+            case layers::Layer::ID::RegionalVideoTileProvider:
             case layers::Layer::ID::ImageSequenceTileProvider:
             case layers::Layer::ID::SizeReferenceTileProvider:
             case layers::Layer::ID::TemporalTileProvider:

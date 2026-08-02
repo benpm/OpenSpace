@@ -1,0 +1,43 @@
+-- Regional Video Mapped to Time
+-- Adds a preprocessed texture video (Basis/KTX2) as a layer covering only a geographic
+-- region of a globe (here the contiguous United States on Earth), with playback mapped
+-- to the simulation time. The area outside the extent is fully transparent.
+--
+-- Texture videos are created from regular video files with the
+-- support/texturevideo/convert_video.py script; see support/texturevideo/README.md.
+
+local earthAsset = asset.require("scene/solarsystem/planets/earth/globe")
+
+-- For a hosted file, use a UrlSynchronization resource like the videotileprovider
+-- examples. Here a local file next to the asset is expected
+local video = asset.resource("regional_example.ktx2")
+
+local Layer = {
+  Name = "Regional Video Example (Mapped to Time)",
+  Type = "RegionalVideoTileProvider",
+  Identifier = "RegionalVideoLayer_Example_MappedToTime",
+  Enabled = true,
+  Video = video,
+  -- Degrees; the extent must not cross the antimeridian
+  Extent = { MinLon = -125.0, MinLat = 24.0, MaxLon = -66.5, MaxLat = 49.5 },
+  StartTime = "2023 01 29 20:00:00",
+  EndTime = "2023 01 29 21:00:00",
+  PlaybackMode = "MapToSimulationTime",
+  -- Uncomment to hide the overlay outside [StartTime, EndTime] instead of freezing on
+  -- the first/last frame
+  -- HideOutsideRange = true,
+  Description = [[
+    Texture video covering the contiguous United States, mapped to the simulation time.
+    The video plays from 20:00 to 21:00 on January 29, 2023 and is composited over the
+    lower color layers; everything outside the extent stays transparent.
+  ]]
+}
+
+
+asset.onInitialize(function()
+  openspace.globebrowsing.addLayer(earthAsset.Earth.Identifier, "ColorLayers", Layer)
+end)
+
+asset.onDeinitialize(function()
+  openspace.globebrowsing.deleteLayer(earthAsset.Earth.Identifier, "ColorLayers", Layer)
+end)
