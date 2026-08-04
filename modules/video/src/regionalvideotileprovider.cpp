@@ -226,13 +226,13 @@ void RegionalVideoTileProvider::reset() {
 ChunkTile RegionalVideoTileProvider::chunkTile(TileIndex tileIndex, int parents,
                                                int maxParents)
 {
-    // The UV transform is a pure function of the tile index, so ascending recomputes it
-    // from the parent's own patch instead of tracking incremental offsets
-    auto ascendToParent = [this](TileIndex& ti, TileUvTransform& uv) {
+    // The shader applies the uvTransform to the rendered chunk's own UV and the frame
+    // texture is identical at every level, so ascending must not alter the transform;
+    // only the index moves so traverseTree's level checks terminate
+    auto ascendToParent = [](TileIndex& ti, TileUvTransform&) {
         ti.x /= 2;
         ti.y /= 2;
         ti.level--;
-        uv = tileUvTransformForExtent(_extent, ti);
     };
 
     TileUvTransform uvTransform = tileUvTransformForExtent(_extent, tileIndex);
