@@ -1,7 +1,104 @@
 # Changelog
 
-All notable changes made on the `project/geojson_perf` branch (relative to `master`).
+All notable changes made on the `project/video_overlays` branch (relative to `master`);
+the branch continues the earlier `project/geojson_perf` work.
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
+
+Performance work has a dedicated write-up with measured numbers in
+[OPTIMIZATIONS.md](OPTIMIZATIONS.md).
+
+## [Unreleased] — 2026-08-02 → 2026-08-04
+
+### Added
+- **Regional video overlays** — a new `RegionalVideoTileProvider` layer type renders a
+  video over only a lat/lon extent of any `RenderableGlobe`, composited over lower layers
+  with full transparency outside the extent. The source is a preprocessed Basis Universal
+  ETC1S KTX2 "texture video" (frames as array layers) transcoded on a worker thread to BC7
+  (BC3 fallback) and uploaded as compressed GPU textures, so VRAM stays ~8:1 below RGBA and
+  no video codec is needed at runtime. Playback maps to simulation time as a pure function
+  of the cluster-synchronized clock, so no `Syncable` is required. Parameters: `Video`,
+  `Extent`, `StartTime`/`EndTime`, `PlaybackMode`, `LoopVideo`, `FramesPerSecond`,
+  `HideOutsideRange`. The existing mpv-backed `VideoTileProvider` is untouched.
+  Conversion tooling in `support/texturevideo/`; example asset under
+  `data/assets/examples/tileprovider/regionalvideotileprovider/`.
+- `GeodeticPatch::overlaps`, `tileUvTransformForExtent` and `maximumLevelForResolution` in
+  globebrowsing, with unit tests (`test_regionaltileuv`, `test_texturevideotiming`).
+
+### Fixed
+- **Duplicated video tiles under tile-tree ascension** — `RegionalVideoTileProvider`
+  recomputed the UV transform from the ancestor patch while ascending, but the shader
+  applies each pile entry's transform to the rendered chunk's own UV and the frame texture
+  is identical at every level, so the transform must be invariant under ascension. Produced
+  ghost copies at 2×/4× scale from level-blend pile entries and a full repeat inside every
+  chunk deeper than `maxLevel`.
+- **sgct render path** (in the `benpm/sgct` fork this branch pins): `renderViewports`
+  final-blit direction, the no-postfx fallback (the ping-pong attached an `intermediate`
+  texture that only exists with FXAA or a postProcess callback, giving a color-less FBO
+  every frame), an FXAA shader interface-block name mismatch that aborted every FXAA/bloom
+  config at startup, and an MSAA early-return that made any `msaa > 1` configuration render
+  nothing. All four are worth upstreaming.
+
+### Changed
+- `ext/ghoul` and `apps/OpenSpace/ext/sgct` point at the `benpm` forks. ghoul gains
+  `Texture::setCompressedPixelData`.
+
+## [Unreleased] — 2026-07-10 → 2026-08-01
+
+### Changed
+- **GeoJSON draw submission is batched.** New `rendering::MultiDrawBatch` merges many small
+  draws sharing a program and vertex layout into `glMultiDrawArrays` calls with per-draw
+  style data in an SSBO indexed by `baseDrawId + gl_DrawID`. `GeoJsonManager` owns three
+  batches (points, lines, polygons) shared by all components on a globe. Lines are expanded
+  to screen-space quads in a geometry shader, removing `glLineWidth` and its ~10 px driver
+  cap. Polygons use a position-only vertex stream with a screen-space-derivative normal.
+  Adjacent draws with identical records and contiguous ranges coalesce: 322,630 → 1
+  sub-draw on the 300 MB test file, 140 → 1 on the Toronto example.
+- **GeoJSON per-frame CPU work is change-driven.** Draw lists and SSBO records are camera
+  independent and reused until a style-dirty flag fires; `GeoJsonComponent::update()` and
+  the polygon pass are skipped outright when nothing can draw. Idle frames do no
+  per-feature work. Frame time on a 44,560-feature file: 250 ms → 3.8 ms.
+- **GeoJSON loading is cached.** Files are parsed with glaze (new
+  `modules/globebrowsing/ext/glaze` submodule) instead of the geos nlohmann-DOM reader,
+  which also preserves z values for `MultiLineString` coordinates that geos silently
+  dropped; the fully derived per-feature data is cached as BEVE through ghoul's
+  `CacheManager`, keyed on cache version, the ignore-heights flag and source mtime.
+  `MakeValid` runs only on features that are actually invalid. 71 MB / 44,560 features:
+  minutes → 3.2 s cold, 1.1 s warm. 300 MB / 322,630 features: 20 s cold, 8.7 s warm.
+- **Terrain heights are refined, not sampled at load.** `RelativeToGround` geometry builds
+  with zero heights (globe queries return 0 until tiles stream in anyway, so load-time
+  sampling cost ~21M useless queries per large file) and a budgeted round-robin sweep
+  raises them as terrain arrives, replacing per-feature 10 s timers that all expired in the
+  same frame. Refined heights persist in a BEVE sidecar cache next to the geometry cache.
+- **`PropertyOwner` sub-owners are indexed by identifier** for O(1) lookup, and registering
+  a sub-owner refreshes only the added subtree's URI caches instead of the whole tree. Both
+  were O(n²) with tens of thousands of sub-owners.
+- Above `PerFeaturePropertiesThreshold` (default 10,000 features) the per-feature property
+  owners are not created; at 322k features they would cost ~1.9M `Property` objects and
+  ~0.5 GB of RAM.
+
+### Added
+- **Conservative frustum and horizon culling for GeoJSON.** Per-feature model-space
+  bounding spheres accumulated from built vertices; sphere-vs-frustum with a 15% guard
+  band, and a shrunken-occluder horizon test. Cull results carry enough slack to stay valid
+  inside a ball of camera motion, checked in O(1) per frame, so the zero-idle-cost
+  invariant holds. Exposed as `PerformFrustumCulling` / `PerformHorizonCulling` on the
+  globe's `GeographicOverlays` owner (default true, `AdvancedUser`). At the regional test
+  view 99% of features cull and draw submission drops from 0.54 ms to 0.07 ms. Frustum
+  culling is suppressed on multi-pass frames (shared draw lists, differing frusta); horizon
+  culling stays on.
+- `.geojson` and `.vrt` files can be required directly as asset dependencies, generating a
+  wrapper asset that adds a GeoJson layer or a GDAL color layer to the Earth globe.
+- Rolling GeoJSON perf counters logged at `LDEBUG` every 10 s (frame interval, emit,
+  draw-submit and update times, sub-draw counts before and after merge, cull counts).
+
+### Fixed
+- A re-sampled GeoJSON feature never refreshed its control heights, so any feature that
+  changed once re-sampled all of its vertices every 10 s forever.
+- A never-cleared `_heightOffsetIsDirty` flag made every frame after a height-offset edit
+  walk all features.
+- An O(n²) freed-slot scan in `MultiDrawBatch::addDraw` made the first geometry build hang
+  at hundreds of thousands of draws.
+- `removePropertySubOwner` no longer dereferences a null scene during shutdown or in tests.
 
 ## [Unreleased] — 2026-07-03
 
