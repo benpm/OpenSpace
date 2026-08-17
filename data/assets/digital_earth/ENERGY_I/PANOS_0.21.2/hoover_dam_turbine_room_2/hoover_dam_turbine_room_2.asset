@@ -1,0 +1,2 @@
+-- working.asset meta asset to include models and panorama
+asset.require("./hoover_dam_turbine_room_2_360")

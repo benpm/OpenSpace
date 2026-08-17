@@ -1,0 +1,30 @@
+-- To learn how you can include your own video, see the wiki
+-- http://wiki.openspaceproject.com/docs/builders/assets/resources.html
+
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local Layer = {
+  Name = "Whaling Voyages from American Offshore Logs",
+  Identifier = "WhalingVoyagesAOL",
+  Enabled = true,
+  Type = "VideoTileProvider",
+  Video = asset.resource("whaling_voyages_1835.05-1836.04.mp4"),
+}
+
+asset.onInitialize(function()
+  openspace.globebrowsing.addLayer(earth.Earth.Identifier, "ColorLayers", Layer)
+end)
+
+asset.onDeinitialize(function()
+  openspace.globebrowsing.deleteLayer(earth.Earth.Identifier, "ColorLayers", Layer)
+end)
+
+asset.export("layer", Layer)
+
+asset.meta = {
+  Name = "Whaling Voyages (May-August 1835) from American Offshore Logs",
+  Description = "All American whaling voyages as detailed from the digitized ships logs form the American Offshore Logs.",
+  Author = "Ka Chun Yu",
+  URL = "https://openspaceproject.com",
+  License = "MIT"
+}

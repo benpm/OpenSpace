@@ -1,0 +1,115 @@
+-- Actions for the "1. Illumination: Suomi NPP Fires" card of the Digital Earth Energy I show.
+-- Generated from data/de_energy_0.21.html; these appear in the in-app
+-- Actions panel under "/Digital Earth/02 Suomi NPP Fires".
+
+local actions = {
+  {
+    Identifier = "de.energy.fires.title",
+    Name = "Title",
+    Command = [[
+      openspace.toggleFade("ScreenSpace.deck00_digital_earth_energy_I1",1)
+    ]],
+    Documentation = "Title (1. Illumination: Suomi NPP Fires)",
+    GuiPath = "/Digital Earth/02 Suomi NPP Fires",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.fires.on",
+    Name = "ON",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.RealTimeFires.Enabled", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.RealTimeFires.Fade",1,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.NightLayers.Earth_at_Night_2012.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.EarthAtmosphere.Renderable.Enabled", false)
+    ]],
+    Documentation = "ON (1. Illumination: Suomi NPP Fires)",
+    GuiPath = "/Digital Earth/02 Suomi NPP Fires",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.fires.play",
+    Name = "Play",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.RealTimeFires.TileProvider.VideoPlayer.Play", nil)
+    ]],
+    Documentation = "Play (1. Illumination: Suomi NPP Fires)",
+    GuiPath = "/Digital Earth/02 Suomi NPP Fires",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.fires.pause",
+    Name = "Pause",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.RealTimeFires.TileProvider.VideoPlayer.Pause", nil)
+    ]],
+    Documentation = "Pause (1. Illumination: Suomi NPP Fires)",
+    GuiPath = "/Digital Earth/02 Suomi NPP Fires",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.fires.go_to_start",
+    Name = "Go to Start",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.RealTimeFires.TileProvider.VideoPlayer.GoToStart", nil)
+    ]],
+    Documentation = "Go to Start (1. Illumination: Suomi NPP Fires)",
+    GuiPath = "/Digital Earth/02 Suomi NPP Fires",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.fires.loop_on",
+    Name = "LOOP ON",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.RealTimeFires.TileProvider.VideoPlayer.LoopVideo", true)
+    ]],
+    Documentation = "LOOP ON (1. Illumination: Suomi NPP Fires)",
+    GuiPath = "/Digital Earth/02 Suomi NPP Fires",
+    Color = { 0.85, 0.85, 0.2, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.fires.loop_off",
+    Name = "LOOP OFF",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.RealTimeFires.TileProvider.VideoPlayer.LoopVideo", false)
+    ]],
+    Documentation = "LOOP OFF (1. Illumination: Suomi NPP Fires)",
+    GuiPath = "/Digital Earth/02 Suomi NPP Fires",
+    Color = { 0.8, 0.25, 0.25, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.fires.off",
+    Name = "OFF",
+    Command = [[
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.RealTimeFires.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.ColorLayers.RealTimeFires.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.Layers.NightLayers.Earth_at_Night_2012.Enabled", true)
+      openspace.setPropertyValueSingle("Scene.EarthAtmosphere.Renderable.Enabled", true)
+    ]],
+    Documentation = "OFF (1. Illumination: Suomi NPP Fires)",
+    GuiPath = "/Digital Earth/02 Suomi NPP Fires",
+    Color = { 0.8, 0.25, 0.25, 1.0 },
+    IsLocal = false
+  },
+}
+
+asset.onInitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.registerAction(a)
+  end
+end)
+
+asset.onDeinitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.removeAction(a.Identifier)
+  end
+end)
+
+asset.meta = {
+  Name = "Digital Earth Energy I Actions - 1. Illumination: Suomi NPP Fires",
+  Description = "In-app action buttons for the 1. Illumination: Suomi NPP Fires section of the Energy I show",
+  Author = "Digital Earth / DMNS",
+  URL = "https://openspaceproject.com",
+  License = "MIT license"
+}

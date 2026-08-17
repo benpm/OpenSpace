@@ -1,0 +1,247 @@
+-- Whaling Port seals at their locations on Earth.
+-- The seals are invisible by default, but can be enabled using shown or hidden using
+-- the exported functions `showSeals(interpolationDuration)` and `hideSeals(interpolationDuration)`.
+
+-- local transforms = asset.require("scene/solarsystem/planets/earth/transforms")
+-- local sun = asset.require("scene/solarsystem/sun/transforms")
+-- local coreKernels = asset.require("spice/core")
+
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+-- local insigniasPath = asset.syncedResource({
+--   Name = "Whaling Port Seals",
+--   Type = "HttpSynchronization",
+--   Identifier = "apollo_insignias",
+--   Version = 1
+-- })
+
+-- Nantucket, MA
+-- New Bedford, MA
+-- New London, CT
+-- Provincetown, MA
+-- Sag Harbor, NY
+-- San Francisco, CA
+
+local NantucketMA = {
+  Identifier = "WhalingPortNantucketMASeal",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 41.25986196642714,
+      Longitude = -70.0401494805066,
+      Altitude = 11000,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 17410,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/whaling_ports/nantucket_ma.png"),
+    Opacity = 1.0
+  },
+  GUI = {
+    Path = "/Earth Layers/Whaling Ports",
+    Name = "Nantucket MA Seal"
+  }
+}
+
+local NewBedfordMA = {
+  Identifier = "WhalingPortNewBedfordMASeal",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 41.69745981424954,
+      Longitude = -71.14372784305495,
+      Altitude = 11000,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 25600,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/whaling_ports/new_bedford_ma.png"),
+    Opacity = 1.0
+  },
+  GUI = {
+    Path = "/Earth Layers/Whaling Ports",
+    Name = "New Bedford MA Seal"
+  }
+}
+
+local NewLondonCT = {
+  Identifier = "WhalingPortNewLondonCTSeal",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 41.35485175658955,
+      Longitude = -72.0984364874534,
+      Altitude = 11000,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 11890,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/whaling_ports/new_london_ct.png"),
+    Opacity = 1.0
+  },
+  GUI = {
+    Path = "/Earth Layers/Whaling Ports",
+    Name = "New London CT Seal"
+  }
+}
+
+local ProvincetownMA = {
+  Identifier = "WhalingPortProvincetownMASeal",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 42.051557184143526,
+      Longitude = -70.19002253527263,
+      Altitude = 11000,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 11970,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/whaling_ports/provincetown_ct.png"),
+    Opacity = 1.0
+  },
+  GUI = {
+    Path = "/Earth Layers/Whaling Ports",
+    Name = "Provincetown MA Seal"
+  }
+}
+
+local SagHarborNY = {
+  Identifier = "WhalingPortSagHarborNYSeal",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 41.001923804133575,
+      Longitude = -72.29668853275614,
+      Altitude = 11000,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 9920,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/whaling_ports/sag_harbor_ny.png"),
+    Opacity = 1.0
+  },
+  GUI = {
+    Path = "/Earth Layers/Whaling Ports",
+    Name = "Sag Harbor NY Seal"
+  }
+}
+
+local SanFranciscoCA = {
+  Identifier = "WhalingPortSanFranciscoCASeal",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 37.80620650764147,
+      Longitude = -122.41547827790755,
+      Altitude = 11000,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 12200,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/whaling_ports/san_francisco_ca.png"),
+    Opacity = 1.0
+  },
+  GUI = {
+    Path = "/Earth Layers/Whaling Ports",
+    Name = "San Francisco CA Seal"
+  }
+}
+
+local ShowSeals = {
+  Identifier = "os.WhalingPorts.ShowSeals",
+  Name = "Show Whaling Port landing labels",
+  Command = [[openspace.setPropertyValue("Scene.WhalingPort*Seal.Renderable.Opacity", 1, 0.5)]],
+  Documentation = "Show whaling port seals.",
+  GuiPath = "/DMNS/Whaling Ports",
+  IsLocal = false
+}
+
+local HideSeals = {
+  Identifier = "os.WhalingPorts.HideSeals",
+  Name = "Hide Whaling Port landing labels",
+  Command = [[openspace.setPropertyValue("Scene.WhalingPort*Seal.Renderable.Opacity", 0, 0.5)]],
+  Documentation = "Hide whaling port seals",
+  GuiPath = "/DMNS/Whaling Ports",
+  IsLocal = false
+}
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(NantucketMA)
+  openspace.addSceneGraphNode(NewBedfordMA)
+  openspace.addSceneGraphNode(NewLondonCT)
+  openspace.addSceneGraphNode(ProvincetownMA)
+  openspace.addSceneGraphNode(SagHarborNY)
+  openspace.addSceneGraphNode(SanFranciscoCA)
+  openspace.action.registerAction(ShowSeals)
+  openspace.action.registerAction(HideSeals)
+end)
+
+asset.onDeinitialize(function()
+  openspace.action.removeAction(HideSeals)
+  openspace.action.removeAction(ShowSeals)
+  openspace.removeSceneGraphNode(NantucketMA)
+  openspace.removeSceneGraphNode(NewBedfordMA)
+  openspace.removeSceneGraphNode(NewLondonCT)
+  openspace.removeSceneGraphNode(ProvincetownMA)
+  openspace.removeSceneGraphNode(SagHarborNY)
+  openspace.removeSceneGraphNode(SanFranciscoCA)
+end)
+
+asset.export(NantucketMA)
+asset.export(NewBedfordMA)
+asset.export(NewLondonCT)
+asset.export(ProvincetownMA)
+asset.export(SagHarborNY)
+asset.export(SanFranciscoCA)
+
+-- asset.export("showSeal", function (missionNumber, interpolationDuration)
+--   openspace.setPropertyValue("Scene.WhalingPorts" .. missionNumber .. "Seal.Renderable.Opacity", 1, interpolationDuration)
+-- end)
+-- asset.export("hideSeal", function (missionNumber, interpolationDuration)
+--   openspace.setPropertyValue("Scene.WhalingPorts" .. missionNumber .. "Seal.Renderable.Opacity", 0, interpolationDuration)
+-- end)
+
+asset.export("showSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.WhalingPorts*Seal.Renderable.Opacity", 1, interpolationDuration)
+end)
+
+asset.export("hideSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.WhalingPorts*Seal.Renderable.Opacity", 0, interpolationDuration)
+end)

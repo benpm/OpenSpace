@@ -1,0 +1,228 @@
+-- Colorado Energy Generators: Coal seals at their locations on Earth.
+-- The seals are invisible by default, but can be enabled using shown or hidden using
+-- the exported functions `showSeals(interpolationDuration)` and `hideSeals(interpolationDuration)`.
+
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local COA014_PublicServiceCoofColorado_ComancheCO_Pueblo = {
+  Identifier = "COA014_PublicServiceCoofColorado_ComancheCO_Pueblo",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.2081,
+      Longitude = -104.5747,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/coal-power-plant_altop7_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/COA",
+    Name = "COA014 - Public Service Co of Colorado, Comanche CO, Pueblo"
+  }
+}
+
+local COA074_PublicServiceCoofColorado_Hayden_Routt = {
+  Identifier = "COA074_PublicServiceCoofColorado_Hayden_Routt",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.4856,
+      Longitude = -107.185,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/coal-power-plant_altop7_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/COA",
+    Name = "COA074 - Public Service Co of Colorado, Hayden, Routt"
+  }
+}
+
+local COA076_TriStateGTAssnInc_CraigCO_Moffat = {
+  Identifier = "COA076_TriStateGTAssnInc_CraigCO_Moffat",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.4627,
+      Longitude = -107.5912,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/coal-power-plant_altop7_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/COA",
+    Name = "COA076 - Tri State GT Assn Inc, Craig CO, Moffat"
+  }
+}
+
+local COA091_PublicServiceCoofColorado_Pawnee_Morgan = {
+  Identifier = "COA091_PublicServiceCoofColorado_Pawnee_Morgan",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.2217,
+      Longitude = -103.6803,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/coal-power-plant_altop7_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/COA",
+    Name = "COA091 - Public Service Co of Colorado, Pawnee, Morgan"
+  }
+}
+
+local COA099_PlatteRiverPowerAuthority_Rawhide_Larimer = {
+  Identifier = "COA099_PlatteRiverPowerAuthority_Rawhide_Larimer",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.860905,
+      Longitude = -105.0212,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/coal-power-plant_altop7_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/COA",
+    Name = "COA099 - Platte River Power Authority, Rawhide, Larimer"
+  }
+}
+
+local COA119_CityofColoradoSpringsCO_RayDNixon_ElPaso = {
+  Identifier = "COA119_CityofColoradoSpringsCO_RayDNixon_ElPaso",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.633451,
+      Longitude = -104.7058,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/coal-power-plant_altop7_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/COA",
+    Name = "COA119 - City of Colorado Springs CO, Ray D Nixon, ElPaso"
+  }
+}
+
+local ShowSeals = {
+  Identifier = "os.COA.ShowSeals",
+  Name = "Show COA landing labels",
+  Command = [[openspace.setPropertyValue("Scene.COA*.Renderable.Opacity", 1, 0.5)]],
+  Documentation = "Show CO COA seals.",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+local HideSeals = {
+  Identifier = "os.COA.HideSeals",
+  Name = "Hide COA landing labels",
+  Command = [[openspace.setPropertyValue("Scene.COA*.Renderable.Opacity", 0, 0.5)]],
+  Documentation = "Hide CO COA seals",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(COA014_PublicServiceCoofColorado_ComancheCO_Pueblo)
+  openspace.addSceneGraphNode(COA074_PublicServiceCoofColorado_Hayden_Routt)
+  openspace.addSceneGraphNode(COA076_TriStateGTAssnInc_CraigCO_Moffat)
+  openspace.addSceneGraphNode(COA091_PublicServiceCoofColorado_Pawnee_Morgan)
+  openspace.addSceneGraphNode(COA099_PlatteRiverPowerAuthority_Rawhide_Larimer)
+  openspace.addSceneGraphNode(COA119_CityofColoradoSpringsCO_RayDNixon_ElPaso)
+  openspace.action.registerAction(ShowSeals)
+  openspace.action.registerAction(HideSeals)
+end)
+
+asset.onDeinitialize(function()
+  openspace.action.removeAction(HideSeals)
+  openspace.action.removeAction(ShowSeals)
+  openspace.removeSceneGraphNode(COA014_PublicServiceCoofColorado_ComancheCO_Pueblo)
+  openspace.removeSceneGraphNode(COA074_PublicServiceCoofColorado_Hayden_Routt)
+  openspace.removeSceneGraphNode(COA076_TriStateGTAssnInc_CraigCO_Moffat)
+  openspace.removeSceneGraphNode(COA091_PublicServiceCoofColorado_Pawnee_Morgan)
+  openspace.removeSceneGraphNode(COA099_PlatteRiverPowerAuthority_Rawhide_Larimer)
+  openspace.removeSceneGraphNode(COA119_CityofColoradoSpringsCO_RayDNixon_ElPaso)
+end)
+
+asset.export(COA014_PublicServiceCoofColorado_ComancheCO_Pueblo)
+asset.export(COA074_PublicServiceCoofColorado_Hayden_Routt)
+asset.export(COA076_TriStateGTAssnInc_CraigCO_Moffat)
+asset.export(COA091_PublicServiceCoofColorado_Pawnee_Morgan)
+asset.export(COA099_PlatteRiverPowerAuthority_Rawhide_Larimer)
+asset.export(COA119_CityofColoradoSpringsCO_RayDNixon_ElPaso)
+
+asset.export("showSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.COA*.Renderable.Opacity", 1, interpolationDuration)
+end)
+
+asset.export("hideSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.COA*.Renderable.Opacity", 0, interpolationDuration)
+end)

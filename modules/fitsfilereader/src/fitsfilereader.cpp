@@ -78,7 +78,7 @@ template <typename T>
 std::shared_ptr<ImageData<T>> FitsFileReader::readImage(const std::filesystem::path& path)
 {
     try {
-        _infile = std::make_unique<FITS>(path, Read, true);
+        _infile = std::make_unique<FITS>(path.string(), Read, true);
         // Primary HDU Object
         if (isPrimaryHDU()) {
             return readImageInternal<T>(_infile->pHDU());

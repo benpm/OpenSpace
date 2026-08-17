@@ -1,0 +1,55 @@
+-- Create a 360 panorama
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+local transforms = asset.require("./chs_laurel_refinery__laurel_mt_transforms") -- Include transforms for position
+local texture = asset.resource('data/chs_laurel_refinery__laurel_mt_edit.jpg'); -- Reference texture file
+openspace.printDebug(transforms)
+local chs_laurel_refinery__laurel_mt = {
+    Identifier = "chs_laurel_refinery__laurel_mt",
+    Parent = transforms.chs_laurel_refinery__laurel_mt_position.Identifier,
+    Transform = {
+        Rotation = { -- Rotate in gui to proper orientation.
+            Type= "StaticRotation",
+            -- If the panorama image has North at the center of image,
+            -- the horizon runs exactly through the centerline, and
+            -- Rotation = {0, LATITUDE, LONGITUDE} with angles in
+            -- radians, then the pano will appear level and properly oriented.
+            Rotation = {0.00,0.796926354,-1.898339262}
+        },
+        Scale = {
+            Type = "StaticScale",
+            Scale = 1.0
+        },
+        Translation = {
+            Type = "StaticTranslation",
+            Position = {0,0,0}
+        }
+    },
+    Renderable = {
+        Type = "RenderableSphereImageLocal",
+        Size = 45,
+        Segments = 40,
+        Opacity = 1.0,
+        Texture = texture,
+        Orientation = "Inside",
+        UseAdditiveBlending = false,
+        MirrorTexture = true,
+        FadeOutThreshold = 1.00,
+        Background = true,
+        RenderBinMode = "PostDeferredTransparent",
+    },
+    GUI = {
+        Name = "CHS Laurel Refinery, Laurel MT",
+        Path = "/DMNS/CHS Laurel Refinery, Laurel, MT",
+        Description = [[CHS Laurel Refinery, Laurel, MT]],
+    }
+}
+asset.onInitialize(function()
+    openspace.addSceneGraphNode(chs_laurel_refinery__laurel_mt)
+    openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.LimitZoom.MinimumAllowedDistance", 1.000000)
+end)
+
+asset.onDeinitialize(function()
+    openspace.removeSceneGraphNode(chs_laurel_refinery__laurel_mt)
+end)
+asset.export(chs_laurel_refinery__laurel_mt)

@@ -1,0 +1,505 @@
+local helper = asset.require("util/slide_deck_helper")
+local deck00 = nil
+local deck01 = nil
+local deck02 = nil
+local deck03 = nil
+local deck04 = nil
+local deck05 = nil
+local deck10 = nil
+local deck11 = nil
+local deck12 = nil
+local deck13 = nil
+local deck14 = nil
+local deck15 = nil
+local deck16 = nil
+local deck17 = nil
+local deck18 = nil
+local deck19 = nil
+local deck20 = nil
+local deck21 = nil
+local deck22 = nil
+local deck23 = nil
+local deck24 = nil
+local deck25 = nil
+local deck26 = nil
+local deck27 = nil
+local deck28 = nil
+local deck29 = nil
+local deck30 = nil
+local deck31 = nil
+local deck40 = nil
+
+asset.onInitialize(function ()
+  deck00 = helper.createDeck("deck00_digital_earth_energy_I", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.0,0.0,-0.85}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck00, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/00.digital_earth_energy_I.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck00, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck00_digital_earth_energy_I1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck00_digital_earth_energy_I1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck01 = helper.createDeck("deck01_beale39_boats_attack_whales", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.35,-0.62,-0.65}, -- use for dome
+    Rotation = {-0.60,0.00,0.00}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.35,
+  })
+  helper.addSlide(deck01, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/01.beale39_boats_attack_whales_plate.viii_p173_v2.jpg"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck01, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck01_beale39_boats_attack_whales1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck01_beale39_boats_attack_whales1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck02 = helper.createDeck("deck02_hamtilton46_greenland_whale_plate4", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.1,-1.0,-0.90}, -- use for dome
+    Rotation = {-0.90,0.00,0.00}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.30,
+  })
+  helper.addSlide(deck02, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/02.hamilton46_greenland_whale_plate4_p122.jpg"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck02, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck02_hamtilton46_greenland_whale_plate41.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck02_hamtilton46_greenland_whale_plate41.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck03 = helper.createDeck("deck03_charles_sidney_raleigh__all_in_a_days_work_bark_gazelle", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.1,0.05,-1.15}, -- use for dome
+    Rotation = {0.02,0.00,0.00}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.33,
+  })
+  helper.addSlide(deck03, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/03.charles_sidney_raleigh__all_in_a_days_work_bark_gazelle_1878-1880.jpg"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck03, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck03_charles_sidney_raleigh__all_in_a_days_work_bark_gazelle1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck03_charles_sidney_raleigh__all_in_a_days_work_bark_gazelle1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck04 = helper.createDeck("deck04_destruction_of_the_larboard_boat_of_the_ann_alexander_by_a_sperm_whale", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.2,0.05,-0.80}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.3,
+  })
+  helper.addSlide(deck04, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/04.destruction_of_the_larboard_boat_of_the_ann_alexander_by_a_sperm_whale__frederick.james.smyth_mit.museum_AF-WA-0528.jpg"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck04, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck04_destruction_of_the_larboard_boat_of_the_ann_alexander_by_a_sperm_whale1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck04_destruction_of_the_larboard_boat_of_the_ann_alexander_by_a_sperm_whale1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck05 = helper.createDeck("deck05_capturing_a_sperm_whale", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.3,0.90,-0.70}, -- use for dome
+    Rotation = {0.75,0.00,0.00}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.44,
+  })
+  helper.addSlide(deck05, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/05.capturing_a_sperm_whale__af-wa-p018_john.hill.engraver.colorist_after_cornelius.r.hulsart.sketcher_william.page.painter_allan.forbes.collection.jpg"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck05, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck05_capturing_a_sperm_whale1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck05_capturing_a_sperm_whale1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck10 = helper.createDeck("deck10_deck_of_whaler_try_works", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.1,0.0,0.00}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck10, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/10.deck_of_whaler_try_works.jpg"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck10, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck10_deck_of_whaler_try_works1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck10_deck_of_whaler_try_works1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck11 = helper.createDeck("deck11_davis74_trying_out", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {2.7,-0.60,-0.85}, -- use for dome
+    Rotation = {-0.60,0.00,0.00}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck11, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/11.davis74_trying_out_p88.jpg"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck11, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck11_davis74_trying_out1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck11_davis74_trying_out1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck12 = helper.createDeck("deck12_casks_whale_oil_new_bedord_waterfront", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.4,0.62,-0.78}, -- use for dome
+    Rotation = {0.50,0.00,0.00}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck12, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/12.casks_whale_oil_new_bedford_waterfront_c1870_v5.jpg"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck12, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck12_casks_whale_oil_new_bedord_waterfront1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck12_casks_whale_oil_new_bedord_waterfront1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck13 = helper.createDeck("deck13_spermaceti_candle_and_oil", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.4,-0.60,-1.00}, -- use for dome
+    Rotation = {-0.55,0.00,0.00}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.4,
+  })
+  helper.addSlide(deck13, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/13.spermaceti_candle_and_oil__genevieve.anderson.jpg"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck13, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck13_spermaceti_candle_and_oil1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck13_spermaceti_candle_and_oil1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck14 = helper.createDeck("deck14_sperm_oil_bottle_and_can", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.6,0.6,-1.0}, -- use for dome
+    Rotation = {0.50,0.00,0.00}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.45,
+  })
+  helper.addSlide(deck14, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/14.sperm_oil_bottle_and_can_raphael.d.mazor.2007.09.04.jpg"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck14, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck14_sperm_oil_bottle_and_can1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck14_sperm_oil_bottle_and_can1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck15 = helper.createDeck("deck15_whale_oil_by_barrels_animated_gif", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {0.95,0.0,-0.90}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck15, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/15.whale_oil_by_barrels_timeseries_34sec.gif"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck15, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck15_whale_oil_by_barrels_animated_gif1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck15_whale_oil_by_barrels_animated_gif1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck16 = helper.createDeck("deck16_whale_oil_barrels", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {0.95,0.0,-0.90}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck16, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/16.whale_oil_barrels.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck16, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck16_whale_oil_barrels1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck16_whale_oil_barrels1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck17 = helper.createDeck("deck17_whale_oil_value", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {0.95,0.0,-0.90}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck17, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/17.whale_oil_value.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck17, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck17_whale_oil_value1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck17_whale_oil_value1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck18 = helper.createDeck("deck18_global_coal_plants_2025__usa", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {0.8,0.0,-0.85}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck18, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/18.global_coal_plants_2025__usa.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck18, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck18_global_coal_plants_2025__usa1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck18_global_coal_plants_2025__usa1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck19 = helper.createDeck("deck19_coal_transp_2025", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {0.8,0.0,-0.85}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck19, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/19.coal_transp_2025.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck19, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck19_coal_transp_20251.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck19_coal_transp_20251.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck20 = helper.createDeck("deck20_ercot_fuel_mix_2024_10_24_1", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.1,0.0,-0.85}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck20, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/20.ercot_fuel_mix_2024.10.24_1.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck20, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck20_ercot_fuel_mix_2024_10_24_11.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck20_ercot_fuel_mix_2024_10_24_11.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck21 = helper.createDeck("deck21_ercot_fuel_mix_2024_10_24_2", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.1,0.0,-0.85}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck21, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/21.ercot_fuel_mix_2024.10.24_2.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck21, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck21_ercot_fuel_mix_2024_10_24_21.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck21_ercot_fuel_mix_2024_10_24_21.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck22 = helper.createDeck("deck22_ercot_fuel_mix_2024_10_24_3", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.1,0.0,-0.85}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck22, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/22.ercot_fuel_mix_2024.10.24_3.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck22, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck22_ercot_fuel_mix_2024_10_24_31.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck22_ercot_fuel_mix_2024_10_24_31.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck23 = helper.createDeck("deck23_ercot_fuel_mix_2024_10_24_4", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.1,0.0,-0.85}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck23, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/23.ercot_fuel_mix_2024.10.24_4.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck23, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck23_ercot_fuel_mix_2024_10_24_41.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck23_ercot_fuel_mix_2024_10_24_41.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck24 = helper.createDeck("deck24_ercot_fuel_mix_2024_10_24_5", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.1,0.0,-0.85}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck24, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/24.ercot_fuel_mix_2024.10.24_5.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck24, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck24_ercot_fuel_mix_2024_10_24_51.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck24_ercot_fuel_mix_2024_10_24_51.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck25 = helper.createDeck("deck25_ercot_fuel_mix_2024_10_24_6", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.1,0.0,-0.85}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck25, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/25.ercot_fuel_mix_2024.10.24_6.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck25, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck25_ercot_fuel_mix_2024_10_24_61.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck25_ercot_fuel_mix_2024_10_24_61.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck26 = helper.createDeck("deck26_caiso_fuel_mix_2025_08_12", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.3,0.0,-1.00}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck26, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/26.caiso_fuel_mix_2025.08.12.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck26, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck26_caiso_fuel_mix_2025_08_121.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck26_caiso_fuel_mix_2025_08_121.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck27 = helper.createDeck("deck27_gridcarbon_2025_08_13", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {2.25,0.0,-0.90}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck27, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/27.gridcarbon_2025.08.13.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck27, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck27_gridcarbon_2025_08_131.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck27_gridcarbon_2025_08_131.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck28 = helper.createDeck("deck28_power_plants_wwsg_nuc_2025_conus", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {0.70,0.0,-0.75}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck28, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/28.power_plants_wwsg_nuc_2025_conus.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck28, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck28_power_plants_wwsg_nuc_2025_conus1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck28_power_plants_wwsg_nuc_2025_conus1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck29 = helper.createDeck("deck29_power_plants_coa_2025_conus", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {0.70,0.0,-0.75}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck29, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/29.power_plants_coa_2025_conus.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck29, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck29_power_plants_coa_2025_conus1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck29_power_plants_coa_2025_conus1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck30 = helper.createDeck("deck30_power_plants_gas_2025_conus", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {0.70,0.0,-0.75}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck30, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/30.power_plants_gas_2025_conus.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck30, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck30_power_plants_gas_2025_conus1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck30_power_plants_gas_2025_conus1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck31 = helper.createDeck("deck31_power_plants_oil_2025_conus", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {0.70,0.0,-0.75}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck31, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/31.power_plants_oil_2025_conus.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck31, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck31_power_plants_oil_2025_conus1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck31_power_plants_oil_2025_conus1.Opacity", 1.0)
+end)
+
+asset.onInitialize(function ()
+  deck40 = helper.createDeck("deck40_de_energy_credits", {
+    UseRadiusAzimuthElevation = true,
+    RadiusAzimuthElevation = {1.0,0,-0.95}, -- use for dome
+    UsePerspectiveProjection = true,
+    FaceCamera = true,
+    Scale = 0.7,
+  })
+  helper.addSlide(deck40, openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/energy_1_slides/40.de_energy_credits.png"))
+  local interpolationDuration = 0.5
+  helper.setCurrentSlide(deck40, 1)
+  openspace.setPropertyValueSingle("ScreenSpace.deck40_de_energy_credits1.Enabled", false)
+  openspace.setPropertyValueSingle("ScreenSpace.deck40_de_energy_credits1.Opacity", 1.0)
+end)
+
+asset.onDeinitialize(function()
+  helper.removeDeck(deck00)
+  helper.removeDeck(deck01)
+  helper.removeDeck(deck02)
+  helper.removeDeck(deck03)
+  helper.removeDeck(deck04)
+  helper.removeDeck(deck05)
+  helper.removeDeck(deck10)
+  helper.removeDeck(deck11)
+  helper.removeDeck(deck12)
+  helper.removeDeck(deck13)
+  helper.removeDeck(deck14)
+  helper.removeDeck(deck15)
+  helper.removeDeck(deck16)
+  helper.removeDeck(deck17)
+  helper.removeDeck(deck18)
+  helper.removeDeck(deck19)
+  helper.removeDeck(deck20)
+  helper.removeDeck(deck21)
+  helper.removeDeck(deck22)
+  helper.removeDeck(deck23)
+  helper.removeDeck(deck24)
+  helper.removeDeck(deck25)
+  helper.removeDeck(deck26)
+  helper.removeDeck(deck27)
+  helper.removeDeck(deck28)
+  helper.removeDeck(deck29)
+  helper.removeDeck(deck30)
+  helper.removeDeck(deck31)
+  helper.removeDeck(deck40)
+end)

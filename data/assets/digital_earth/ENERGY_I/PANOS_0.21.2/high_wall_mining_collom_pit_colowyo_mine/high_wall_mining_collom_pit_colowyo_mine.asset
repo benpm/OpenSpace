@@ -1,0 +1,2 @@
+-- high_wall_mining_collom_pit_colowyo_mine.asset meta asset to include models and panorama
+asset.require("./high_wall_mining_collom_pit_colowyo_mine_360")

@@ -36,6 +36,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <set>
 #include <string>
 #include <string_view>
@@ -224,6 +225,18 @@ public:
     void stopBouncing(Property* prop);
 
     /**
+     * Overrides the time reference used for property interpolations. When set, the
+     * interpolation system uses the provided time instead of the real clock, which makes
+     * interpolation behavior deterministic for testing. Pass `std::nullopt` to restore
+     * the normal (real-clock) behavior.
+     *
+     * \param time The fixed time to use for interpolations, or `std::nullopt` to use the
+     *        real clock
+     */
+    void setInterpolationTimeReference(
+        std::optional<std::chrono::steady_clock::time_point> time);
+
+    /**
      * Returns the Lua library that contains all Lua functions available to change the
      * scene graph.
      *
@@ -327,6 +340,11 @@ private:
         std::chrono::time_point<std::chrono::steady_clock> bouncingAbortTime;
     };
     std::vector<PropertyInterpolationInfo> _propertyInterpolationInfos;
+
+    /// When set, this time is used for property interpolations instead of the real
+    /// clock (see setInterpolationTimeReference). Used to make interpolation
+    /// deterministic
+    std::optional<std::chrono::steady_clock::time_point> _interpolationTimeOverride;
 
     std::unordered_map<std::string, std::vector<std::string>> _guiTreeOrderMap;
 };

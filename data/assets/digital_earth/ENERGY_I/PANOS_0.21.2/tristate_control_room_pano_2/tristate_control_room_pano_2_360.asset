@@ -1,0 +1,51 @@
+-- Create a 360 panorama
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+local transforms = asset.require("./tristate_control_room_pano_2_transforms") -- Include transforms for position
+local texture = asset.resource('data/tristate_control_room_pano_2_8K.jpg'); -- Reference texture file
+openspace.printDebug(transforms)
+local tristate_control_room_pano_2 = {
+    Identifier = "tristate_control_room_pano_2",
+    Parent = transforms.tristate_control_room_pano_2_position.Identifier,
+    Transform = {
+        Rotation = { -- Rotate in gui to proper orientation.
+            Type= "StaticRotation",
+            Rotation = { 0.00, 0.6964995755, -1.8325989144 }
+        },
+        Scale = {
+            Type = "StaticScale",
+            Scale = 1.0
+        },
+        Translation = {
+            Type = "StaticTranslation",
+            Position = {0,0,0}
+        }
+    },
+    Renderable = {
+        Type = "RenderableSphereImageLocal",
+        Size = 45,
+        Segments = 40,
+        Opacity = 1.0,
+        Texture = texture,
+        Orientation = "Inside",
+        UseAdditiveBlending = false,
+        MirrorTexture = true,
+        FadeOutThreshold = 1.00,
+        Background = true,
+        RenderBinMode = "PostDeferredTransparent",
+    },
+    GUI = {
+        Name = "Tri-State Control Room Pano 2",
+        Path = "/DMNS/Tri-State Control Room Pano 2",
+        Description = [[Tri-State Control Room Pano 2]],
+    }
+}
+asset.onInitialize(function()
+    openspace.addSceneGraphNode(tristate_control_room_pano_2)
+    openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.LimitZoom.MinimumAllowedDistance", 1.000000)
+end)
+
+asset.onDeinitialize(function()
+    openspace.removeSceneGraphNode(tristate_control_room_pano_2)
+end)
+asset.export(tristate_control_room_pano_2)

@@ -1,0 +1,2 @@
+-- hoover_dam_exterior_intake_towers.asset meta asset to include models and panorama
+asset.require("./hoover_dam_exterior_intake_towers_360")

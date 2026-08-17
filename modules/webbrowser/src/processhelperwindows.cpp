@@ -74,10 +74,14 @@ namespace {
 } // namespace
 #endif // WIN32
 
-// Entry point function for sub-processes
-int main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow) {
+// Entry point function for sub-processes. This executable is linked as a console
+// (CUI) subsystem program, so the CRT entry is `mainCRTStartup` -> `main`. Clang
+// strictly validates the signature of `main` (MSVC does not), so we use a standard
+// signature and obtain the module instance via `GetModuleHandle` instead of relying
+// on the non-standard WinMain-style parameters.
+int main(int, char**) {
     // Provide CEF with command-line arguments
-    CefMainArgs mainArgs = CefMainArgs(hInstance);
+    CefMainArgs mainArgs = CefMainArgs(GetModuleHandle(nullptr));
 
     CefRefPtr<openspace::WebBrowserApp> app = new openspace::WebBrowserApp;
 

@@ -1,0 +1,95 @@
+{
+    "version": 4,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 19,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "windows-min",
+            "description": "no tests, no extraneous modules, no vcpkg, no warnings",
+            "generator": "Visual Studio 18 2026",
+            "binaryDir": "${sourceDir}/build",
+            "warnings": {
+                "dev": false,
+                "deprecated": false,
+                "systemVars": false
+            },
+            "environment": {
+                "VCPKG_ROOT": "",
+                "VCPKG_DEFAULT_TRIPLET": ""
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "GHOUL_HAVE_TESTS": "OFF",
+                "OPENSPACE_HAVE_TESTS": "OFF",
+                "OPENSPACE_MODULE_VIDEO": "ON",
+                "OPENSPACE_MODULE_TOYVOLUME": "OFF",
+                "SGCT_BUILD_TESTS": "OFF",
+                "ASSIMP_INSTALL_PDB": "OFF",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_TOOLCHAIN_FILE": "",
+                "DISABLE_VCPKG": "ON",
+                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.3/msvc2022_64"
+            },
+            "hidden": false
+        },
+        {
+            "name": "windows-llvm",
+            "description": "LLVM toolchain (clang-cl + lld-link), Ninja Multi-Config",
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build",
+            "warnings": {
+                "dev": false,
+                "deprecated": false,
+                "systemVars": false
+            },
+            "environment": {
+                "VCPKG_ROOT": "",
+                "VCPKG_DEFAULT_TRIPLET": ""
+            },
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang-cl",
+                "CMAKE_CXX_COMPILER": "clang-cl",
+                "CMAKE_LINKER_TYPE": "LLD",
+                "CMAKE_CONFIGURATION_TYPES": "RelWithDebInfo;Debug",
+                "GHOUL_HAVE_TESTS": "OFF",
+                "OPENSPACE_HAVE_TESTS": "OFF",
+                "OPENSPACE_MODULE_VIDEO": "ON",
+                "OPENSPACE_MODULE_TOYVOLUME": "OFF",
+                "SGCT_BUILD_TESTS": "OFF",
+                "ASSIMP_INSTALL_PDB": "OFF",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_TOOLCHAIN_FILE": "",
+                "DISABLE_VCPKG": "ON",
+                "CMAKE_PREFIX_PATH": "C:/Qt/6.8.3/msvc2022_64"
+            },
+            "hidden": false
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "windows-min",
+            "configuration": "RelWithDebInfo",
+            "configurePreset": "windows-min",
+            "jobs": 6,
+            "targets": [
+                "OpenSpace"
+            ],
+            "inheritConfigureEnvironment": true,
+            "hidden": false
+        },
+        {
+            "name": "windows-llvm",
+            "configuration": "RelWithDebInfo",
+            "configurePreset": "windows-llvm",
+            "jobs": 6,
+            "targets": [
+                "OpenSpace"
+            ],
+            "inheritConfigureEnvironment": true,
+            "hidden": false
+        }
+    ]
+}

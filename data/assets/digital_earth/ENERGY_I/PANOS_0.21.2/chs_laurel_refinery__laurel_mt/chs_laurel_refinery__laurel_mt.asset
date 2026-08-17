@@ -1,0 +1,4 @@
+-- 360 panorama asset for chs_laurel_refinery__laurel_mt
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+asset.require("./chs_laurel_refinery__laurel_mt_360")

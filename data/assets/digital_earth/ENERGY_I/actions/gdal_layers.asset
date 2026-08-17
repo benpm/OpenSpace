@@ -1,0 +1,309 @@
+-- Actions for the "8. GDAL Layers" card of the Digital Earth Energy I show.
+-- Generated from data/de_energy_0.21.html; these appear in the in-app
+-- Actions panel under "/Digital Earth/09 GDAL Layers".
+
+local actions = {
+  {
+    Identifier = "de.energy.gdal_layers.us_coa_plants_load",
+    Name = "US COA Plants LOAD",
+    Command = [[
+      openspace.globebrowsing.addLayer("Earth", "ColorLayers", { Identifier = "EIA_COA_2025", Enabled = true, FilePath = "${ASSETS}/digital_earth/ENERGY_I/US_EIA_OPERATING_GENERATORS/power_plants_coa_2025_conus_alpha.vrt" })
+    ]],
+    Documentation = "US COA Plants LOAD (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_coa_toggle",
+    Name = "US COA TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.Layers.ColorLayers.EIA_COA_2025",1)
+    ]],
+    Documentation = "US COA TOGGLE (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_gas_plants_load",
+    Name = "US GAS Plants LOAD",
+    Command = [[
+      openspace.globebrowsing.addLayer("Earth", "ColorLayers", { Identifier = "EIA_GAS_2025", Enabled = true, FilePath = "${ASSETS}/digital_earth/ENERGY_I/US_EIA_OPERATING_GENERATORS/power_plants_gas_2025_conus_alpha.vrt" })
+    ]],
+    Documentation = "US GAS Plants LOAD (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_gas_toggle",
+    Name = "US GAS TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.Layers.ColorLayers.EIA_GAS_2025",1)
+    ]],
+    Documentation = "US GAS TOGGLE (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_oil_plants_load",
+    Name = "US OIL Plants LOAD",
+    Command = [[
+      openspace.globebrowsing.addLayer("Earth", "ColorLayers", { Identifier = "EIA_OIL_2025", Enabled = true, FilePath = "${ASSETS}/digital_earth/ENERGY_I/US_EIA_OPERATING_GENERATORS/power_plants_oil_2025_conus_alpha.vrt" })
+    ]],
+    Documentation = "US OIL Plants LOAD (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_oil_toggle",
+    Name = "US OIL TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.Layers.ColorLayers.EIA_OIL_2025",1)
+    ]],
+    Documentation = "US OIL TOGGLE (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_nuc_plants_load",
+    Name = "US NUC Plants LOAD",
+    Command = [[
+      openspace.globebrowsing.addLayer("Earth", "ColorLayers", { Identifier = "EIA_NUC_2025", Enabled = true, FilePath = "${ASSETS}/digital_earth/ENERGY_I/US_EIA_OPERATING_GENERATORS/power_plants_nuc_2025_conus_alpha.vrt" })
+    ]],
+    Documentation = "US NUC Plants LOAD (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_nuc_toggle",
+    Name = "US NUC TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.Layers.ColorLayers.EIA_NUC_2025",1)
+    ]],
+    Documentation = "US NUC TOGGLE (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_hyd_plants_load",
+    Name = "US HYD Plants LOAD",
+    Command = [[
+      openspace.globebrowsing.addLayer("Earth", "ColorLayers", { Identifier = "EIA_HYD_2025", Enabled = true, FilePath = "${ASSETS}/digital_earth/ENERGY_I/US_EIA_OPERATING_GENERATORS/power_plants_hyd_2025_conus_alpha.vrt" })
+    ]],
+    Documentation = "US HYD Plants LOAD (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_hyd_toggle",
+    Name = "US HYD TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.Layers.ColorLayers.EIA_HYD_2025",1)
+    ]],
+    Documentation = "US HYD TOGGLE (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_sol_plants_load",
+    Name = "US SOL Plants LOAD",
+    Command = [[
+      openspace.globebrowsing.addLayer("Earth", "ColorLayers", { Identifier = "EIA_SOL_2025", Enabled = true, FilePath = "${ASSETS}/digital_earth/ENERGY_I/US_EIA_OPERATING_GENERATORS/power_plants_sol_2025_conus_alpha.vrt" })
+    ]],
+    Documentation = "US SOL Plants LOAD (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_sol_toggle",
+    Name = "US SOL TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.Layers.ColorLayers.EIA_SOL_2025",1)
+    ]],
+    Documentation = "US SOL TOGGLE (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_win_plants_load",
+    Name = "US WIN Plants LOAD",
+    Command = [[
+      openspace.globebrowsing.addLayer("Earth", "ColorLayers", { Identifier = "EIA_WIN_2025", Enabled = true, FilePath = "${ASSETS}/digital_earth/ENERGY_I/US_EIA_OPERATING_GENERATORS/power_plants_win_2025_conus_alpha.vrt" })
+    ]],
+    Documentation = "US WIN Plants LOAD (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_win_toggle",
+    Name = "US WIN TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.Layers.ColorLayers.EIA_WIN_2025",1)
+    ]],
+    Documentation = "US WIN TOGGLE (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_wwsg_n_plants_load",
+    Name = "US WWSG+N Plants LOAD",
+    Command = [[
+      openspace.globebrowsing.addLayer("Earth", "ColorLayers", { Identifier = "EIA_WWSG_N", Enabled = true, FilePath = "${ASSETS}/digital_earth/ENERGY_I/US_EIA_OPERATING_GENERATORS/power_plants_wwsg_nuc_2025_conus_alpha.vrt" })
+    ]],
+    Documentation = "US WWSG+N Plants LOAD (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_wwsg_n_toggle",
+    Name = "US WWSG+N TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.Layers.ColorLayers.EIA_WWSG_N",1)
+    ]],
+    Documentation = "US WWSG+N TOGGLE (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_bat_plants_load",
+    Name = "US BAT Plants LOAD",
+    Command = [[
+      openspace.globebrowsing.addLayer("Earth", "ColorLayers", { Identifier = "EIA_BAT_2025", Enabled = true, FilePath = "${ASSETS}/digital_earth/ENERGY_I/US_EIA_OPERATING_GENERATORS/power_plants_bat_2025_conus_alpha.vrt" })
+    ]],
+    Documentation = "US BAT Plants LOAD (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_bat_toggle",
+    Name = "US BAT TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.Layers.ColorLayers.EIA_BAT_2025",1)
+    ]],
+    Documentation = "US BAT TOGGLE (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_bio_plants_load",
+    Name = "US BIO Plants LOAD",
+    Command = [[
+      openspace.globebrowsing.addLayer("Earth", "ColorLayers", { Identifier = "EIA_BIO_2025", Enabled = true, FilePath = "${ASSETS}/digital_earth/ENERGY_I/US_EIA_OPERATING_GENERATORS/power_plants_bio_2025_conus_alpha.vrt" })
+    ]],
+    Documentation = "US BIO Plants LOAD (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_bio_toggle",
+    Name = "US BIO TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.Layers.ColorLayers.EIA_BIO_2025",1)
+    ]],
+    Documentation = "US BIO TOGGLE (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.coal_transport_2025_load",
+    Name = "Coal Transport 2025 LOAD",
+    Command = [[
+      openspace.globebrowsing.addLayer("Earth", "ColorLayers", { Identifier = "us_coal_2025", Enabled = true, FilePath = "${ASSETS}/digital_earth/ENERGY_I/GDAL/us_coal_2025/coal_transp_2025_alpha.vrt" })
+    ]],
+    Documentation = "Coal Transport 2025 LOAD (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.coal_transport_toggle",
+    Name = "Coal Transport TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.Layers.ColorLayers.us_coal_2025",1)
+    ]],
+    Documentation = "Coal Transport TOGGLE (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.wind_gdal_load",
+    Name = "Wind GDAL LOAD",
+    Command = [[
+      openspace.globebrowsing.addLayer("Earth", "ColorLayers", { Identifier = "global_wind_atlas", Enabled = true, FilePath = "${ASSETS}/digital_earth/ENERGY_I/GDAL/gwa3/gwa3_250_powerdensity_50m_cropped_to_conus_200mi_buffer_blue_color_tbl_8K_alpha.vrt" })
+    ]],
+    Documentation = "Wind GDAL LOAD (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.wind_toggle",
+    Name = "Wind TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.Layers.ColorLayers.global_wind_atlas",1)
+    ]],
+    Documentation = "Wind TOGGLE (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.solar_gdal_load",
+    Name = "Solar GDAL LOAD",
+    Command = [[
+      openspace.globebrowsing.addLayer("Earth", "ColorLayers", { Identifier = "nsrdb_solar_irradiance", Enabled = true, FilePath = "${ASSETS}/digital_earth/ENERGY_I/GDAL/nsrdb_solar_irradiance/nsrdb_solar_irradiance_w_yellow_ramp_conus_borders_alpha.vrt" })
+    ]],
+    Documentation = "Solar GDAL LOAD (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.us_bio_solar_toggle",
+    Name = "US BIO Solar TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.Layers.ColorLayers.nsrdb_solar_irradiance",1)
+    ]],
+    Documentation = "US BIO Solar TOGGLE (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gdal_layers.reload_scene_tree_f5",
+    Name = "Reload Scene Tree (F5)",
+    Command = [[
+      openspace.setPropertyValueSingle("Modules.CefWebGui.Reload", nil)
+    ]],
+    Documentation = "Reload Scene Tree (F5) (8. GDAL Layers)",
+    GuiPath = "/Digital Earth/09 GDAL Layers",
+    IsLocal = false
+  },
+}
+
+asset.onInitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.registerAction(a)
+  end
+end)
+
+asset.onDeinitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.removeAction(a.Identifier)
+  end
+end)
+
+asset.meta = {
+  Name = "Digital Earth Energy I Actions - 8. GDAL Layers",
+  Description = "In-app action buttons for the 8. GDAL Layers section of the Energy I show",
+  Author = "Digital Earth / DMNS",
+  URL = "https://openspaceproject.com",
+  License = "MIT license"
+}

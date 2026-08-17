@@ -1109,6 +1109,10 @@ const glm::dmat4& RenderableGlobe::modelTransform() const {
     return _cachedModelTransform;
 }
 
+const glm::dmat4& RenderableGlobe::inverseModelTransform() const {
+    return _cachedInverseModelTransform;
+}
+
 void RenderableGlobe::invalidateShader() {
     _shadersNeedRecompilation = true;
 }

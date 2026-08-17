@@ -663,7 +663,10 @@ void Scene::addPropertyInterpolation(Property* prop, float durationSeconds,
         ghoul::easingFunction<float>(easingFunction);
 
     // First check if the current property already has an interpolation information
-    const std::chrono::steady_clock::time_point now = currentTimeForInterpolation();
+    const std::chrono::steady_clock::time_point now =
+        _interpolationTimeOverride.has_value() ?
+        *_interpolationTimeOverride :
+        currentTimeForInterpolation();
     for (PropertyInterpolationInfo& info : _propertyInterpolationInfos) {
         if (info.prop == prop) {
             info.beginTime = now;
@@ -719,7 +722,9 @@ void Scene::updateInterpolations() {
 
     using namespace std::chrono;
 
-    const steady_clock::time_point now = currentTimeForInterpolation();
+    const steady_clock::time_point now = _interpolationTimeOverride.has_value() ?
+        *_interpolationTimeOverride :
+        currentTimeForInterpolation();
     // First, let's update the properties
     for (PropertyInterpolationInfo& i : _propertyInterpolationInfos) {
         const long long us =
@@ -816,6 +821,12 @@ void Scene::stopBouncing(Property* prop) {
     }
 
     it->bouncingShouldStop = true;
+}
+
+void Scene::setInterpolationTimeReference(
+                                std::optional<std::chrono::steady_clock::time_point> time)
+{
+    _interpolationTimeOverride = time;
 }
 
 void Scene::setPropertiesFromProfile(const Profile& p) {

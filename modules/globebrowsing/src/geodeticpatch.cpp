@@ -145,6 +145,12 @@ bool GeodeticPatch::contains(const Geodetic2& p) const {
     return std::abs(diff.lat) <= _halfSize.lat && std::abs(diff.lon) <= _halfSize.lon;
 }
 
+bool GeodeticPatch::overlaps(const GeodeticPatch& other) const {
+    // Strict inequalities: patches that only share an edge have zero overlap area
+    return minLat() < other.maxLat() && other.minLat() < maxLat() &&
+           minLon() < other.maxLon() && other.minLon() < maxLon();
+}
+
 double GeodeticPatch::edgeLatitudeNearestEquator() const {
     return _center.lat + _halfSize.lat * (isNorthern() ? -1.0 : 1.0);
 }
@@ -252,6 +258,43 @@ Geodetic2 GeodeticPatch::closestPoint(const Geodetic2& p) const {
     const double clampedLon = std::clamp(pointLon, minLon(), maxLon());
 
     return Geodetic2 { .lat = clampedLat, .lon = clampedLon };
+}
+
+TileUvTransform tileUvTransformForExtent(const GeodeticPatch& extent,
+                                         const TileIndex& tileIndex)
+{
+    const GeodeticPatch tile = GeodeticPatch(tileIndex);
+    const double extentWidth = extent.maxLon() - extent.minLon();
+    const double extentHeight = extent.maxLat() - extent.minLat();
+    return TileUvTransform {
+        .uvOffset = glm::vec2(
+            static_cast<float>((tile.minLon() - extent.minLon()) / extentWidth),
+            static_cast<float>((tile.minLat() - extent.minLat()) / extentHeight)
+        ),
+        .uvScale = glm::vec2(
+            static_cast<float>((tile.maxLon() - tile.minLon()) / extentWidth),
+            static_cast<float>((tile.maxLat() - tile.minLat()) / extentHeight)
+        )
+    };
+}
+
+int maximumLevelForResolution(const GeodeticPatch& extent, const glm::ivec2& resolution,
+                              int tileSize)
+{
+    ghoul_assert(tileSize > 0, "tileSize must be positive");
+
+    const double pixelsPerRadianLon = resolution.x / (extent.maxLon() - extent.minLon());
+    const double pixelsPerRadianLat = resolution.y / (extent.maxLat() - extent.minLat());
+    const double pixelsPerRadian = std::max(pixelsPerRadianLon, pixelsPerRadianLat);
+
+    // A tile at level L spans 2pi / 2^L radians and thus covers
+    // pixelsPerRadian * 2pi / 2^L source pixels; the highest useful level is where that
+    // count drops to tileSize. One extra level of oversampling margin; clamped to the
+    // minimum chunk split depth used by RenderableGlobe
+    const int level = static_cast<int>(
+        std::ceil(std::log2(glm::two_pi<double>() * pixelsPerRadian / tileSize))
+    );
+    return std::max(level + 1, 2);
 }
 
 } // namespace openspace

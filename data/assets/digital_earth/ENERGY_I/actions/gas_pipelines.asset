@@ -1,0 +1,169 @@
+-- Actions for the "10. Gas Pipelines" card of the Digital Earth Energy I show.
+-- Generated from data/de_energy_0.21.html; these appear in the in-app
+-- Actions panel under "/Digital Earth/11 Gas Pipelines".
+
+local actions = {
+  {
+    Identifier = "de.energy.gas_pipelines.gas_pipeline_load",
+    Name = "Gas Pipeline LOAD",
+    Command = [[
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_co.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/EIA_NATURAL_GAS_PIPELINES/natural_gas_pipelines_co.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_co.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_co.Enabled", false)
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_wy.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/EIA_NATURAL_GAS_PIPELINES/natural_gas_pipelines_wy.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_wy.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_wy.Enabled", false)
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_nm.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/EIA_NATURAL_GAS_PIPELINES/natural_gas_pipelines_nm.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_nm.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_nm.Enabled", false)
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_ok.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/EIA_NATURAL_GAS_PIPELINES/natural_gas_pipelines_ok.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_ok.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_ok.Enabled", false)
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_tx.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/EIA_NATURAL_GAS_PIPELINES/natural_gas_pipelines_tx.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_tx.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_tx.Enabled", false)
+      if not openspace.hasProperty("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_la.Enabled") then
+        openspace.globebrowsing.addGeoJsonFromFile("${ASSETS}/digital_earth/ENERGY_I/EIA_NATURAL_GAS_PIPELINES/natural_gas_pipelines_la.geojson")
+      end
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_la.Fade",0,1)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_la.Enabled", false)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.ERCOT.DefaultProperties.FillOpacity", 0.050000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_co.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_co.DefaultProperties.Color", {0.078431,0.400000,0.894118})
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_co.DefaultProperties.LineWidth", 5.0)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_co.DefaultProperties.Extrude", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_co.DefaultProperties.PerformShading", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_co.DefaultProperties.AltitudeMode", 1.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_wy.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_wy.DefaultProperties.Color", {0.078431,0.400000,0.894118})
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_wy.DefaultProperties.LineWidth", 5.0)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_wy.DefaultProperties.Extrude", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_wy.DefaultProperties.PerformShading", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_wy.DefaultProperties.AltitudeMode", 1.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_nm.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_nm.DefaultProperties.Color", {0.078431,0.400000,0.894118})
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_nm.DefaultProperties.LineWidth", 5.0)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_nm.DefaultProperties.Extrude", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_nm.DefaultProperties.PerformShading", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_nm.DefaultProperties.AltitudeMode", 1.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_ok.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_ok.DefaultProperties.Color", {0.078431,0.400000,0.894118})
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_ok.DefaultProperties.LineWidth", 5.0)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_ok.DefaultProperties.Extrude", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_ok.DefaultProperties.PerformShading", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_ok.DefaultProperties.AltitudeMode", 1.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_tx.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_tx.DefaultProperties.Color", {0.078431,0.400000,0.894118})
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_tx.DefaultProperties.LineWidth", 5.0)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_tx.DefaultProperties.Extrude", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_tx.DefaultProperties.PerformShading", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_tx.DefaultProperties.AltitudeMode", 1.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_la.HeightOffset", 1000.000000)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_la.DefaultProperties.Color", {0.078431,0.400000,0.894118})
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_la.DefaultProperties.LineWidth", 5.0)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_la.DefaultProperties.Extrude", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_la.DefaultProperties.PerformShading", true)
+      openspace.setPropertyValueSingle("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_la.DefaultProperties.AltitudeMode", 1.000000)
+    ]],
+    Documentation = "Gas Pipeline LOAD (10. Gas Pipelines)",
+    GuiPath = "/Digital Earth/11 Gas Pipelines",
+    Color = { 0.9, 0.6, 0.1, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gas_pipelines.gas_pipelines_co_toggle",
+    Name = "Gas Pipelines CO TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_co")
+    ]],
+    Documentation = "Gas Pipelines CO TOGGLE (10. Gas Pipelines)",
+    GuiPath = "/Digital Earth/11 Gas Pipelines",
+    Color = { 0.0, 0.85, 0.75, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gas_pipelines.gas_pipelines_wy_toggle",
+    Name = "Gas Pipelines WY TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_wy")
+    ]],
+    Documentation = "Gas Pipelines WY TOGGLE (10. Gas Pipelines)",
+    GuiPath = "/Digital Earth/11 Gas Pipelines",
+    Color = { 0.0, 0.85, 0.75, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gas_pipelines.gas_pipelines_nm_toggle",
+    Name = "Gas Pipelines NM TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_nm")
+    ]],
+    Documentation = "Gas Pipelines NM TOGGLE (10. Gas Pipelines)",
+    GuiPath = "/Digital Earth/11 Gas Pipelines",
+    Color = { 0.0, 0.85, 0.75, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gas_pipelines.gas_pipelines_ok_toggle",
+    Name = "Gas Pipelines OK TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_ok")
+    ]],
+    Documentation = "Gas Pipelines OK TOGGLE (10. Gas Pipelines)",
+    GuiPath = "/Digital Earth/11 Gas Pipelines",
+    Color = { 0.0, 0.85, 0.75, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gas_pipelines.gas_pipelines_tx_toggle",
+    Name = "Gas Pipelines TX TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_tx")
+    ]],
+    Documentation = "Gas Pipelines TX TOGGLE (10. Gas Pipelines)",
+    GuiPath = "/Digital Earth/11 Gas Pipelines",
+    Color = { 0.0, 0.85, 0.75, 1.0 },
+    IsLocal = false
+  },
+  {
+    Identifier = "de.energy.gas_pipelines.gas_pipelines_la_toggle",
+    Name = "Gas Pipelines LA TOGGLE",
+    Command = [[
+      openspace.toggleFade("Scene.Earth.Renderable.GeographicOverlays.natural_gas_pipelines_la")
+    ]],
+    Documentation = "Gas Pipelines LA TOGGLE (10. Gas Pipelines)",
+    GuiPath = "/Digital Earth/11 Gas Pipelines",
+    Color = { 0.0, 0.85, 0.75, 1.0 },
+    IsLocal = false
+  },
+}
+
+asset.onInitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.registerAction(a)
+  end
+end)
+
+asset.onDeinitialize(function()
+  for _, a in ipairs(actions) do
+    openspace.action.removeAction(a.Identifier)
+  end
+end)
+
+asset.meta = {
+  Name = "Digital Earth Energy I Actions - 10. Gas Pipelines",
+  Description = "In-app action buttons for the 10. Gas Pipelines section of the Energy I show",
+  Author = "Digital Earth / DMNS",
+  URL = "https://openspaceproject.com",
+  License = "MIT license"
+}

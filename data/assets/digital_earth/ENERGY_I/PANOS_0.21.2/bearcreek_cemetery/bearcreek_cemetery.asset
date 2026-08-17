@@ -1,0 +1,2 @@
+-- bearcreek_cemetery.asset meta asset to include models and panorama
+asset.require("./bearcreek_cemetery_360")

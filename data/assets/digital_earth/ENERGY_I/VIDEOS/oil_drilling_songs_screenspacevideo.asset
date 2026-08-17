@@ -1,0 +1,28 @@
+-- Oil drilling songs, played as background audio (no visible plane).
+-- The source .mp4 is audio with a 16x16 dummy video stream that libmpv cannot
+-- decode, so it was rendering as a black ScreenSpaceVideo square. The audio was
+-- extracted to .mp3 and is now played through the audio module instead.
+
+local Audio = asset.resource(
+  "cash.roughneck_frank.this.old.rig_willet.im.a.tool.pusher.from.snyder_ashland.oil_flatt.scruggs.ballad.of.jedd.clampett.mp3"
+)
+local Identifier = "OilDrillingSongsVideo"
+
+asset.onInitialize(function()
+  openspace.audio.playAudio(Audio, Identifier, false)
+end)
+
+asset.onDeinitialize(function()
+  if openspace.audio.isPlaying(Identifier) then
+    openspace.audio.stopAudio(Identifier)
+  end
+end)
+
+asset.meta = {
+  Name = "OilDrillingSongsVideo",
+  Version = "1.0",
+  Description = "Oil drilling songs played as background audio",
+  Author = "OpenSpace Team",
+  URL = "https://openspaceproject.com",
+  License = "MIT"
+}

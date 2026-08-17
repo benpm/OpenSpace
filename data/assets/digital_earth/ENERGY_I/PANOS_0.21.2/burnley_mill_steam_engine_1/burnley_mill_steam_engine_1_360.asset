@@ -1,0 +1,51 @@
+-- Create a 360 panorama
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+local transforms = asset.require("./burnley_mill_steam_engine_1_transforms") -- Include transforms for position
+local texture = asset.resource('data/burnley_mill_steam_engine_1_2981_pano.jpg'); -- Reference texture file
+openspace.printDebug(transforms)
+local burnley_mill_steam_engine_1 = {
+    Identifier = "burnley_mill_steam_engine_1",
+    Parent = transforms.burnley_mill_steam_engine_1_position.Identifier,
+    Transform = {
+        Rotation = { -- Rotate in gui to proper orientation.
+            Type= "StaticRotation",
+            Rotation = { 0.00, 0.898772097, -0.0030452673}
+        },
+        Scale = {
+            Type = "StaticScale",
+            Scale = 1.0
+        },
+        Translation = {
+            Type = "StaticTranslation",
+            Position = {0,0,0}
+        }
+    },
+    Renderable = {
+        Type = "RenderableSphereImageLocal",
+        Size = 45,
+        Segments = 40,
+        Opacity = 1.0,
+        Texture = texture,
+        Orientation = "Inside",
+        UseAdditiveBlending = false,
+        MirrorTexture = true,
+        FadeOutThreshold = 1.00,
+        Background = true,
+        RenderBinMode = "PostDeferredTransparent",
+    },
+    GUI = {
+        Name = "Burnley Mill Steam Engine 1",
+        Path = "/DMNS/Burnley Mill Steam Engine 1",
+        Description = [[Burnley Mill Steam Engine 1]],
+    }
+}
+asset.onInitialize(function()
+    openspace.addSceneGraphNode(burnley_mill_steam_engine_1)
+    openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.LimitZoom.MinimumAllowedDistance", 1.000000)
+end)
+
+asset.onDeinitialize(function()
+    openspace.removeSceneGraphNode(burnley_mill_steam_engine_1)
+end)
+asset.export(burnley_mill_steam_engine_1)

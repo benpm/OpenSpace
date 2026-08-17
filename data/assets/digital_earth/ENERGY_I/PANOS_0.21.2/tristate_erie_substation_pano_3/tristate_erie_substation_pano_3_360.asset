@@ -1,0 +1,51 @@
+-- Create a 360 panorama
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+local transforms = asset.require("./tristate_erie_substation_pano_3_transforms") -- Include transforms for position
+local texture = asset.resource('data/tristate_erie_substation_pano_3_8K.jpg'); -- Reference texture file
+openspace.printDebug(transforms)
+local tristate_erie_substation_pano_3 = {
+    Identifier = "tristate_erie_substation_pano_3",
+    Parent = transforms.tristate_erie_substation_pano_3_position.Identifier,
+    Transform = {
+        Rotation = { -- Rotate in gui to proper orientation.
+            Type= "StaticRotation",
+            Rotation = { 0.00, 0.6986058001, -1.8318486167 }
+        },
+        Scale = {
+            Type = "StaticScale",
+            Scale = 1.0
+        },
+        Translation = {
+            Type = "StaticTranslation",
+            Position = {0,0,0}
+        }
+    },
+    Renderable = {
+        Type = "RenderableSphereImageLocal",
+        Size = 45,
+        Segments = 40,
+        Opacity = 1.0,
+        Texture = texture,
+        Orientation = "Inside",
+        UseAdditiveBlending = false,
+        MirrorTexture = true,
+        FadeOutThreshold = 1.00,
+        Background = true,
+        RenderBinMode = "PostDeferredTransparent",
+    },
+    GUI = {
+        Name = "Tri-State Erie Substation Pano 3",
+        Path = "/DMNS/Tri-State Erie Substation Pano 3",
+        Description = [[Tri-State Erie Substation Pano 3]],
+    }
+}
+asset.onInitialize(function()
+    openspace.addSceneGraphNode(tristate_erie_substation_pano_3)
+    openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.LimitZoom.MinimumAllowedDistance", 1.000000)
+end)
+
+asset.onDeinitialize(function()
+    openspace.removeSceneGraphNode(tristate_erie_substation_pano_3)
+end)
+asset.export(tristate_erie_substation_pano_3)

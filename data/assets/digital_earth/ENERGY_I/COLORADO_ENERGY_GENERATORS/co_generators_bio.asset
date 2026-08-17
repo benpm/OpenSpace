@@ -1,0 +1,73 @@
+-- Colorado Energy Generators: Gas seals at their locations on Earth.
+-- The seals are invisible by default, but can be enabled using shown or hidden using
+-- the exported functions `showSeals(interpolationDuration)` and `hideSeals(interpolationDuration)`.
+
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local QQQXYZ = {
+  Identifier = "co_gas_QQQXYZ",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = QQQ.lat,
+      Longitude = QQQ.lon,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/biomass_bonfire_berkahicon_flaticon.com.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/BIO",
+    Name = "QQQXYZ_ NAME"
+  }
+}
+
+local ShowSeals = {
+  Identifier = "os.BIO.ShowSeals",
+  Name = "Show BIO landing labels",
+  Command = [[openspace.setPropertyValue("Scene.BIO*.Renderable.Opacity", 1, 0.5)]],
+  Documentation = "Show CO BIO seals.",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+local HideSeals = {
+  Identifier = "os.BIO.HideSeals",
+  Name = "Hide BIO landing labels",
+  Command = [[openspace.setPropertyValue("Scene.BIO*.Renderable.Opacity", 0, 0.5)]],
+  Documentation = "Hide CO BIO seals",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(QQQXYZ)
+  openspace.action.registerAction(ShowSeals)
+  openspace.action.registerAction(HideSeals)
+end)
+
+asset.onDeinitialize(function()
+  openspace.action.removeAction(HideSeals)
+  openspace.action.removeAction(ShowSeals)
+  openspace.removeSceneGraphNode(QQQXYZ)
+end)
+
+asset.export(QQQXYZ)
+
+asset.export("showSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.BIO*.Renderable.Opacity", 1, interpolationDuration)
+end)
+
+asset.export("hideSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.BIO*.Renderable.Opacity", 0, interpolationDuration)
+end)

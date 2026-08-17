@@ -25,11 +25,13 @@
 #version __CONTEXT__
 
 #include "powerscaling/powerscalingmath.glsl"
+#include "geojson_drawdata.glsl"
 
 layout(points) in;
 in Data {
   vec3 normal; // Point normals correspond to globe out direction, model space
   flat float dynamicHeight;
+  flat int drawIndex;
 } in_data[];
 
 layout(triangle_strip, max_vertices = 4) out;
@@ -37,6 +39,7 @@ out Data {
   vec4 positionViewSpace;
   vec2 texCoords;
   flat float screenSpaceDepth;
+  flat vec4 color;
 } out_data;
 
 // General settings
@@ -44,23 +47,13 @@ uniform dmat4 modelTransform;
 uniform dmat4 viewTransform;
 uniform dmat4 projectionTransform;
 
-uniform float heightOffset;
-uniform bool useHeightMapData;
-
 // Camera information
 uniform vec3 cameraUp;
 uniform vec3 cameraRight;
 uniform dvec3 cameraPosition; // world coordinates
 uniform vec3 cameraLookUp;
 
-uniform float pointSize;
-uniform float textureWidthFactor;
-
-// If false, use the center
-uniform bool useBottomAnchorPoint = true;
-
 // Render mode
-uniform int renderMode;
 // OBS! Keep in sync with option property options
 const int RenderOptionCameraDir = 0;
 const int RenderOptionCameraPos = 1;
@@ -76,6 +69,14 @@ const vec2 Corners[4] = vec2[4](
 
 
 void main() {
+  DrawElement element = drawElements[in_data[0].drawIndex];
+  bool useHeightMapData = (element.flags & FlagUseHeightMap) != 0u;
+  bool useBottomAnchorPoint = (element.flags & FlagBottomAnchor) != 0u;
+  int renderMode = int((element.flags & FlagsRenderModeMask) >> FlagsRenderModeShift);
+  float heightOffset = element.heightOffset;
+  float pointSize = element.sizeOrWidth;
+  float textureWidthFactor = element.textureWidthFactor;
+
   dvec4 dpos = dvec4(dvec3(gl_in[0].gl_Position.xyz), 1.0);
 
   // Offset position based on height information
@@ -136,6 +137,7 @@ void main() {
 
   out_data.screenSpaceDepth = bottomLeft.w;
   out_data.positionViewSpace = vec4(viewTransform * dpos);
+  out_data.color = element.color;
 
   // Build primitive
   out_data.texCoords = Corners[0];

@@ -1,0 +1,58 @@
+<VRTDataset rasterXSize="8192" rasterYSize="3946">
+  <SRS>GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]</SRS>
+  <GeoTransform> -1.2759842730000000e+02,  7.7502441406249994e-03,  0.0000000000000000e+00,  5.2245768699999999e+01,  0.0000000000000000e+00, -7.7496198682209831e-03</GeoTransform>
+  <Metadata>
+    <MDI key="AREA_OR_POINT">Area</MDI>
+  </Metadata>
+  <Metadata domain="IMAGE_STRUCTURE">
+    <MDI key="INTERLEAVE">PIXEL</MDI>
+  </Metadata>
+  <VRTRasterBand dataType="Byte" band="1">
+    <Metadata />
+    <NoDataValue>0.00000000000000E+00</NoDataValue>
+    <ColorInterp>Red</ColorInterp>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">gwa3_250_powerdensity_50m_cropped_to_conus_200mi_buffer_blue_color_tbl_8K.png</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="8192" RasterYSize="3946" DataType="Byte" BlockXSize="8192" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="8192" ySize="3946" />
+      <DstRect xOff="0" yOff="0" xSize="8192" ySize="3946" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Byte" band="2">
+    <Metadata />
+    <NoDataValue>0.00000000000000E+00</NoDataValue>
+    <ColorInterp>Green</ColorInterp>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">gwa3_250_powerdensity_50m_cropped_to_conus_200mi_buffer_blue_color_tbl_8K.png</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="8192" RasterYSize="3946" DataType="Byte" BlockXSize="8192" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="8192" ySize="3946" />
+      <DstRect xOff="0" yOff="0" xSize="8192" ySize="3946" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Byte" band="3">
+    <Metadata />
+    <NoDataValue>0.00000000000000E+00</NoDataValue>
+    <ColorInterp>Blue</ColorInterp>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">gwa3_250_powerdensity_50m_cropped_to_conus_200mi_buffer_blue_color_tbl_8K.png</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="8192" RasterYSize="3946" DataType="Byte" BlockXSize="8192" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="8192" ySize="3946" />
+      <DstRect xOff="0" yOff="0" xSize="8192" ySize="3946" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Byte" band="4">
+    <Metadata />
+    <NoDataValue>0.00000000000000E+00</NoDataValue>
+    <ColorInterp>Alpha</ColorInterp>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">gwa3_250_powerdensity_50m_cropped_to_conus_200mi_buffer_blue_color_tbl_8K.png</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="8192" RasterYSize="3946" DataType="Byte" BlockXSize="8192" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="8192" ySize="3946" />
+      <DstRect xOff="0" yOff="0" xSize="8192" ySize="3946" />
+    </SimpleSource>
+  </VRTRasterBand>
+</VRTDataset>

@@ -1,0 +1,848 @@
+-- Colorado Energy Generators: Gas seals at their locations on Earth.
+-- The seals are invisible by default, but can be enabled using shown or hidden using
+-- the exported functions `showSeals(interpolationDuration)` and `hideSeals(interpolationDuration)`.
+
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local SUN266_AvangridPowerLLC_SanLuisValleySolarRanch_Alamosa = {
+  Identifier = "SUN266_AvangridPowerLLC_SanLuisValleySolarRanch_Alamosa",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 37.694535,
+      Longitude = -105.9276,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN266 - Avangrid Power LLC, San Luis Valley Solar Ranch, Alamosa"
+  }
+}
+
+local SUN267_SolarofAlamosaLLC_AlamosaSolar_Alamosa = {
+  Identifier = "SUN267_SolarofAlamosaLLC_AlamosaSolar_Alamosa",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 37.598579,
+      Longitude = -105.9558,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN267 - Solar of Alamosa LLC, Alamosa Solar, Alamosa"
+  }
+}
+
+local SUN268_GreaterSandhillILLC_GreaterSandhillI_Alamosa = {
+  Identifier = "SUN268_GreaterSandhillILLC_GreaterSandhillI_Alamosa",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 37.685467,
+      Longitude = -105.8909,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN268 - Greater Sandhill I LLC, Greater Sandhill I, Alamosa"
+  }
+}
+
+local SUN302_OnwardEnergy_ComancheSolar_Pueblo = {
+  Identifier = "SUN302_OnwardEnergy_ComancheSolar_Pueblo",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.205278,
+      Longitude = -104.5667,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN302 - Onward Energy, Comanche Solar, Pueblo"
+  }
+}
+
+local SUN310_SolarStarColoradoIIILLC_HooperSolar_Alamosa = {
+  Identifier = "SUN310_SolarStarColoradoIIILLC_HooperSolar_Alamosa",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 37.691863,
+      Longitude = -105.9908,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN310 - Solar Star Colorado III LLC, Hooper Solar, Alamosa"
+  }
+}
+
+local SUN311_SRJenkinsLLC_SRJenkinsFtLupton_Weld = {
+  Identifier = "SUN311_SRJenkinsLLC_SRJenkinsFtLupton_Weld",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.081444,
+      Longitude = -104.7467,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN311 - SR Jenkins LLC, SR Jenkins Ft Lupton, Weld"
+  }
+}
+
+local SUN317_SanIsabelSolarLLC_SanIsabelSolarLLC_LasAnimas = {
+  Identifier = "SUN317_SanIsabelSolarLLC_SanIsabelSolarLLC_LasAnimas",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 37.372,
+      Longitude = -104.84,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN317 - San Isabel Solar LLC, San Isabel Solar LLC, Las Animas"
+  }
+}
+
+local SUN319_BisonSolarLLC_BisonSolarLLC_Larimer = {
+  Identifier = "SUN319_BisonSolarLLC_BisonSolarLLC_Larimer",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.863809,
+      Longitude = -105.0111,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN319 - Bison Solar LLC, Bison Solar LLC, Larimer"
+  }
+}
+
+local SUN321_DGColoradoSolarLLC_ClearSpringRanchPVProject_ElPaso = {
+  Identifier = "SUN321_DGColoradoSolarLLC_ClearSpringRanchPVProject_ElPaso",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.602102,
+      Longitude = -104.6947,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN321 - DG Colorado Solar LLC, Clear Spring Ranch  PVProject, El Paso"
+  }
+}
+
+local SUN329_DukeEnergyRenewablesServices_VictorySolarLLC_Adams = {
+  Identifier = "SUN329_DukeEnergyRenewablesServices_VictorySolarLLC_Adams",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.795,
+      Longitude = -104.43,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN329 - Duke Energy Renewables Services, Victory Solar LLC, Adams"
+  }
+}
+
+local SUN338_SRPlatteLLC_SRPlatteSolarFarm_Weld = {
+  Identifier = "SUN338_SRPlatteLLC_SRPlatteSolarFarm_Weld",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.181742,
+      Longitude = -104.6921,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN338 - SR Platte LLC, SR Platte Solar Farm, Weld"
+  }
+}
+
+local SUN346_TitanSolarLLC_TitanSolar_Arapahoe = {
+  Identifier = "SUN346_TitanSolarLLC_TitanSolar_Arapahoe",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.68646,
+      Longitude = -104.014,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN346 - Titan Solar LLC, Titan Solar, Arapahoe"
+  }
+}
+
+local SUN348_PioneerSolarCOLLC_PioneerSolarCOLLC_Adams = {
+  Identifier = "SUN348_PioneerSolarCOLLC_PioneerSolarCOLLC_Adams",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.761569,
+      Longitude = -104.459,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN348 - Pioneer Solar CO LLC, Pioneer Solar CO LLC, Adams"
+  }
+}
+
+local SUN362_GrazingYakSolarLLC_GrazingYakSolar_ElPaso = {
+  Identifier = "SUN362_GrazingYakSolarLLC_GrazingYakSolar_ElPaso",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.977759,
+      Longitude = -104.2527,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN362 - Grazing Yak Solar LLC, Grazing Yak Solar, El Paso"
+  }
+}
+
+local SUN363_SpanishPeaksSolarLLC_SpanishPeaksSolar_LasAnimas = {
+  Identifier = "SUN363_SpanishPeaksSolarLLC_SpanishPeaksSolar_LasAnimas",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 37.378,
+      Longitude = -104.47,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN363 - Spanish Peaks Solar LLC, Spanish Peaks Solar, Las Animas"
+  }
+}
+
+local SUN366_DukeEnergyRenewablesServices_PalmerSolar_ElPaso = {
+  Identifier = "SUN366_DukeEnergyRenewablesServices_PalmerSolar_ElPaso",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.6299,
+      Longitude = -104.652,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN366 - Duke Energy Renewables Services, Palmer Solar, El Paso"
+  }
+}
+
+local SUN389_GreenbackerRenewableEnergyCorporation_RawhidePrairieSolarHybrid_Larimer = {
+  Identifier = "SUN389_GreenbackerRenewableEnergyCorporation_RawhidePrairieSolarHybrid_Larimer",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.857978,
+      Longitude = -105.0156,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN389 - Greenbacker Renewable Energy Corporation, Rawhide Prairie Solar Hybrid, Larimer"
+  }
+}
+
+local SUN391_NeptuneEnergyCenterLLC_NeptuneEnergyCenterHybrid_Pueblo = {
+  Identifier = "SUN391_NeptuneEnergyCenterLLC_NeptuneEnergyCenterHybrid_Pueblo",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.330263,
+      Longitude = -104.4142,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN391 - Neptune Energy Center LLC, Neptune Energy Center Hybrid, Pueblo"
+  }
+}
+
+local SUN393_LightsourceRenewableEnergyAssetManagementLLC_BighornSolar1_Pueblo = {
+  Identifier = "SUN393_LightsourceRenewableEnergyAssetManagementLLC_BighornSolar1_Pueblo",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.207518,
+      Longitude = -104.5967,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN393 - Lightsource Renewable Energy Asset Management LLC, Bighorn Solar 1, Pueblo"
+  }
+}
+
+local SUN395_ThunderWolfEnergyCenterLLC_ThunderWolfEnergyCenterHybrid_Pueblo = {
+  Identifier = "SUN395_ThunderWolfEnergyCenterLLC_ThunderWolfEnergyCenterHybrid_Pueblo",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.1899,
+      Longitude = -104.398,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN395 - Thunder Wolf Energy Center LLC, Thunder Wolf Energy Center Hybrid, Pueblo"
+  }
+}
+
+local SUN405_DukeEnergyRenewablesServices_PikeSolarHybrid_ElPaso = {
+  Identifier = "SUN405_DukeEnergyRenewablesServices_PikeSolarHybrid_ElPaso",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.6217,
+      Longitude = -104.581,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN405 - Duke Energy Renewables Services, Pike Solar Hybrid, El Paso"
+  }
+}
+
+local SUN428_LightsourceRenewableEnergyAssetManagementLLC_SunMountainSolar1_Pueblo = {
+  Identifier = "SUN428_LightsourceRenewableEnergyAssetManagementLLC_SunMountainSolar1_Pueblo",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.180331,
+      Longitude = -104.5185,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN428 - Lightsource Renewable Energy Asset Management LLC, Sun Mountain Solar 1, Pueblo"
+  }
+}
+
+local SUN432_HunterSolarLLC_HunterSolarLLCCO_Arapahoe = {
+  Identifier = "SUN432_HunterSolarLLC_HunterSolarLLCCO_Arapahoe",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.626617,
+      Longitude = -104.465,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN432 - Hunter Solar LLC, Hunter Solar LLC CO, Arapahoe"
+  }
+}
+
+local SUN468_AESCleanEnergy_HighMesaCO_Garfield = {
+  Identifier = "SUN468_AESCleanEnergy_HighMesaCO_Garfield",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.3959,
+      Longitude = -108.073,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN468 - AES Clean Energy, High Mesa CO, Garfield"
+  }
+}
+
+local SUN472_CSWindAmericaInc_CSWINDAmericaInc_Pueblo = {
+  Identifier = "SUN472_CSWindAmericaInc_CSWINDAmericaInc_Pueblo",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.169473,
+      Longitude = -104.619,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN472 - CS Wind America Inc, CS WIND America Inc, Pueblo"
+  }
+}
+
+local SUN479_GreenbackerRenewableEnergyCorporation_Overland_Weld = {
+  Identifier = "SUN479_GreenbackerRenewableEnergyCorporation_Overland_Weld",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.135008,
+      Longitude = -104.6454,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/solar-panel_monkik_flaticon.com_edit.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/SUN",
+    Name = "SUN479 - Greenbacker Renewable Energy Corporation, Overland, Weld"
+  }
+}
+
+local ShowSeals = {
+  Identifier = "os.SUN.ShowSeals",
+  Name = "Show SUN landing labels",
+  Command = [[openspace.setPropertyValue("Scene.SUN*.Renderable.Opacity", 1, 0.5)]],
+  Documentation = "Show CO SUN seals.",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+local HideSeals = {
+  Identifier = "os.SUN.HideSeals",
+  Name = "Hide SUN Port landing labels",
+  Command = [[openspace.setPropertyValue("Scene.SUN*.Renderable.Opacity", 0, 0.5)]],
+  Documentation = "Hide CO SUN seals",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(SUN266_AvangridPowerLLC_SanLuisValleySolarRanch_Alamosa)
+  openspace.addSceneGraphNode(SUN267_SolarofAlamosaLLC_AlamosaSolar_Alamosa)
+  openspace.addSceneGraphNode(SUN268_GreaterSandhillILLC_GreaterSandhillI_Alamosa)
+  openspace.addSceneGraphNode(SUN302_OnwardEnergy_ComancheSolar_Pueblo)
+  openspace.addSceneGraphNode(SUN310_SolarStarColoradoIIILLC_HooperSolar_Alamosa)
+  openspace.addSceneGraphNode(SUN311_SRJenkinsLLC_SRJenkinsFtLupton_Weld)
+  openspace.addSceneGraphNode(SUN317_SanIsabelSolarLLC_SanIsabelSolarLLC_LasAnimas)
+  openspace.addSceneGraphNode(SUN319_BisonSolarLLC_BisonSolarLLC_Larimer)
+  openspace.addSceneGraphNode(SUN321_DGColoradoSolarLLC_ClearSpringRanchPVProject_ElPaso)
+  openspace.addSceneGraphNode(SUN329_DukeEnergyRenewablesServices_VictorySolarLLC_Adams)
+  openspace.addSceneGraphNode(SUN338_SRPlatteLLC_SRPlatteSolarFarm_Weld)
+  openspace.addSceneGraphNode(SUN346_TitanSolarLLC_TitanSolar_Arapahoe)
+  openspace.addSceneGraphNode(SUN348_PioneerSolarCOLLC_PioneerSolarCOLLC_Adams)
+  openspace.addSceneGraphNode(SUN362_GrazingYakSolarLLC_GrazingYakSolar_ElPaso)
+  openspace.addSceneGraphNode(SUN363_SpanishPeaksSolarLLC_SpanishPeaksSolar_LasAnimas)
+  openspace.addSceneGraphNode(SUN366_DukeEnergyRenewablesServices_PalmerSolar_ElPaso)
+  openspace.addSceneGraphNode(SUN389_GreenbackerRenewableEnergyCorporation_RawhidePrairieSolarHybrid_Larimer)
+  openspace.addSceneGraphNode(SUN391_NeptuneEnergyCenterLLC_NeptuneEnergyCenterHybrid_Pueblo)
+  openspace.addSceneGraphNode(SUN393_LightsourceRenewableEnergyAssetManagementLLC_BighornSolar1_Pueblo)
+  openspace.addSceneGraphNode(SUN395_ThunderWolfEnergyCenterLLC_ThunderWolfEnergyCenterHybrid_Pueblo)
+  openspace.addSceneGraphNode(SUN405_DukeEnergyRenewablesServices_PikeSolarHybrid_ElPaso)
+  openspace.addSceneGraphNode(SUN428_LightsourceRenewableEnergyAssetManagementLLC_SunMountainSolar1_Pueblo)
+  openspace.addSceneGraphNode(SUN432_HunterSolarLLC_HunterSolarLLCCO_Arapahoe)
+  openspace.addSceneGraphNode(SUN468_AESCleanEnergy_HighMesaCO_Garfield)
+  openspace.addSceneGraphNode(SUN472_CSWindAmericaInc_CSWINDAmericaInc_Pueblo)
+  openspace.addSceneGraphNode(SUN479_GreenbackerRenewableEnergyCorporation_Overland_Weld)
+  openspace.action.registerAction(ShowSeals)
+  openspace.action.registerAction(HideSeals)
+end)
+
+asset.onDeinitialize(function()
+  openspace.action.removeAction(HideSeals)
+  openspace.action.removeAction(ShowSeals)
+  openspace.removeSceneGraphNode(SUN266_AvangridPowerLLC_SanLuisValleySolarRanch_Alamosa)
+  openspace.removeSceneGraphNode(SUN267_SolarofAlamosaLLC_AlamosaSolar_Alamosa)
+  openspace.removeSceneGraphNode(SUN268_GreaterSandhillILLC_GreaterSandhillI_Alamosa)
+  openspace.removeSceneGraphNode(SUN302_OnwardEnergy_ComancheSolar_Pueblo)
+  openspace.removeSceneGraphNode(SUN310_SolarStarColoradoIIILLC_HooperSolar_Alamosa)
+  openspace.removeSceneGraphNode(SUN311_SRJenkinsLLC_SRJenkinsFtLupton_Weld)
+  openspace.removeSceneGraphNode(SUN317_SanIsabelSolarLLC_SanIsabelSolarLLC_LasAnimas)
+  openspace.removeSceneGraphNode(SUN319_BisonSolarLLC_BisonSolarLLC_Larimer)
+  openspace.removeSceneGraphNode(SUN321_DGColoradoSolarLLC_ClearSpringRanchPVProject_ElPaso)
+  openspace.removeSceneGraphNode(SUN329_DukeEnergyRenewablesServices_VictorySolarLLC_Adams)
+  openspace.removeSceneGraphNode(SUN338_SRPlatteLLC_SRPlatteSolarFarm_Weld)
+  openspace.removeSceneGraphNode(SUN346_TitanSolarLLC_TitanSolar_Arapahoe)
+  openspace.removeSceneGraphNode(SUN348_PioneerSolarCOLLC_PioneerSolarCOLLC_Adams)
+  openspace.removeSceneGraphNode(SUN362_GrazingYakSolarLLC_GrazingYakSolar_ElPaso)
+  openspace.removeSceneGraphNode(SUN363_SpanishPeaksSolarLLC_SpanishPeaksSolar_LasAnimas)
+  openspace.removeSceneGraphNode(SUN366_DukeEnergyRenewablesServices_PalmerSolar_ElPaso)
+  openspace.removeSceneGraphNode(SUN389_GreenbackerRenewableEnergyCorporation_RawhidePrairieSolarHybrid_Larimer)
+  openspace.removeSceneGraphNode(SUN391_NeptuneEnergyCenterLLC_NeptuneEnergyCenterHybrid_Pueblo)
+  openspace.removeSceneGraphNode(SUN393_LightsourceRenewableEnergyAssetManagementLLC_BighornSolar1_Pueblo)
+  openspace.removeSceneGraphNode(SUN395_ThunderWolfEnergyCenterLLC_ThunderWolfEnergyCenterHybrid_Pueblo)
+  openspace.removeSceneGraphNode(SUN405_DukeEnergyRenewablesServices_PikeSolarHybrid_ElPaso)
+  openspace.removeSceneGraphNode(SUN428_LightsourceRenewableEnergyAssetManagementLLC_SunMountainSolar1_Pueblo)
+  openspace.removeSceneGraphNode(SUN432_HunterSolarLLC_HunterSolarLLCCO_Arapahoe)
+  openspace.removeSceneGraphNode(SUN468_AESCleanEnergy_HighMesaCO_Garfield)
+  openspace.removeSceneGraphNode(SUN472_CSWindAmericaInc_CSWINDAmericaInc_Pueblo)
+  openspace.removeSceneGraphNode(SUN479_GreenbackerRenewableEnergyCorporation_Overland_Weld)
+end)
+
+asset.export(SUN266_AvangridPowerLLC_SanLuisValleySolarRanch_Alamosa)
+asset.export(SUN267_SolarofAlamosaLLC_AlamosaSolar_Alamosa)
+asset.export(SUN268_GreaterSandhillILLC_GreaterSandhillI_Alamosa)
+asset.export(SUN302_OnwardEnergy_ComancheSolar_Pueblo)
+asset.export(SUN310_SolarStarColoradoIIILLC_HooperSolar_Alamosa)
+asset.export(SUN311_SRJenkinsLLC_SRJenkinsFtLupton_Weld)
+asset.export(SUN317_SanIsabelSolarLLC_SanIsabelSolarLLC_LasAnimas)
+asset.export(SUN319_BisonSolarLLC_BisonSolarLLC_Larimer)
+asset.export(SUN321_DGColoradoSolarLLC_ClearSpringRanchPVProject_ElPaso)
+asset.export(SUN329_DukeEnergyRenewablesServices_VictorySolarLLC_Adams)
+asset.export(SUN338_SRPlatteLLC_SRPlatteSolarFarm_Weld)
+asset.export(SUN346_TitanSolarLLC_TitanSolar_Arapahoe)
+asset.export(SUN348_PioneerSolarCOLLC_PioneerSolarCOLLC_Adams)
+asset.export(SUN362_GrazingYakSolarLLC_GrazingYakSolar_ElPaso)
+asset.export(SUN363_SpanishPeaksSolarLLC_SpanishPeaksSolar_LasAnimas)
+asset.export(SUN366_DukeEnergyRenewablesServices_PalmerSolar_ElPaso)
+asset.export(SUN389_GreenbackerRenewableEnergyCorporation_RawhidePrairieSolarHybrid_Larimer)
+asset.export(SUN391_NeptuneEnergyCenterLLC_NeptuneEnergyCenterHybrid_Pueblo)
+asset.export(SUN393_LightsourceRenewableEnergyAssetManagementLLC_BighornSolar1_Pueblo)
+asset.export(SUN395_ThunderWolfEnergyCenterLLC_ThunderWolfEnergyCenterHybrid_Pueblo)
+asset.export(SUN405_DukeEnergyRenewablesServices_PikeSolarHybrid_ElPaso)
+asset.export(SUN428_LightsourceRenewableEnergyAssetManagementLLC_SunMountainSolar1_Pueblo)
+asset.export(SUN432_HunterSolarLLC_HunterSolarLLCCO_Arapahoe)
+asset.export(SUN468_AESCleanEnergy_HighMesaCO_Garfield)
+asset.export(SUN472_CSWindAmericaInc_CSWINDAmericaInc_Pueblo)
+asset.export(SUN479_GreenbackerRenewableEnergyCorporation_Overland_Weld)
+
+asset.export("showSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.SUN*.Renderable.Opacity", 1, interpolationDuration)
+end)
+
+asset.export("hideSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.SUN*.Renderable.Opacity", 0, interpolationDuration)
+end)

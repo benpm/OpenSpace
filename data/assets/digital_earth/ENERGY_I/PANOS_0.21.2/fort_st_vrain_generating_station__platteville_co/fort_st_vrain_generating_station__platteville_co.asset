@@ -1,0 +1,4 @@
+-- 360 panorama asset for fort_st_vrain_generating_station__platteville_co
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+asset.require("./fort_st_vrain_generating_station__platteville_co_360")

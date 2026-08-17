@@ -1,0 +1,4 @@
+-- 360 panorama asset for craig_station_rooftop_west_view
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+asset.require("./craig_station_rooftop_west_view_360")

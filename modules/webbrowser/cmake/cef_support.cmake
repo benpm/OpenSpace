@@ -126,6 +126,10 @@ macro(set_openspace_cef_target_out_dir)
 endmacro ()
 
 macro(add_windows_cef_manifest target_dir manifest_path target extension)
+  # NOTE: uses the Windows SDK "mt.exe" (on PATH inside a VS dev prompt / vcvars64).
+  # Do not swap in llvm-mt.exe here: llvm-mt cannot merge the two input manifests below
+  # and errors with "invalid option" on the second file. Build the LLVM/Ninja config
+  # via build-llvm.bat.
   add_custom_command(
       TARGET ${target}
       POST_BUILD

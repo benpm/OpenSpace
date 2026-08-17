@@ -1,0 +1,4 @@
+-- 360 panorama asset for smith_mine_montana
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+asset.require("./smith_mine_montana_360")

@@ -1,0 +1,66 @@
+-- Create a 360 panorama
+--
+-- Version by Ka Chun Yu (DMNS) May 2024
+local transforms = asset.require("./derby_dome_wy_pump_jack_transforms") -- Include transforms for position
+local texture = asset.resource('data/derby_dome_wy_pump_jack.jpg'); -- Reference texture file
+openspace.printDebug(transforms)
+local derby_dome_wy_pump_jack = {
+    Identifier = "derby_dome_wy_pump_jack",
+    Parent = transforms.derby_dome_wy_pump_jack_position.Identifier,
+    Transform = {
+        Rotation = { -- Rotate in gui to proper orientation.
+            Type= "StaticRotation",
+            -- If the panorama image has North at the center of image,
+            -- the horizon runs exactly through the centerline, and
+            -- Rotation = {0, LATITUDE, LONGITUDE} with angles in
+            -- radians, then the pano will appear level and properly
+            -- oriented inside OpenSpace.
+            --
+            -- The coordinates for where this pano was taken is
+            --    39°24'16.41" N 100°33'53.11" W
+            -- Converting this to decimal degrees:
+            --        39+24/60+16.41/3600  =   39.4045583333
+            --   -1*(100+33/60+53.11/3600) = -100.564752778
+            -- Next, convert degrees to radians using the conversion
+            -- (pi radians/180 deg):
+            --   39.4045583333 * 3.14159265359/180 =  0.68773928321
+            -- -100.564752778  * 3.14159265359/180 = -1.75518604743
+            Rotation = { 0.00, 0.745114393444, -1.89465211783 }
+        },
+        Scale = {
+            Type = "StaticScale",
+            Scale = 1.0
+        },
+        Translation = {
+            Type = "StaticTranslation",
+            Position = {0,0,0}
+        }
+    },
+    Renderable = {
+        Type = "RenderableSphereImageLocal",
+        Size = 45,
+        Segments = 40,
+        Opacity = 1.0,
+        Texture = texture,
+        Orientation = "Inside",
+        UseAdditiveBlending = false,
+        MirrorTexture = true,
+        FadeOutThreshold = 1.00,
+        Background = true,
+        RenderBinMode = "PostDeferredTransparent",
+    },
+    GUI = {
+        Name = "Derby Dome WY Pump Jack",
+        Path = "/DMNS/Derby Dome WY Pump Jack",
+        Description = [[Derby Dome WY Pump Jack]],
+    }
+}
+asset.onInitialize(function()
+    openspace.addSceneGraphNode(derby_dome_wy_pump_jack)
+    openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.LimitZoom.MinimumAllowedDistance", 1.000000)
+end)
+
+asset.onDeinitialize(function()
+    openspace.removeSceneGraphNode(derby_dome_wy_pump_jack)
+end)
+asset.export(derby_dome_wy_pump_jack)

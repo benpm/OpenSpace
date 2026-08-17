@@ -24,6 +24,7 @@
 
 #include <modules/video/videomodule.h>
 
+#include <modules/video/include/regionalvideotileprovider.h>
 #include <modules/video/include/videotileprovider.h>
 #include <modules/video/include/screenspacevideo.h>
 #include <modules/video/include/renderablevideosphere.h>
@@ -36,6 +37,7 @@
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/dictionary.h>
 #include <ghoul/misc/templatefactory.h>
+#include <basisu_transcoder.h>
 
 namespace openspace {
 
@@ -44,10 +46,15 @@ VideoModule::VideoModule()
 {}
 
 void VideoModule::internalInitialize(const ghoul::Dictionary&) {
+    // Global one-time initialization of the Basis Universal transcoder tables, required
+    // before any ktx2_transcoder use (RegionalVideoTileProvider)
+    basist::basisu_transcoder_init();
+
     ghoul::TemplateFactory<TileProvider>* fTileProvider =
         FactoryManager::ref().factory<TileProvider>();
     ghoul_assert(fTileProvider, "TileProvider factory was not created");
     fTileProvider->registerClass<VideoTileProvider>("VideoTileProvider");
+    fTileProvider->registerClass<RegionalVideoTileProvider>("RegionalVideoTileProvider");
 
     ghoul::TemplateFactory<ScreenSpaceRenderable>* fSsRenderable =
         FactoryManager::ref().factory<ScreenSpaceRenderable>();
@@ -64,6 +71,7 @@ void VideoModule::internalInitialize(const ghoul::Dictionary&) {
 
 std::vector<Documentation> VideoModule::documentations() const {
     return {
+        RegionalVideoTileProvider::Documentation(),
         RenderableVideoPlane::Documentation(),
         RenderableVideoSphere::Documentation(),
         ScreenSpaceVideo::Documentation(),

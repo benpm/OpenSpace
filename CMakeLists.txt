@@ -158,6 +158,33 @@ if (MSVC AND TARGET OpenSpace)
 endif ()
 
 
+##########################################################################################
+# clang/LLVM (clang-cl) build fixup for the spice submodule.                             #
+# Guarded on the Clang compiler id so the MSVC build is unaffected. The assimp and       #
+# tiny-process-library fixups live in ghoul (ext/ghoul/ext/CMakeLists.txt) and the sgct  #
+# image.cpp fix lives in the sgct submodule, since those repos own those sources.        #
+##########################################################################################
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # spice is legacy f2c-generated K&R C that trips clang diagnostics which default to
+  # errors (clang 16+); spice's own /W0 doesn't downgrade those. Applied per-target
+  # rather than via global CMAKE_C_FLAGS so we don't clobber CMake's clang-cl defaults
+  # (/DWIN32 etc.) that other C deps such as cdf rely on.
+  # It also forces SpiceZfc.h into a PCH whose prototypes conflict with the f2c sources'
+  # own local prototypes under clang (an unsuppressible "conflicting types" error), so
+  # disable the forced PCH; the affected sources include what they need themselves.
+  if (TARGET spice)
+    target_compile_options(spice PRIVATE
+      -Wno-implicit-int
+      -Wno-implicit-function-declaration
+      -Wno-int-conversion
+      -Wno-deprecated-non-prototype
+      -Wno-error=incompatible-function-pointer-types
+    )
+    set_property(TARGET spice PROPERTY DISABLE_PRECOMPILE_HEADERS ON)
+  endif ()
+endif ()
+
+
 if (OPENSPACE_HAVE_TESTS)
   add_subdirectory(support/coding/codegen/tests)
   set_target_properties(run_test_codegen PROPERTIES FOLDER "Unit Tests/support")

@@ -24,6 +24,7 @@ Thumbs.db
 
 # OpenSpace-generated folders and files
 /bin/
+/dist/
 /cache/
 /cache-*/
 /cache_gdal/
@@ -55,3 +56,7 @@ openspace.cfg.override
 support/runner/config.json
 support/runner/**/__pycache__
 support/runner/**/__pycache__
+
+# Digital Earth media: too large for the GitHub repo (LFS budget); kept local-only
+data/assets/digital_earth/**/*.mp4
+data/assets/digital_earth/**/*.mp3

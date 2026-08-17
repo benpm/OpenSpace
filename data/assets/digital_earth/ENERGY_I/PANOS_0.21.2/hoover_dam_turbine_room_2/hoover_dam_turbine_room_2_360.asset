@@ -1,0 +1,49 @@
+-- working_360.asset creates a 360 panorama
+local transforms = asset.require("./hoover_dam_turbine_room_2_transforms") -- Include transforms for position
+local texture = asset.resource('data/hoover_dam_turbine_room_2_IMG_0106_pano_edit.jpg'); -- Reference texture file
+openspace.printDebug(transforms)
+local hoover_dam_turbine_room_2 = {
+    Identifier = "hoover_dam_turbine_room_2",
+    Parent = transforms.hoover_dam_turbine_room_2_position.Identifier,
+    Transform = {
+        Rotation = { -- rotate in gui to proper orientation and put values here.
+            Type= "StaticRotation",
+            Rotation = {0.78,-0.33,0.07}
+        },
+        Scale = {
+            Type = "StaticScale",
+            Scale = 0.5
+        },
+        Translation = {
+            Type = "StaticTranslation",
+            Position = {0,0,0}
+        }
+    },
+    Renderable = {
+        Type = "RenderableSphereImageLocal",
+        Size = 45,
+        Segments = 40,
+        Opacity = 1.0,
+        Texture = texture,
+        Orientation = "Inside",
+        UseAdditiveBlending = false,
+        MirrorTexture = true,
+        FadeOutThreshold = 1.00,
+        Background = true,
+        RenderBinMode = "PostDeferredTransparent",
+    },
+    GUI = {
+        Name = "hoover_dam_turbine_room_2",
+        Path = "/DMNS/Hoover_Dam_Turbine_Room_2",
+        Description = [[hoover_dam_turbine_room_2]],
+    }
+}
+asset.onInitialize(function()
+    openspace.addSceneGraphNode(hoover_dam_turbine_room_2)
+    openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.LimitZoom.MinimumAllowedDistance", 1.000000)
+end)
+
+asset.onDeinitialize(function()
+    openspace.removeSceneGraphNode(hoover_dam_turbine_room_2)
+end)
+asset.export(hoover_dam_turbine_room_2)

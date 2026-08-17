@@ -59,4 +59,12 @@ function (create_new_application application_name)
   endif ()
 
   target_link_libraries(${application_name} PUBLIC openspace-module-base)
+
+  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND MSVC)
+    # zlib is bundled both standalone (zlibstatic) and inside the CDF library (kameleon),
+    # so symbols such as `z_errmsg` are defined twice. MSVC's linker resolves this via
+    # archive member selection; lld-link errors on the duplicate. Take the first
+    # definition (the two copies are identical zlib sources).
+    target_link_options(${application_name} PRIVATE /force:multiple)
+  endif ()
 endfunction ()

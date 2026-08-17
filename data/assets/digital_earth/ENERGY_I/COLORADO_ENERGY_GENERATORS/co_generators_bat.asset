@@ -1,0 +1,293 @@
+-- Colorado Energy Generators: Gas seals at their locations on Earth.
+-- The seals are invisible by default, but can be enabled using shown or hidden using
+-- the exported functions `showSeals(interpolationDuration)` and `hideSeals(interpolationDuration)`.
+
+local earth = asset.require("scene/solarsystem/planets/earth/globe")
+
+local BAT390_NeptuneEnergyCenterLLC_NeptuneEnergyCenterHybrid_Pueblo = {
+  Identifier = "BAT390_NeptuneEnergyCenterLLC_NeptuneEnergyCenterHybrid_Pueblo",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.330263,
+      Longitude = -104.4142,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/battery_pixel.perfect_flaticon.com.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/BAT",
+    Name = "BAT390 - Neptune Energy Center LLC, Neptune Energy Center Hybrid, Pueblo"
+  }
+}
+
+local BAT394_ThunderWolfEnergyCenterLLC_ThunderWolfEnergyCenterHybrid_Pueblo = {
+  Identifier = "BAT394_ThunderWolfEnergyCenterLLC_ThunderWolfEnergyCenterHybrid_Pueblo",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 38.1899,
+      Longitude = -104.398,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/battery_pixel.perfect_flaticon.com.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/BAT",
+    Name = "BAT394 - Thunder Wolf Energy Center LLC, Thunder Wolf Energy Center Hybrid, Pueblo"
+  }
+}
+
+local BAT459_UnitedPowerInc_RattlesnakeRidgeBatteryStorage_Weld = {
+  Identifier = "BAT459_UnitedPowerInc_RattlesnakeRidgeBatteryStorage_Weld",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.197388,
+      Longitude = -104.608,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/battery_pixel.perfect_flaticon.com.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/BAT",
+    Name = "BAT459 - United Power Inc, Rattlesnake Ridge Battery Storage, Weld"
+  }
+}
+
+local BAT463_UnitedPowerInc_DavisBatteryStorage_Weld = {
+  Identifier = "BAT463_UnitedPowerInc_DavisBatteryStorage_Weld",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.144366,
+      Longitude = -104.7451,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/battery_pixel.perfect_flaticon.com.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/BAT",
+    Name = "BAT463 - United Power Inc, Davis Battery Storage, Weld"
+  }
+}
+
+local BAT464_UnitedPowerInc_BromleyBatteryStorage_Adams = {
+  Identifier = "BAT464_UnitedPowerInc_BromleyBatteryStorage_Adams",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.978775,
+      Longitude = -104.7687,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/battery_pixel.perfect_flaticon.com.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/BAT",
+    Name = "BAT464 - United Power Inc, Bromley Battery Storage, Adams"
+  }
+}
+
+
+local BAT465_UnitedPowerInc_KeenesburgBatteryStorage_Weld = {
+  Identifier = "BAT465_UnitedPowerInc_KeenesburgBatteryStorage_Weld",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 40.146214,
+      Longitude = -104.5487,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/battery_pixel.perfect_flaticon.com.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/BAT",
+    Name = "BAT465 - United Power Inc, Keenesburg Battery Storage, Weld"
+  }
+}
+
+
+local BAT467_AESCleanEnergy_HighMesaCO_Garfield = {
+  Identifier = "BAT467_AESCleanEnergy_HighMesaCO_Garfield",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.3959,
+      Longitude = -108.0733,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/battery_pixel.perfect_flaticon.com.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/BAT",
+    Name = "BAT467 - AESCleanEnergy, High Mesa CO, Garfield"
+  }
+}
+
+local BAT480_WhetstonePowerOperationsLLC_PrairieCenterEnergyLLC_Adams = {
+  Identifier = "BAT480_WhetstonePowerOperationsLLC_PrairieCenterEnergyLLC_Adams",
+  Parent = earth.Earth.Identifier,
+  Transform = {
+    Translation = {
+      Type = "GlobeTranslation",
+      Globe = earth.Earth.Identifier,
+      Latitude = 39.930281,
+      Longitude = -104.7943,
+      Altitude = 4500,
+      UseHeightmap = false
+    }
+  },
+  Renderable = {
+    Type = "RenderablePlaneImageLocal",
+    Size = 5000,
+    Origin = "Center",
+    Billboard = true,
+    Texture = openspace.absPath("${ASSETS}/digital_earth/ENERGY_I/COLORADO_ENERGY_GENERATORS/battery_pixel.perfect_flaticon.com.png"),
+    Opacity = 1.0,
+    Enabled = false,
+  },
+  GUI = {
+    Path = "/CO Energy/BAT",
+    Name = "BAT480 - Whetstone Power Operations LLC, Prairie Center Energy LLC, Adams"
+  }
+}
+
+local ShowSeals = {
+  Identifier = "os.BAT.ShowSeals",
+  Name = "Show BAT landing labels",
+  Command = [[openspace.setPropertyValue("Scene.BAT*.Renderable.Opacity", 1, 0.5)]],
+  Documentation = "Show CO BAT seals.",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+local HideSeals = {
+  Identifier = "os.BAT.HideSeals",
+  Name = "Hide BAT landing labels",
+  Command = [[openspace.setPropertyValue("Scene.BAT*.Renderable.Opacity", 0, 0.5)]],
+  Documentation = "Hide CO BAT seals",
+  GuiPath = "/DMNS/CO Energy",
+  IsLocal = false
+}
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(BAT390_NeptuneEnergyCenterLLC_NeptuneEnergyCenterHybrid_Pueblo)
+  openspace.addSceneGraphNode(BAT394_ThunderWolfEnergyCenterLLC_ThunderWolfEnergyCenterHybrid_Pueblo)
+  openspace.addSceneGraphNode(BAT459_UnitedPowerInc_RattlesnakeRidgeBatteryStorage_Weld)
+  openspace.addSceneGraphNode(BAT463_UnitedPowerInc_DavisBatteryStorage_Weld)
+  openspace.addSceneGraphNode(BAT464_UnitedPowerInc_BromleyBatteryStorage_Adams)
+  openspace.addSceneGraphNode(BAT465_UnitedPowerInc_KeenesburgBatteryStorage_Weld)
+  openspace.addSceneGraphNode(BAT467_AESCleanEnergy_HighMesaCO_Garfield)
+  openspace.addSceneGraphNode(BAT480_WhetstonePowerOperationsLLC_PrairieCenterEnergyLLC_Adams)
+  openspace.action.registerAction(ShowSeals)
+  openspace.action.registerAction(HideSeals)
+end)
+
+
+asset.onDeinitialize(function()
+  openspace.action.removeAction(HideSeals)
+  openspace.action.removeAction(ShowSeals)
+  openspace.removeSceneGraphNode(BAT390_NeptuneEnergyCenterLLC_NeptuneEnergyCenterHybrid_Pueblo)
+  openspace.removeSceneGraphNode(BAT394_ThunderWolfEnergyCenterLLC_ThunderWolfEnergyCenterHybrid_Pueblo)
+  openspace.removeSceneGraphNode(BAT459_UnitedPowerInc_RattlesnakeRidgeBatteryStorage_Weld)
+  openspace.removeSceneGraphNode(BAT463_UnitedPowerInc_DavisBatteryStorage_Weld)
+  openspace.removeSceneGraphNode(BAT464_UnitedPowerInc_BromleyBatteryStorage_Adams)
+  openspace.removeSceneGraphNode(BAT465_UnitedPowerInc_KeenesburgBatteryStorage_Weld)
+  openspace.removeSceneGraphNode(BAT467_AESCleanEnergy_HighMesaCO_Garfield)
+  openspace.removeSceneGraphNode(BAT480_WhetstonePowerOperationsLLC_PrairieCenterEnergyLLC_Adams)
+end)
+
+asset.export(BAT390_NeptuneEnergyCenterLLC_NeptuneEnergyCenterHybrid_Pueblo)
+asset.export(BAT394_ThunderWolfEnergyCenterLLC_ThunderWolfEnergyCenterHybrid_Pueblo)
+asset.export(BAT459_UnitedPowerInc_RattlesnakeRidgeBatteryStorage_Weld)
+asset.export(BAT463_UnitedPowerInc_DavisBatteryStorage_Weld)
+asset.export(BAT464_UnitedPowerInc_BromleyBatteryStorage_Adams)
+asset.export(BAT465_UnitedPowerInc_KeenesburgBatteryStorage_Weld)
+asset.export(BAT467_AESCleanEnergy_HighMesaCO_Garfield)
+asset.export(BAT480_WhetstonePowerOperationsLLC_PrairieCenterEnergyLLC_Adams)
+
+asset.export("showSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.BAT*.Renderable.Opacity", 1, interpolationDuration)
+end)
+
+asset.export("hideSeals", function (interpolationDuration)
+  openspace.setPropertyValue("Scene.BAT*.Renderable.Opacity", 0, interpolationDuration)
+end)
