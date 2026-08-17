@@ -24,6 +24,7 @@ Thumbs.db
 
 # OpenSpace-generated folders and files
 /bin/
+/dist/
 /cache/
 /cache-*/
 /cache_gdal/
