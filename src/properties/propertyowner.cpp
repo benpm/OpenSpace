@@ -201,13 +201,8 @@ const std::vector<PropertyOwner*>& PropertyOwner::propertySubOwners() const {
 }
 
 PropertyOwner* PropertyOwner::propertySubOwner(std::string_view identifier) const {
-    std::vector<PropertyOwner*>::const_iterator it = std::find_if(
-        _subOwners.begin(),
-        _subOwners.end(),
-        [&identifier](PropertyOwner* owner) { return owner->identifier() == identifier; }
-    );
-
-    return it != _subOwners.end() && (*it)->identifier() == identifier ? *it : nullptr;
+    const auto it = _subOwnerIndex.find(identifier);
+    return it != _subOwnerIndex.end() ? it->second : nullptr;
 }
 
 bool PropertyOwner::hasPropertySubOwner(const std::string& identifier) const {
@@ -283,17 +278,8 @@ void PropertyOwner::addPropertySubOwner(PropertyOwner* owner) {
         "PropertyOwner must have an identifier"
     );
 
-    // See if we can find the name of the propertyowner to add using the lower bound
-    std::vector<PropertyOwner*>::const_iterator it = std::find_if(
-        _subOwners.begin(),
-        _subOwners.end(),
-        [identifier = owner->identifier()](PropertyOwner* o) {
-            return o->identifier() == identifier;
-        }
-    );
-
-    // If we found the PropertyOwner's name, we need to bail out
-    if (it != _subOwners.end() && (*it)->identifier() == owner->identifier()) {
+    // See if a propertyowner with this name is already registered
+    if (_subOwnerIndex.contains(owner->identifier())) {
         LERROR(std::format(
             "PropertyOwner '{}' already present in PropertyOwner '{}'",
             owner->identifier(),
@@ -313,8 +299,11 @@ void PropertyOwner::addPropertySubOwner(PropertyOwner* owner) {
         }
 
         _subOwners.push_back(owner);
+        _subOwnerIndex.emplace(owner->identifier(), owner);
         owner->setPropertyOwner(this);
-        updateUriCaches();
+        // Only the added owner's subtree gets new URIs; the rest of the tree is
+        // unaffected by this registration
+        owner->updateUriCaches();
         if (global::openSpaceEngine) {
             global::openSpaceEngine->invalidatePropertyCache();
             global::openSpaceEngine->invalidatePropertyOwnerCache();
@@ -364,25 +353,26 @@ void PropertyOwner::removeProperty(Property& prop) {
 void PropertyOwner::removePropertySubOwner(PropertyOwner* owner) {
     ghoul_precondition(owner != nullptr, "owner must not be nullptr");
 
-    // See if we can find the name of the PropertyOwner to add
-    std::vector<PropertyOwner*>::const_iterator it = std::find_if(
-        _subOwners.begin(),
-        _subOwners.end(),
-        [identifier = owner->identifier()](PropertyOwner* o) {
-            return o->identifier() == identifier;
-        }
-    );
+    const auto indexIt = _subOwnerIndex.find(owner->identifier());
+    std::vector<PropertyOwner*>::const_iterator it = _subOwners.end();
+    if (indexIt != _subOwnerIndex.end()) {
+        it = std::find(_subOwners.begin(), _subOwners.end(), indexIt->second);
+    }
 
     // If we found the PropertyOwner, we can delete it
-    if (it == _subOwners.end() || (*it)->identifier() != owner->identifier()) {
+    if (it == _subOwners.end()) {
         LERROR(std::format(
             "PropertyOwner with name '{}' not found for removal", owner->identifier()
         ));
         return;
     }
 
-    for (Property* prop : (*it)->propertiesRecursive()) {
-        global::renderEngine->scene()->removePropertyInterpolation(prop);
+    // The render engine might not have an active scene (e.g. during shutdown or in
+    // tests), in which case there are no interpolations to remove
+    if (Scene* scene = global::renderEngine->scene()) {
+        for (Property* prop : (*it)->propertiesRecursive()) {
+            scene->removePropertyInterpolation(prop);
+        }
     }
 
     // Notify the change so the UI can update
@@ -396,6 +386,7 @@ void PropertyOwner::removePropertySubOwner(PropertyOwner* owner) {
         global::openSpaceEngine->invalidatePropertyCache();
     }
     _subOwners.erase(it);
+    _subOwnerIndex.erase(indexIt);
 
     if (global::openSpaceEngine) {
         global::openSpaceEngine->invalidatePropertyOwnerCache();
@@ -410,6 +401,16 @@ void PropertyOwner::setIdentifier(std::string identifier) {
     if (identifier.find_first_of(". \t\n") != std::string::npos) {
         throw ghoul::RuntimeError("Identifier must not contain any dots or whitespaces");
     }
+
+    // If registered with an owner, re-key its sub-owner index
+    if (_owner) {
+        const auto it = _owner->_subOwnerIndex.find(_identifier);
+        if (it != _owner->_subOwnerIndex.end() && it->second == this) {
+            _owner->_subOwnerIndex.erase(it);
+            _owner->_subOwnerIndex.emplace(identifier, this);
+        }
+    }
+
     _identifier = std::move(identifier);
 }
 

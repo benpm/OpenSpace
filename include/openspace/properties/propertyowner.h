@@ -25,9 +25,11 @@
 #ifndef __OPENSPACE_CORE___PROPERTYOWNER___H__
 #define __OPENSPACE_CORE___PROPERTYOWNER___H__
 
+#include <ghoul/misc/map.h>
 #include <map>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 namespace openspace {
@@ -367,6 +369,15 @@ private:
      * indirectly owned properties.
      */
     void updateUriCaches();
+
+    /// Index of _subOwners by identifier for O(1) lookup with many sub-owners. Kept in
+    /// sync by addPropertySubOwner / removePropertySubOwner / setIdentifier; _subOwners
+    /// remains the source of truth for (GUI) ordering
+    std::unordered_map<
+        std::string, PropertyOwner*,
+        transparent_string_hash,
+        std::equal_to<>
+    > _subOwnerIndex;
 };
 
 } // namespace openspace
