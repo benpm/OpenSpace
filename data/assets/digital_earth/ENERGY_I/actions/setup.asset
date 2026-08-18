@@ -71,7 +71,7 @@ local actions = {
       openspace.setPropertyValueSingle("Dashboard.Distance.Enabled", true)
       openspace.setPropertyValueSingle("Dashboard.Framerate.Enabled", true)
       openspace.setPropertyValueSingle("Dashboard.GlobeLocation.Enabled", true)
-      openspace.setPropertyValueSingle("Dashboard.ParallelConnection.Enabled", true)
+      openspace.setPropertyValueSingle("Dashboard.Astrocast.Enabled", true)
       openspace.setPropertyValueSingle("Dashboard.Date.FontSize", 10.000000)
       openspace.setPropertyValueSingle("Dashboard.Date.TimeFormat", "YYYY/MM/DD")
       openspace.setPropertyValueSingle("Scene.bearcreek_cemetery.Renderable.Fade",0,1)
