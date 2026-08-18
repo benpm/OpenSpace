@@ -24,25 +24,34 @@
 
 #version __CONTEXT__
 
+#include "geojson_drawdata.glsl"
+
 layout(location = 0) in vec3 in_position;
-layout(location = 1) in vec3 in_normal;
 layout(location = 2) in float in_height;
 
 out Data {
-  vec3 normal;
-  float dynamicHeight;
-  flat int drawIndex;
+  vec4 positionViewSpace;
+  float depth;
+  flat vec4 color;
+  flat uint flags;
 } out_data;
 
-// gl_DrawID is only available in the vertex stage, so resolve the per-draw record
-// index here and pass it on to the geometry shader. Matches the declaration in
-// geojson_drawdata.glsl
-uniform int baseDrawId;
+uniform dmat4 modelTransform;
+uniform dmat4 viewTransform;
+uniform dmat4 projectionTransform;
 
 
 void main() {
-  gl_Position = vec4(in_position, 1.0);
-  out_data.normal = in_normal;
-  out_data.dynamicHeight = in_height;
-  out_data.drawIndex = baseDrawId + gl_DrawID;
+  DrawElement element = drawElements[baseDrawId + gl_DrawID];
+
+  // Offset model pos based on height info
+  dvec4 modelPos = offsetByHeight(in_position, in_height, element);
+
+  out_data.positionViewSpace = vec4(viewTransform * modelTransform * modelPos);
+  out_data.color = element.color;
+  out_data.flags = element.flags;
+  gl_Position = vec4(projectionTransform * out_data.positionViewSpace);
+  // Set z to 0 to disable near and far plane, unique handling for perspective in space
+  gl_Position.z = 0.0;
+  out_data.depth = gl_Position.w;
 }

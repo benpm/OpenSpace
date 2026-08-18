@@ -22,27 +22,34 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#version __CONTEXT__
+#include "fragment.glsl"
 
-layout(location = 0) in vec3 in_position;
-layout(location = 1) in vec3 in_normal;
-layout(location = 2) in float in_height;
-
-out Data {
-  vec3 normal;
-  float dynamicHeight;
-  flat int drawIndex;
-} out_data;
-
-// gl_DrawID is only available in the vertex stage, so resolve the per-draw record
-// index here and pass it on to the geometry shader. Matches the declaration in
-// geojson_drawdata.glsl
-uniform int baseDrawId;
+in Data {
+  vec4 positionViewSpace;
+  flat vec4 color;
+  float acrossLine;
+  flat float halfWidth;
+  float depth;
+} in_data;
 
 
-void main() {
-  gl_Position = vec4(in_position, 1.0);
-  out_data.normal = in_normal;
-  out_data.dynamicHeight = in_height;
-  out_data.drawIndex = baseDrawId + gl_DrawID;
+Fragment getFragment() {
+  // Anti-alias with a one pixel feather across the line, replacing GL_LINE_SMOOTH
+  float feather = smoothstep(
+    in_data.halfWidth - 0.5,
+    in_data.halfWidth + 0.5,
+    abs(in_data.acrossLine)
+  );
+  float alpha = in_data.color.a * (1.0 - feather);
+
+  if (alpha <= 0.001) {
+    discard;
+  }
+
+  Fragment frag;
+  frag.color = vec4(in_data.color.rgb, alpha);
+  frag.depth = in_data.depth;
+  frag.gPosition = in_data.positionViewSpace;
+  frag.gNormal = vec4(0.0, 0.0, 0.0, 1.0);
+  return frag;
 }

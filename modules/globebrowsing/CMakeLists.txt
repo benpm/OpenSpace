@@ -57,8 +57,11 @@ set(HEADER_FILES
   src/tiletextureinitdata.h
   src/tilecacheproperties.h
   src/timequantizer.h
+  src/geojson/geojsoncache.h
   src/geojson/geojsoncomponent.h
+  src/geojson/geojsonculling.h
   src/geojson/geojsonmanager.h
+  src/geojson/geojsonparser.h
   src/geojson/geojsonproperties.h
   src/geojson/globegeometryfeature.h
   src/geojson/globegeometryhelper.h
@@ -101,8 +104,11 @@ set(SOURCE_FILES
   src/tileloadjob.cpp
   src/tiletextureinitdata.cpp
   src/timequantizer.cpp
+  src/geojson/geojsoncache.cpp
   src/geojson/geojsoncomponent.cpp
+  src/geojson/geojsonculling.cpp
   src/geojson/geojsonmanager.cpp
+  src/geojson/geojsonparser.cpp
   src/geojson/geojsonproperties.cpp
   src/geojson/globegeometryfeature.cpp
   src/geojson/globegeometryhelper.cpp
@@ -126,11 +132,15 @@ set(SHADER_FILES
   shaders/advanced_rings_fs.glsl
   shaders/blending.glsl
   shaders/ellipsoid.glsl
-  shaders/geojson_fs.glsl
+  shaders/geojson_drawdata.glsl
+  shaders/geojson_lines_fs.glsl
+  shaders/geojson_lines_gs.glsl
+  shaders/geojson_lines_vs.glsl
   shaders/geojson_points_fs.glsl
   shaders/geojson_points_gs.glsl
   shaders/geojson_points_vs.glsl
-  shaders/geojson_vs.glsl
+  shaders/geojson_polygons_fs.glsl
+  shaders/geojson_polygons_vs.glsl
   shaders/globalrenderer_vs.glsl
   shaders/interpolate_fs.glsl
   shaders/interpolate_vs.glsl
@@ -190,3 +200,17 @@ set_property(TARGET geos PROPERTY FOLDER "External")
 set_property(TARGET geos_c PROPERTY FOLDER "External")
 set_property(TARGET ryu PROPERTY FOLDER "External")
 end_dependency("GEOS")
+
+begin_dependency("Glaze")
+add_subdirectory(ext/glaze SYSTEM)
+target_link_libraries(openspace-module-globebrowsing PRIVATE glaze::glaze)
+if (MSVC)
+  # Glaze requires the standard conformant preprocessor. Only the two translation units
+  # that include it need this, so it is set per source rather than on the whole target
+  set_source_files_properties(
+    src/geojson/geojsoncache.cpp
+    src/geojson/geojsonparser.cpp
+    PROPERTIES COMPILE_OPTIONS "/Zc:preprocessor"
+  )
+endif ()
+end_dependency("Glaze")

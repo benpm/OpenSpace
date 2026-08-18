@@ -22,27 +22,62 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#version __CONTEXT__
+#include "fragment.glsl"
 
-layout(location = 0) in vec3 in_position;
-layout(location = 1) in vec3 in_normal;
-layout(location = 2) in float in_height;
+in Data {
+  vec4 positionViewSpace;
+  float depth;
+  flat vec4 color;
+  flat uint flags;
+} in_data;
 
-out Data {
-  vec3 normal;
-  float dynamicHeight;
-  flat int drawIndex;
-} out_data;
+uniform float ambientIntensity = 0.2;
+uniform float diffuseIntensity = 0.8;
 
-// gl_DrawID is only available in the vertex stage, so resolve the per-draw record
-// index here and pass it on to the geometry shader. Matches the declaration in
-// geojson_drawdata.glsl
-uniform int baseDrawId;
+uniform uint nLightSources;
+uniform vec3 lightDirectionsViewSpace[8];
+uniform float lightIntensities[8];
+
+// Keep in sync with geojson_drawdata.glsl and the GeoJsonDrawRecord struct in
+// globegeometryfeature.h (this stage only needs the flag, not the whole SSBO include)
+const uint FlagPerformShading = 16u;
+
+const vec3 LightColor = vec3(1.0);
 
 
-void main() {
-  gl_Position = vec4(in_position, 1.0);
-  out_data.normal = in_normal;
-  out_data.dynamicHeight = in_height;
-  out_data.drawIndex = baseDrawId + gl_DrawID;
+Fragment getFragment() {
+  if (in_data.color.a == 0.0) {
+    discard;
+  }
+
+  Fragment frag;
+  frag.color = in_data.color;
+
+  // Simple diffuse phong shading based on light sources
+  if ((in_data.flags & FlagPerformShading) != 0u && nLightSources > 0) {
+    // All polygon triangles are flat shaded (the old vertex normals were one flat
+    // normal per triangle), so the normal is derived from the view-space position
+    // derivatives instead of a vertex attribute. Flip it to face the camera, matching
+    // the visible side that used to be lit
+    vec3 n = normalize(
+      cross(dFdx(in_data.positionViewSpace.xyz), dFdy(in_data.positionViewSpace.xyz))
+    );
+    if (!gl_FrontFacing) {
+      n = -n;
+    }
+
+    // Ambient color
+    frag.color.xyz = ambientIntensity * in_data.color.rgb;
+
+    for (int i = 0; i < nLightSources; i++) {
+      vec3 l = lightDirectionsViewSpace[i];
+      vec3 diffuseColor = diffuseIntensity * max(dot(n, l), 0.0) * in_data.color.rgb;
+      frag.color.xyz += lightIntensities[i] * (LightColor * diffuseColor);
+    }
+  }
+
+  frag.depth = in_data.depth;
+  frag.gPosition = in_data.positionViewSpace;
+  frag.gNormal = vec4(0.0, 0.0, 0.0, 1.0);
+  return frag;
 }

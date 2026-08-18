@@ -24,39 +24,27 @@
 
 #version __CONTEXT__
 
+#include "geojson_drawdata.glsl"
+
 layout(location = 0) in vec3 in_position;
-layout(location = 1) in vec3 in_normal;
 layout(location = 2) in float in_height;
 
 out Data {
   vec4 positionViewSpace;
-  vec3 normal;
-  float depth;
+  flat int drawIndex;
 } out_data;
 
 uniform dmat4 modelTransform;
 uniform dmat4 viewTransform;
-uniform dmat4 projectionTransform;
-uniform mat3 normalTransform;
-
-uniform float heightOffset;
-uniform bool useHeightMapData;
 
 
 void main() {
-  dvec4 modelPos = dvec4(in_position, 1.0);
+  int drawIndex = baseDrawId + gl_DrawID;
+  DrawElement element = drawElements[drawIndex];
 
   // Offset model pos based on height info
-  if (length(in_position) > 0.0) {
-    dvec3 outDirection = normalize(dvec3(in_position));
-    double height = useHeightMapData ? in_height + heightOffset : heightOffset;
-    modelPos += dvec4(outDirection * height, 0.0);
-  }
+  dvec4 modelPos = offsetByHeight(in_position, in_height, element);
 
   out_data.positionViewSpace = vec4(viewTransform * modelTransform * modelPos);
-  out_data.normal = normalize(normalTransform * in_normal);
-  gl_Position = vec4(projectionTransform * out_data.positionViewSpace);
-  // Set z to 0 to disable near and far plane, unique handling for perspective in space
-  gl_Position.z = 0.0;
-  out_data.depth = gl_Position.w;
+  out_data.drawIndex = drawIndex;
 }

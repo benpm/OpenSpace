@@ -22,53 +22,41 @@
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                         *
  ****************************************************************************************/
 
-#include "fragment.glsl"
+// Per-draw data for batched GeoJson rendering. Must be kept in sync with the
+// GeoJsonDrawRecord struct in globegeometryfeature.h (std430, 32 bytes)
+struct DrawElement {
+  vec4 color;               // rgb + final opacity
+  float heightOffset;       // meters
+  float sizeOrWidth;        // point size (world units) or line width (pixels)
+  float textureWidthFactor; // points only
+  uint flags;
+};
 
-in Data {
-  vec4 positionViewSpace;
-  vec3 normal;
-  float depth;
-} in_data;
+layout(std430) buffer DrawData {
+  DrawElement drawElements[];
+};
 
-uniform vec3 color;
-uniform float opacity;
+// Offset of the current multidraw group's first record in drawElements. Shaders index
+// records with drawElements[baseDrawId + gl_DrawID]
+uniform int baseDrawId;
 
-uniform float ambientIntensity = 0.2;
-uniform float diffuseIntensity = 0.8;
-uniform bool performShading = true;
+const uint FlagUseHeightMap = 1u;
+const uint FlagBottomAnchor = 2u;
+const uint FlagsRenderModeShift = 2u;
+const uint FlagsRenderModeMask = 3u << FlagsRenderModeShift; // bits 2-3
+const uint FlagPerformShading = 16u;
 
-uniform uint nLightSources;
-uniform vec3 lightDirectionsViewSpace[8];
-uniform float lightIntensities[8];
-
-const vec3 LightColor = vec3(1.0);
-
-
-Fragment getFragment() {
-  if (opacity == 0.0) {
-    discard;
+// Displace a model-space position along its outward direction by the draw's height
+// offset, plus the height map sample when the draw uses the height map
+dvec4 offsetByHeight(vec3 position, float height, DrawElement element) {
+  dvec4 modelPos = dvec4(position, 1.0);
+  if (length(position) > 0.0) {
+    dvec3 outDirection = normalize(dvec3(position));
+    bool useHeightMapData = (element.flags & FlagUseHeightMap) != 0u;
+    double h = useHeightMapData ?
+      height + element.heightOffset :
+      element.heightOffset;
+    modelPos += dvec4(outDirection * h, 0.0);
   }
-
-  Fragment frag;
-  frag.color = vec4(color, opacity);
-
-  // Simple diffuse phong shading based on light sources
-  if (performShading && nLightSources > 0) {
-    // @TODO: Fix faulty triangle normals. This should not have to be inverted
-    vec3 n = -normalize(in_data.normal);
-
-    // Ambient color
-    frag.color.xyz = ambientIntensity * color;
-
-    for (int i = 0; i < nLightSources; i++) {
-      vec3 l = lightDirectionsViewSpace[i];
-      vec3 diffuseColor = diffuseIntensity * max(dot(n, l), 0.0) * color;
-      frag.color.xyz += lightIntensities[i] * (LightColor * diffuseColor);
-    }
-  }
-
-  frag.depth = in_data.depth;
-  frag.gPosition = in_data.positionViewSpace;
-  frag.gNormal = vec4(0.0, 0.0, 0.0, 1.0);
-  return frag;
+  return modelPos;
 }
