@@ -528,6 +528,8 @@ RenderEngine::RenderEngine()
     _globalBlackout.owner.addProperty(_globalBlackout.applyToMaster);
     addPropertySubOwner(_globalBlackout.owner);
 
+    addPropertySubOwner(_postProcessor);
+
     addProperty(_screenshotWindowIds);
     addProperty(_applyWarping);
 
@@ -699,6 +701,7 @@ void RenderEngine::initializeGL() {
 void RenderEngine::deinitializeGL() {
     ZoneScoped;
 
+    _postProcessor.deinitializeGL();
     _renderer.deinitialize();
 }
 
@@ -1120,6 +1123,12 @@ void RenderEngine::renderDashboard() const {
     );
 
     global::dashboard->render(penPosition);
+}
+
+void RenderEngine::postProcess(int windowId, unsigned int texture, glm::ivec2 size) {
+    ZoneScoped;
+
+    _postProcessor.apply(windowId, texture, size);
 }
 
 void RenderEngine::postDraw() {

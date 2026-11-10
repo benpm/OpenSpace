@@ -43,6 +43,7 @@
 #include <openspace/misc/stacktrace.h>
 #include <openspace/opengl/gl.h>
 #include <openspace/openspace.h>
+#include <openspace/rendering/renderengine.h>
 #include <openspace/util/progressbar.h>
 #include <openspace/util/task.h>
 #include <openspace/util/taskloader.h>
@@ -612,6 +613,24 @@ void mainDraw2DFunc(const sgct::RenderData& data) {
     glDisable(GL_DEPTH_TEST);
 
     LTRACE("main::mainDraw2DFunc(end)");
+}
+
+
+
+void mainPostProcessFunc(const sgct::Window& window, sgct::FrustumMode,
+                         unsigned int texture, glm::ivec2 size)
+{
+    ZoneScoped;
+    LTRACE("main::mainPostProcessFunc(begin)");
+
+    try {
+        global::renderEngine->postProcess(window.id(), texture, size);
+    }
+    catch (const RuntimeError& e) {
+        LERRORC(e.component, e.message);
+    }
+
+    LTRACE("main::mainPostProcessFunc(end)");
 }
 
 
@@ -1592,6 +1611,7 @@ int main(int argc, char* argv[]) {
         .draw = mainRenderFunc,
         .draw2D = mainDraw2DFunc,
         .postDraw = mainPostDrawFunc,
+        .postProcess = mainPostProcessFunc,
         .encode = mainEncode,
         .decode = mainDecode,
         .keyboard = mainKeyboardCallback,

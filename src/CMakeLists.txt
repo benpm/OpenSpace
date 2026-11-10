@@ -42,6 +42,12 @@ set(OPENSPACE_SHADERS
   ${PROJECT_SOURCE_DIR}/shaders/framebuffer/raycastframebuffer_fs.glsl
   ${PROJECT_SOURCE_DIR}/shaders/framebuffer/renderframebuffer_fs.glsl
   ${PROJECT_SOURCE_DIR}/shaders/framebuffer/resolveframebuffer_vs.glsl
+  ${PROJECT_SOURCE_DIR}/shaders/postprocess/bloom_blur_fs.glsl
+  ${PROJECT_SOURCE_DIR}/shaders/postprocess/bloom_brightpass_fs.glsl
+  ${PROJECT_SOURCE_DIR}/shaders/postprocess/bloom_upsample_fs.glsl
+  ${PROJECT_SOURCE_DIR}/shaders/postprocess/composite_fs.glsl
+  ${PROJECT_SOURCE_DIR}/shaders/postprocess/postprocess_vs.glsl
+  ${PROJECT_SOURCE_DIR}/shaders/postprocess/sharpen_fs.glsl
   ${PROJECT_SOURCE_DIR}/shaders/powerscaling/powerscaling_fs.glsl
   ${PROJECT_SOURCE_DIR}/shaders/powerscaling/powerscaling_vs.glsl
   ${PROJECT_SOURCE_DIR}/shaders/powerscaling/powerscalingmath.glsl
@@ -297,6 +303,7 @@ target_sources(
     ${PROJECT_SOURCE_DIR}/include/openspace/rendering/luaconsole.h
     ${PROJECT_SOURCE_DIR}/include/openspace/rendering/helper.h
     ${PROJECT_SOURCE_DIR}/include/openspace/rendering/labelscomponent.h
+    ${PROJECT_SOURCE_DIR}/include/openspace/rendering/postprocessor.h
     ${PROJECT_SOURCE_DIR}/include/openspace/rendering/raycasterlistener.h
     ${PROJECT_SOURCE_DIR}/include/openspace/rendering/raycastermanager.h
     ${PROJECT_SOURCE_DIR}/include/openspace/rendering/renderable.h
@@ -607,6 +614,7 @@ target_sources(
     rendering/labelscomponent.cpp
     rendering/loadingscreen.cpp
     rendering/luaconsole.cpp
+    rendering/postprocessor.cpp
     rendering/raycastermanager.cpp
     rendering/renderable.cpp
     rendering/renderengine.cpp

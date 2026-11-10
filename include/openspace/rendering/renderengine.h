@@ -37,6 +37,7 @@
 #include <openspace/properties/vector/vec3property.h>
 #include <openspace/properties/vector/vec4property.h>
 #include <openspace/rendering/framebufferrenderer.h>
+#include <openspace/rendering/postprocessor.h>
 #include <cstdint>
 #include <chrono>
 #include <filesystem>
@@ -89,6 +90,17 @@ public:
 
     void renderOverlays(const ShutdownInformation& shutdownInfo);
     void renderEndscreen();
+
+    /**
+     * Applies the post-processing effects to the finished frame of a window. This is
+     * called by SGCT through its post-process callback once per window and eye, after
+     * the scene has been rendered and before the 2D overlays.
+     *
+     * \param windowId The SGCT id of the window being rendered
+     * \param texture The texture holding the rendered frame
+     * \param size The size of \p texture in pixels
+     */
+    void postProcess(int windowId, unsigned int texture, glm::ivec2 size);
     void postDraw();
 
     float hdrExposure() const;
@@ -174,6 +186,7 @@ private:
     Scene* _scene = nullptr;
 
     FramebufferRenderer _renderer;
+    PostProcessor _postProcessor;
     Dictionary _rendererData;
     Dictionary _resolveData;
     ScreenLog* _log = nullptr;

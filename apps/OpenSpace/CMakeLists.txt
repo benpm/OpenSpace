@@ -66,8 +66,9 @@ endif ()
 begin_header("Dependency: SGCT")
 
 # SGCT is resolved through the vcpkg overlay port at support/vcpkg/ports/sgct, which
-# fetches a pinned commit of https://github.com/SGCT/SGCT from GitHub. To move to a newer
-# SGCT, update REF and SHA512 in that port's portfile.cmake
+# fetches a pinned commit of https://github.com/benpm/sgct from GitHub. That fork of SGCT
+# adds the post-process callback that the RenderEngine's post-processing relies on. To
+# move to a newer SGCT, update REF and SHA512 in that port's portfile.cmake
 find_package(sgct CONFIG REQUIRED)
 target_link_libraries(OpenSpace PRIVATE sgct::sgct)
 
