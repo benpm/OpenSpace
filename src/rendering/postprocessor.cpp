@@ -561,7 +561,9 @@ void PostProcessor::drawQuad() const {
     glBindVertexArray(0);
 }
 
-void PostProcessor::apply(int windowId, GLuint inputTexture, glm::ivec2 size) {
+void PostProcessor::apply(int windowId, GLuint inputTexture, glm::ivec2 size,
+                          glm::ivec2 eyeLayout)
+{
     ZoneScoped;
     TracyGpuZone("PostProcessor");
 
@@ -593,7 +595,7 @@ void PostProcessor::apply(int windowId, GLuint inputTexture, glm::ivec2 size) {
             // The sharpening reads the composite, so that one goes into a texture first
             glBindFramebuffer(GL_FRAMEBUFFER, res.composite.framebuffer);
             glViewport(0, 0, size.x, size.y);
-            renderComposite(res, inputTexture);
+            renderComposite(res, inputTexture, eyeLayout);
 
             glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(outputFramebuffer));
             glViewport(
@@ -612,13 +614,13 @@ void PostProcessor::apply(int windowId, GLuint inputTexture, glm::ivec2 size) {
                 outputViewport[2],
                 outputViewport[3]
             );
-            renderComposite(res, inputTexture);
+            renderComposite(res, inputTexture, eyeLayout);
         }
     }
     else {
         // Tone mapping and vignette (or nothing at all) only need the composite pass
         const WindowResources empty;
-        renderComposite(empty, inputTexture);
+        renderComposite(empty, inputTexture, eyeLayout);
     }
 
     // SGCT runs this callback with depth testing and blending disabled and restores
@@ -675,8 +677,8 @@ void PostProcessor::renderBloom(WindowResources& res, GLuint inputTexture) {
     _upsampleProgram->deactivate();
 }
 
-void PostProcessor::renderComposite(const WindowResources& res,
-                                    GLuint inputTexture) const
+void PostProcessor::renderComposite(const WindowResources& res, GLuint inputTexture,
+                                    glm::ivec2 eyeLayout) const
 {
     ZoneScoped;
     TracyGpuZone("Composite");
@@ -726,6 +728,7 @@ void PostProcessor::renderComposite(const WindowResources& res,
         _compositeCache.vignetteFalloff,
         _vignette.falloff.value()
     );
+    _compositeProgram->setUniform(_compositeCache.eyeLayout, glm::vec2(eyeLayout));
     drawQuad();
     _compositeProgram->deactivate();
 }

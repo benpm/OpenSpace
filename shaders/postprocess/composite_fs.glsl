@@ -47,6 +47,9 @@ uniform float whitePoint;
 uniform bool applyVignette;
 uniform float vignetteIntensity;
 uniform float vignetteFalloff;
+// Number of eye images in the texture horizontally and vertically, (2, 1) for
+// side-by-side stereo
+uniform vec2 eyeLayout;
 
 const int OperatorClamp = 0;
 const int OperatorReinhard = 1;
@@ -117,7 +120,8 @@ void main() {
   }
 
   if (applyVignette) {
-    vec2 uv = in_data.texCoords;
+    // The vignette is centered on each eye image separately
+    vec2 uv = fract(in_data.texCoords * eyeLayout);
     float falloff = 16.0 * uv.x * uv.y * (1.0 - uv.x) * (1.0 - uv.y);
     float vignette = pow(falloff, vignetteFalloff);
     color *= mix(1.0, vignette, vignetteIntensity);

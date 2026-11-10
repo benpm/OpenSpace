@@ -1125,10 +1125,12 @@ void RenderEngine::renderDashboard() const {
     global::dashboard->render(penPosition);
 }
 
-void RenderEngine::postProcess(int windowId, unsigned int texture, glm::ivec2 size) {
+void RenderEngine::postProcess(int windowId, unsigned int texture, glm::ivec2 size,
+                               glm::ivec2 eyeLayout)
+{
     ZoneScoped;
 
-    _postProcessor.apply(windowId, texture, size);
+    _postProcessor.apply(windowId, texture, size, eyeLayout);
 }
 
 void RenderEngine::postDraw() {

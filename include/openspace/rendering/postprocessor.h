@@ -66,8 +66,12 @@ public:
      *        intermediate buffers, as windows can have different sizes
      * \param inputTexture The 2D texture holding the rendered frame
      * \param size The size of \p inputTexture in pixels
+     * \param eyeLayout The number of eye images next to each other horizontally and
+     *        vertically in \p inputTexture. Side-by-side stereo uses (2, 1), so that
+     *        effects such as the vignette are applied to each eye separately
      */
-    void apply(int windowId, GLuint inputTexture, glm::ivec2 size);
+    void apply(int windowId, GLuint inputTexture, glm::ivec2 size,
+        glm::ivec2 eyeLayout = glm::ivec2(1, 1));
 
     /**
      * Releases all OpenGL resources. Has to be called with a valid context.
@@ -100,7 +104,8 @@ private:
     void drawQuad() const;
 
     void renderBloom(WindowResources& res, GLuint inputTexture);
-    void renderComposite(const WindowResources& res, GLuint inputTexture) const;
+    void renderComposite(const WindowResources& res, GLuint inputTexture,
+        glm::ivec2 eyeLayout) const;
     void renderSharpening(const WindowResources& res) const;
 
     bool isBloomEnabled() const;
@@ -162,7 +167,7 @@ private:
     std::unique_ptr<opengl::ProgramObject> _compositeProgram;
     UniformCache(sceneTexture, bloomTexture, passthrough, gamma, applyBloom,
         bloomIntensity, applyToneMapping, toneMappingOperator, exposure, whitePoint,
-        applyVignette, vignetteIntensity, vignetteFalloff) _compositeCache;
+        applyVignette, vignetteIntensity, vignetteFalloff, eyeLayout) _compositeCache;
 
     std::unique_ptr<opengl::ProgramObject> _sharpenProgram;
     UniformCache(inputTexture, amount) _sharpenCache;

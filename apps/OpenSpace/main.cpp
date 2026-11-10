@@ -623,8 +623,23 @@ void mainPostProcessFunc(const sgct::Window& window, sgct::FrustumMode,
     ZoneScoped;
     LTRACE("main::mainPostProcessFunc(begin)");
 
+    // Side-by-side and top-bottom stereo hand over one texture that holds both eyes, so
+    // screen-space effects that depend on the position in the image have to know that
+    const sgct::Window::StereoMode sm = window.stereoMode();
+    glm::ivec2 eyeLayout = glm::ivec2(1, 1);
+    if (sm == sgct::Window::StereoMode::SideBySide ||
+        sm == sgct::Window::StereoMode::SideBySideInverted)
+    {
+        eyeLayout = glm::ivec2(2, 1);
+    }
+    else if (sm == sgct::Window::StereoMode::TopBottom ||
+             sm == sgct::Window::StereoMode::TopBottomInverted)
+    {
+        eyeLayout = glm::ivec2(1, 2);
+    }
+
     try {
-        global::renderEngine->postProcess(window.id(), texture, size);
+        global::renderEngine->postProcess(window.id(), texture, size, eyeLayout);
     }
     catch (const RuntimeError& e) {
         LERRORC(e.component, e.message);

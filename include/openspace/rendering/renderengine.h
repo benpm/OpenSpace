@@ -99,8 +99,11 @@ public:
      * \param windowId The SGCT id of the window being rendered
      * \param texture The texture holding the rendered frame
      * \param size The size of \p texture in pixels
+     * \param eyeLayout The number of eye images next to each other horizontally and
+     *        vertically in \p texture, which is (2, 1) for side-by-side stereo
      */
-    void postProcess(int windowId, unsigned int texture, glm::ivec2 size);
+    void postProcess(int windowId, unsigned int texture, glm::ivec2 size,
+        glm::ivec2 eyeLayout);
     void postDraw();
 
     float hdrExposure() const;
