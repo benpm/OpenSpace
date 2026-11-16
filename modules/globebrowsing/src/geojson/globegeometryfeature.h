@@ -217,6 +217,7 @@ private:
     std::vector<Geodetic3> _heightUpdateReferencePoints;
     std::vector<double> _lastControlHeights;
     std::chrono::system_clock::time_point _lastHeightUpdateTime;
+    bool _hasGeometry = false;
 
     bool _hasTexture = false;
     std::unique_ptr<TextureComponent> _pointTexture;

@@ -496,11 +496,15 @@ bool GlobeGeometryFeature::shouldUpdateDueToHeightMapChange() const {
 }
 
 void GlobeGeometryFeature::update(bool dataIsDirty, bool preventHeightUpdates) {
-    if (!preventHeightUpdates && shouldUpdateDueToHeightMapChange()) {
-        updateHeightsFromHeightMap();
-    }
-    else if (dataIsDirty) {
+    // Build the geometry first if it is dirty or has never been built. Otherwise a
+    // feature whose first update comes later than `HeightUpdateInterval` after its
+    // creation (e.g. a layer that is enabled later) only gets its heights updated, has
+    // no geometry, and is never drawn. Building the geometry also samples the heights
+    if (dataIsDirty || !_hasGeometry) {
         updateGeometry();
+    }
+    else if (!preventHeightUpdates && shouldUpdateDueToHeightMapChange()) {
+        updateHeightsFromHeightMap();
     }
 
     if (_pointTexture) {
@@ -523,6 +527,7 @@ void GlobeGeometryFeature::updateGeometry() {
 
     // Compute new heights - to see if height map changed
     _lastControlHeights = getCurrentReferencePointsHeights();
+    _hasGeometry = true;
 }
 
 void GlobeGeometryFeature::updateHeightsFromHeightMap() {
