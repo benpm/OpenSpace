@@ -199,7 +199,11 @@ HorizonsResultCode isValidHorizonsAnswer(const nlohmann::json& answer) {
         const std::string errorMsg = it->get<std::string>();
 
         // Projected output length (~X) exceeds 90024 line max -- change step-size
-        if (errorMsg.contains("Projected output length")) {
+        // or, in newer Horizons versions:
+        // Output length exceeded, X times requested, max. is 90000
+        if (errorMsg.contains("Projected output length") ||
+            errorMsg.contains("Output length exceeded"))
+        {
             return HorizonsResultCode::ErrorSize;
         }
         // STEP_SIZE too big, exceeds available span
