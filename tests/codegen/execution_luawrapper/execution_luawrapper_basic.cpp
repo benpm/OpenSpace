@@ -78,9 +78,14 @@ namespace {
     }
 
     bool ranTestFunc7 = false;
+    // Set at runtime by the reset function. If the throw were unconditional, the
+    // compiler would flag the generated wrapper's `return 0;` as unreachable (C4702)
+    bool testFunc7ShouldThrow = false;
     [[codegen::luawrap]] void testFunc7() {
         ranTestFunc7 = true;
-        throw lua::LuaError("Thrown Lua error message");
+        if (testFunc7ShouldThrow) {
+            throw lua::LuaError("Thrown Lua error message");
+        }
     }
 
     bool ranTestFunc8 = false;
@@ -105,6 +110,7 @@ namespace {
         ranTestFunc5 = false;
         ranTestFunc6 = false;
         ranTestFunc7 = false;
+        testFunc7ShouldThrow = true;
         ranTestFunc8 = false;
     }
 } // namespace

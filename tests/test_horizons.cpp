@@ -51,6 +51,19 @@ namespace {
 
     // Avoid repetitive code by using these functions
 #ifdef OPENSPACE_MODULE_SPACE_ENABLED
+    // A request with a valid answer: the Tesla Roadster seen from the solar system
+    // barycenter on 2022-05-22 in 12 h steps
+    HorizonsTestData validTestData() {
+        HorizonsTestData data;
+        data.observer = "@ssb";
+        data.target = "Tesla";
+        data.start = "2022-05-22 00:00:00";
+        data.stop = "2022-05-23 00:00:00";
+        data.step = "12";
+        data.unit = "h";
+        return data;
+    }
+
     void testHorizonsAnswer(const HorizonsTestData& data, HorizonsType type,
         const std::filesystem::path& filePath,
         HorizonsResultCode expectedAnswerCode)
@@ -535,13 +548,7 @@ TEST_CASE("HorizonsFile: Detect multiple observers or targets", "[horizonsfile]"
 
 TEST_CASE("HorizonsFile: Valid request and response", "[horizonsfile]") {
 #ifdef OPENSPACE_MODULE_SPACE_ENABLED
-    HorizonsTestData data;
-    data.observer = "@ssb";
-    data.target = "Tesla";
-    data.start = "2022-05-22 00:00:00";
-    data.stop = "2022-05-23 00:00:00";
-    data.step = "12";
-    data.unit = "h";
+    const HorizonsTestData data = validTestData();
     const std::filesystem::path filePathVector = absPath(
         "${TESTDIR}/horizonsTest/validVectorFile.hrz"
     );
@@ -759,6 +766,17 @@ TEST_CASE("HorizonsFile: Reading Vector data from request", "[horizonsfile]") {
     const double y2 = 61979705046.1750488281;
     const double z2 = -125109598352.4534301758;
 
+    // Download the file in this test: Catch2 runs the test cases in random order, so
+    // the file from "Valid request and response" may not exist yet
+    testHorizonsAnswerAndResult(
+        validTestData(),
+        type,
+        filePathVector,
+        HorizonsResultCode::Valid,
+        HorizonsResultCode::Valid,
+        false
+    );
+
     testReadingHorizons(
         type, filePathVector,
         t0, x0, y0, z0,
@@ -792,6 +810,17 @@ TEST_CASE("HorizonsFile: Reading Observer data from request", "[horizonsfile]") 
     const double x2 = -127634254978.5487976074;
     const double y2 = 61986837622.6675033569;
     const double z2 = -125120288440.1994018555;
+
+    // Download the file in this test: Catch2 runs the test cases in random order, so
+    // the file from "Valid request and response" may not exist yet
+    testHorizonsAnswerAndResult(
+        validTestData(),
+        type,
+        filePathObserver,
+        HorizonsResultCode::Valid,
+        HorizonsResultCode::Valid,
+        false
+    );
 
     testReadingHorizons(
         type, filePathObserver,

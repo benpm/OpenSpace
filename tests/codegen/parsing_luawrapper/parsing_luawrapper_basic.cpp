@@ -916,8 +916,7 @@ TEST_CASE("Parsing/LuaWrapper/Basic:  Optional parameter", "[Parsing][LuaWrapper
         REQUIRE(f);
         CHECK(f->functionName == "func2");
         CHECK(f->documentation.empty());
-
-        VariableType* ret = f->returnValue;
+        CHECK(f->returnValue == nullptr);
 
         REQUIRE(f->arguments.size() == 1);
         Variable* v = f->arguments[0];
