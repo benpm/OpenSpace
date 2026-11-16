@@ -117,7 +117,7 @@ namespace {
         ));
     }
 
-    void log(int i, const EventCameraMovedPosition& e) {
+    void log(int i, [[maybe_unused]] const EventCameraMovedPosition& e) {
         assert_msg(e.type == EventCameraMovedPosition::Type, "Wrong type");
         LINFO(std::format("[{}] EventCameraMovedPosition", i));
     }
@@ -148,7 +148,7 @@ namespace {
         LINFO(std::format("[{}] FocusNodeChanged: {} -> {}", i, e.oldNode, e.newNode));
     }
 
-    void log(int i, const EventGuiTreeUpdated& e) {
+    void log(int i, [[maybe_unused]] const EventGuiTreeUpdated& e) {
         assert_msg(e.type == EventGuiTreeUpdated::Type, "Wrong type");
         LINFO(std::format("[{}] EventGuiTreeUpdated", i));
     }

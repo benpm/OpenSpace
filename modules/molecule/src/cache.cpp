@@ -222,7 +222,8 @@ namespace {
         return traj;
     }
 
-    void memTrajectoryDestroy(md_trajectory_i* traj) {
+    // @TODO: Not called yet: cached trajectories live until the application exits
+    [[maybe_unused]] void memTrajectoryDestroy(md_trajectory_i* traj) {
         assert_msg(traj, "No trajectory");
 
         MemTrajectory* mem = reinterpret_cast<MemTrajectory*>(traj->inst);

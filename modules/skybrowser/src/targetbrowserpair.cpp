@@ -174,7 +174,8 @@ Dictionary TargetBrowserPair::dataAsDictionary() const {
     std::vector<int> selectedImagesIndices;
 
     for (const std::string& imageUrl : selectedImages()) {
-        const bool imageExists = module->wwtDataHandler().image(imageUrl).has_value();
+        [[maybe_unused]] const bool imageExists =
+            module->wwtDataHandler().image(imageUrl).has_value();
         assert_msg(imageExists, "Image doesn't exist in the wwt catalog!");
         try {
             selectedImagesIndices.push_back(

@@ -260,9 +260,9 @@ namespace {
         else if (auto* matrix = qobject_cast<MatrixWidget*>(widget);  matrix) {
             matrix->blockSignals(true);
             if (propertyValue.isList()) {
-                PropertyList list = propertyValue.toList();
+                PropertyList values = propertyValue.toList();
                 std::vector<double> param;
-                for (const PropertyValue& value : list) {
+                for (const PropertyValue& value : values) {
                     param.push_back(value.toDouble());
                 }
                 matrix->setValues(param);

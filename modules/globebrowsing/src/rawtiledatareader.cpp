@@ -426,7 +426,7 @@ void RawTileDataReader::initialize() {
         const int sizeLevel0 = _dataset->GetRasterBand(1)->GetXSize();
         const double diff = std::log2(sizeLevel0) - std::log2(_initData.dimensions.x);
         const double intdiff = diff >= 0 ? ceil(diff) : floor(diff);
-        _maxChunkLevel = intdiff;
+        _maxChunkLevel = static_cast<int>(intdiff);
     }
 }
 

@@ -35,10 +35,6 @@
 #include <iostream>
 #include <string_view>
 
-namespace {
-    constexpr std::string_view _loggerCat = "BrowserClient";
-} // namespace
-
 namespace openspace {
 
 bool BrowserClient::_hasFocus = false;

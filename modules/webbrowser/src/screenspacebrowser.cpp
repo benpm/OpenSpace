@@ -124,8 +124,8 @@ ScreenSpaceBrowser::ScreenSpaceBrowser(const Dictionary& dictionary)
     , _reload(ReloadInfo)
     , _key(::KeyInfo)
     , _triggerKey(TriggerKeyInfo)
-    , _url(UrlInfo)
     , _renderHandler(new ScreenSpaceRenderHandler)
+    , _url(UrlInfo)
     , _keyboardHandler(new WebKeyboardHandler)
 {
     const Parameters p = codegen::bake<Parameters>(dictionary);

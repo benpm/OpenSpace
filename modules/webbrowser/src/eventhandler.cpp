@@ -402,7 +402,7 @@ bool EventHandler::mouseButtonCallback(MouseButton button, MouseAction action,
         state.lastClickPosition = _mousePosition;
     }
 
-    CefBrowserHost::MouseButtonType cefButton = [this, button]() {
+    CefBrowserHost::MouseButtonType cefButton = [button]() {
         switch (button) {
         case MouseButton::Left:
             return MBT_LEFT;

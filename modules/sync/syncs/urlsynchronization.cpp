@@ -468,8 +468,8 @@ bool UrlSynchronization::trySyncUrls() {
                 (originalName.parent_path() / *_unzipFilesDestination) :
                 originalName.parent_path();
 
-            std::error_code ec;
-            std::filesystem::create_directories(dest, ec);
+            std::error_code createError;
+            std::filesystem::create_directories(dest, createError);
 
             struct zip_t* z = zip_open(source.c_str(), 0, 'r');
             const bool is64 = zip_is64(z) == 1;

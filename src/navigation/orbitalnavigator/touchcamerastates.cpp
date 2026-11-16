@@ -31,7 +31,7 @@
 
 namespace {
     using namespace openspace;
-    constexpr std::string_view _loggerCat = "TouchCameraStates";
+    [[maybe_unused]] constexpr std::string_view _loggerCat = "TouchCameraStates";
 
     double validAngleDiff(double lastAngle, double currentAngle) {
         // Ifs used to set angles 359 + 1 = 0 and 0 - 1 = 359

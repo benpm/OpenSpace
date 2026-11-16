@@ -629,8 +629,8 @@ std::vector<std::string> TimeQuantizer::quantized(Time& start, Time& end) {
     const DateTime e = DateTime(end.ISO8601());
     quantize(end, true);
 
-    const double startSeconds = s.J2000();
-    const double endSeconds = e.J2000();
+    [[maybe_unused]] const double startSeconds = s.J2000();
+    [[maybe_unused]] const double endSeconds = e.J2000();
     assert_msg(
         static_cast<int>(endSeconds - startSeconds) % static_cast<int>(_resolution) == 0,
         "Quantization error"
