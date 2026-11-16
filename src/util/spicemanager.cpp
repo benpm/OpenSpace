@@ -258,19 +258,7 @@ SpiceManager::KernelHandle SpiceManager::loadKernel(std::filesystem::path filePa
         throwSpiceError("Kernel loading");
     }
 
-    const std::filesystem::path fileExtension = filePath.extension();
-    if (fileExtension == ".bc" || fileExtension == ".BC" ||
-        fileExtension == ".ck" || fileExtension == ".CK")
-    {
-        // Binary ck kernel
-        findCkCoverage(filePath);
-    }
-    else if (fileExtension == ".bsp" || fileExtension == ".BSP" ||
-            fileExtension == ".spk" || fileExtension == ".SPK")
-    {
-        // Spk kernel
-        findSpkCoverage(filePath);
-    }
+    findCoverage(filePath);
 
     const KernelHandle kernelId = ++_lastAssignedKernel;
     assert_msg(kernelId != 0, "Kernel Handle wrapped around to 0");
@@ -304,8 +292,7 @@ void SpiceManager::unloadKernel(KernelHandle kernelId) {
             _spkIntervals.clear();
 
             for (const KernelInformation& i : _loadedKernels) {
-                findCkCoverage(i.path);
-                findSpkCoverage(i.path);
+                findCoverage(i.path);
             }
         }
         // Otherwise, we hold on to it, but reduce the reference counter by 1
@@ -350,8 +337,7 @@ void SpiceManager::unloadKernel(std::filesystem::path filePath) {
         _spkIntervals.clear();
 
         for (const KernelInformation& i : _loadedKernels) {
-            findCkCoverage(i.path);
-            findSpkCoverage(i.path);
+            findCoverage(i.path);
         }
     }
     else {
@@ -1032,6 +1018,22 @@ SpiceManager::TerminatorEllipseResult SpiceManager::terminatorEllipse(
         ));
     }
     return res;
+}
+
+void SpiceManager::findCoverage(const std::filesystem::path& path) {
+    const std::filesystem::path extension = path.extension();
+    if (extension == ".bc" || extension == ".BC" ||
+        extension == ".ck" || extension == ".CK")
+    {
+        // Binary ck kernel
+        findCkCoverage(path);
+    }
+    else if (extension == ".bsp" || extension == ".BSP" ||
+             extension == ".spk" || extension == ".SPK")
+    {
+        // Spk kernel
+        findSpkCoverage(path);
+    }
 }
 
 void SpiceManager::findCkCoverage(const std::filesystem::path& path) {

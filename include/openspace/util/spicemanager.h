@@ -958,6 +958,15 @@ private:
     void findSpkCoverage(const std::filesystem::path& path);
 
     /**
+     * Calls findCkCoverage for CK kernels (`.bc`, `.ck`) and findSpkCoverage for SPK
+     * kernels (`.bsp`, `.spk`), identified by the file extension. Other kernel types,
+     * such as leap second (`.tls`) or text (`.tpc`, `.ker`) kernels, have no coverage.
+     *
+     * \param path The path to the kernel that should be examined
+     */
+    void findCoverage(const std::filesystem::path& path);
+
+    /**
      * If a position is requested for an uncovered time in the SPK kernels, this function
      * will return an estimated position. If the coverage has not yet started, the first
      * position will be retrieved. If the coverage has ended, the last position will be
