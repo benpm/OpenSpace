@@ -46,6 +46,7 @@
 #include <geos/geom/Point.h>
 #include <geos/util/GEOSException.h>
 #include <algorithm>
+#include <cstddef>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -501,6 +502,7 @@ void GeoJsonComponent::deinitializeGL() {
     for (GlobeGeometryFeature& g : _geometryFeatures) {
         g.deinitializeGL();
     }
+    _pointTextures.clear();
 
     global::renderEngine->removeRenderProgram(_linesAndPolygonsProgram.get());
     _linesAndPolygonsProgram = nullptr;
@@ -597,6 +599,15 @@ void GeoJsonComponent::update() {
         g.update(_dataIsDirty, _preventUpdatesFromHeightMap);
     }
 
+    if (_textureIsDirty) [[unlikely]] {
+        removeUnusedPointTextures();
+    }
+
+    // Reload the textures whose files changed on disk
+    for (const auto& [path, texture] : _pointTextures) {
+        texture->update();
+    }
+
     _textureIsDirty = false;
     _dataIsDirty = false;
 }
@@ -651,6 +662,7 @@ void GeoJsonComponent::readFile() {
     }
 
     computeMainFeatureMetaPropeties();
+    removeUnusedPointTextures();
 }
 
 void GeoJsonComponent::parseSingleFeature(const geos::io::GeoJSONFeature& feature,
@@ -701,7 +713,12 @@ void GeoJsonComponent::parseSingleFeature(const geos::io::GeoJSONFeature& featur
     for (const geos::geom::Geometry* geometry : geomsToAdd) {
         const int index = static_cast<int>(_geometryFeatures.size());
         try {
-            GlobeGeometryFeature g(_globeNode, _defaultProperties, propsFromFile);
+            GlobeGeometryFeature g(
+                _globeNode,
+                _defaultProperties,
+                propsFromFile,
+                _pointTextures
+            );
             g.createFromSingleGeosGeometry(geometry, index, _ignoreHeightsFromFile);
             g.initializeGL(_pointsProgram.get(), _linesAndPolygonsProgram.get());
             _geometryFeatures.push_back(std::move(g));
@@ -864,6 +881,31 @@ void GeoJsonComponent::flyToFeature(std::optional<int> index) const {
         _globeNode.owner()->identifier(), lat, lon, d
     );
     global::scriptEngine->queueScript(script);
+}
+
+void GeoJsonComponent::removeUnusedPointTextures() {
+    std::erase_if(
+        _pointTextures,
+        [this](const GlobeGeometryFeature::PointTextureCache::value_type& entry) {
+            return std::none_of(
+                _geometryFeatures.cbegin(),
+                _geometryFeatures.cend(),
+                [&entry](const GlobeGeometryFeature& g) {
+                    return g.pointTexture() == entry.second.get();
+                }
+            );
+        }
+    );
+
+    const std::ptrdiff_t nTextured = std::count_if(
+        _geometryFeatures.cbegin(),
+        _geometryFeatures.cend(),
+        [](const GlobeGeometryFeature& g) { return g.pointTexture() != nullptr; }
+    );
+    LDEBUG(std::format(
+        "GeoJson layer '{}' uses {} point texture(s) for {} feature(s)",
+        identifier(), _pointTextures.size(), nTextured
+    ));
 }
 
 void GeoJsonComponent::triggerDeletion() const {

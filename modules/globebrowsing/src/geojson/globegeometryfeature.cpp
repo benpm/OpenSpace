@@ -68,13 +68,15 @@ namespace openspace {
 
 GlobeGeometryFeature::GlobeGeometryFeature(const RenderableGlobe& globe,
                                            GeoJsonProperties& defaultProperties,
-                                           GeoJsonOverrideProperties& overrideProperties)
+                                           GeoJsonOverrideProperties& overrideProperties,
+                                           PointTextureCache& pointTextureCache)
     : _globe(globe)
     , _properties({
         .defaultValues = defaultProperties,
         .overrideValues = overrideProperties
     })
     , _lastHeightUpdateTime(std::chrono::system_clock::now())
+    , _pointTextureCache(pointTextureCache)
 {}
 
 std::string GlobeGeometryFeature::key() const {
@@ -143,21 +145,32 @@ void GlobeGeometryFeature::updateTexture(bool isInitializeStep) {
         return;
     }
 
-    if (isInitializeStep || !_pointTexture) {
-        _pointTexture = std::make_unique<TextureComponent>(2);
-        _pointTexture->setFilterMode(opengl::Texture::FilterMode::AnisotropicMipMap);
-        _pointTexture->setWrapping(opengl::Texture::WrappingMode::ClampToEdge);
+    // All features of a layer share one texture per file. Loading it for each feature
+    // instead creates one GL texture per point, which runs out of memory for layers with
+    // tens of thousands of points
+    texture = std::filesystem::absolute(texture);
+    auto it = _pointTextureCache.find(texture);
+    if (it == _pointTextureCache.end()) {
+        if (!std::filesystem::is_regular_file(texture)) {
+            LERROR(std::format(
+                "Trying to use texture file that does not exist: {}", texture
+            ));
+            return;
+        }
+
+        auto t = std::make_unique<TextureComponent>(2);
+        t->setFilterMode(opengl::Texture::FilterMode::AnisotropicMipMap);
+        t->setWrapping(opengl::Texture::WrappingMode::ClampToEdge);
+        t->loadFromFile(texture);
+        it = _pointTextureCache.emplace(texture, std::move(t)).first;
     }
 
-    if (std::filesystem::is_regular_file(texture)) {
-        _hasTexture = true;
-        _pointTexture->loadFromFile(texture);
-    }
-    else {
-        LERROR(std::format(
-            "Trying to use texture file that does not exist: {}", texture
-        ));
-    }
+    _hasTexture = true;
+    _pointTexture = it->second.get();
+}
+
+const TextureComponent* GlobeGeometryFeature::pointTexture() const {
+    return _pointTexture;
 }
 
 void GlobeGeometryFeature::createFromSingleGeosGeometry(const geos::geom::Geometry* geo,
@@ -501,10 +514,6 @@ void GlobeGeometryFeature::update(bool dataIsDirty, bool preventHeightUpdates) {
     }
     else if (dataIsDirty) {
         updateGeometry();
-    }
-
-    if (_pointTexture) {
-        _pointTexture->update();
     }
 }
 

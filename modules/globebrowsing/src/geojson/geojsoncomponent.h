@@ -113,6 +113,14 @@ private:
 
     void triggerDeletion() const;
 
+    /**
+     * Remove the point textures that no feature uses anymore, for example after the
+     * `PointTexture` property was changed.
+     */
+    void removeUnusedPointTextures();
+
+    /// Declared before `_geometryFeatures`, as the features refer to the textures
+    GlobeGeometryFeature::PointTextureCache _pointTextures;
     std::vector<GlobeGeometryFeature> _geometryFeatures;
 
     BoolProperty _enabled;

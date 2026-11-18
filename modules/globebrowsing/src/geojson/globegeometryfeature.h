@@ -31,6 +31,8 @@
 #include <openspace/rendering/helper.h>
 #include <openspace/rendering/texturecomponent.h>
 #include <chrono>
+#include <filesystem>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -58,9 +60,15 @@ class GlobeGeometryFeature {
 public:
     using Vertex = rendering::VertexXYZNormal;
 
+    /// The point textures of one GeoJson layer, keyed by absolute file path, so that
+    /// each texture file is loaded only once no matter how many features use it
+    using PointTextureCache =
+        std::map<std::filesystem::path, std::unique_ptr<TextureComponent>>;
+
     GlobeGeometryFeature(const RenderableGlobe& globe,
         GeoJsonProperties& defaultProperties,
-        GeoJsonOverrideProperties& overrideProperties);
+        GeoJsonOverrideProperties& overrideProperties,
+        PointTextureCache& pointTextureCache);
 
 
     // TODO: Use instead of numbers
@@ -131,6 +139,9 @@ public:
     bool useHeightMap() const;
 
     void updateTexture(bool isInitializeStep = false);
+
+    /// The point texture this feature uses, or `nullptr` if it does not use one
+    const TextureComponent* pointTexture() const;
 
     void createFromSingleGeosGeometry(const geos::geom::Geometry* geo, int index,
         bool ignoreHeights);
@@ -219,7 +230,9 @@ private:
     std::chrono::system_clock::time_point _lastHeightUpdateTime;
 
     bool _hasTexture = false;
-    std::unique_ptr<TextureComponent> _pointTexture;
+    PointTextureCache& _pointTextureCache;
+    /// Non-owning, the texture is owned by `_pointTextureCache`
+    TextureComponent* _pointTexture = nullptr;
 
     opengl::ProgramObject* _linesAndPolygonsProgram = nullptr;
     opengl::ProgramObject* _pointsProgram = nullptr;
