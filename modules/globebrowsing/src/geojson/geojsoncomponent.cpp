@@ -59,6 +59,7 @@
 #include <fstream>
 #include <functional>
 #include <iterator>
+#include <unordered_set>
 #include <utility>
 
 namespace {
@@ -548,7 +549,7 @@ void GeoJsonComponent::initializeGL(rendering::MultiDrawBatch* pointsBatch,
     _polygonsBatch = polygonsBatch;
 
     for (GlobeGeometryFeature& g : _geometryFeatures) {
-        g.initializeGL(_pointsBatch, _linesBatch, _polygonsBatch);
+        g.initializeGL(_pointsBatch, _linesBatch, _polygonsBatch, _pointTextures);
     }
 }
 
@@ -572,6 +573,7 @@ void GeoJsonComponent::deinitializeGL() {
     for (GlobeGeometryFeature& g : _geometryFeatures) {
         g.deinitializeGL();
     }
+    _pointTextures.clear();
 
     _pointsBatch = nullptr;
     _linesBatch = nullptr;
@@ -727,9 +729,19 @@ bool GeoJsonComponent::update() {
         _lastSweepStart = now;
     }
 
+    // Reload point textures whose file changed on disk. A reload creates a new GL
+    // texture, which changes the point draw group keys
+    for (const auto& [path, texture] : _pointTextures) {
+        const opengl::Texture* previous = texture->texture();
+        texture->update();
+        if (texture->texture() != previous) {
+            _styleIsDirty = true;
+        }
+    }
+
     // Skip all per-feature work on idle frames
     const bool featureLoopNeeded = _dataIsDirty || _heightOffsetIsDirty ||
-        _textureIsDirty || _nPointTextureFeatures > 0;
+        _textureIsDirty;
     if (!featureLoopNeeded && !(heightsEnabled && _heightSweepActive)) {
         return false;
     }
@@ -751,7 +763,7 @@ bool GeoJsonComponent::update() {
             }
 
             if (_textureIsDirty) [[unlikely]] {
-                g.updateTexture();
+                g.updateTexture(_pointTextures);
                 // A changed texture changes the point draw group keys
                 _styleIsDirty = true;
             }
@@ -760,12 +772,7 @@ bool GeoJsonComponent::update() {
         }
 
         if (textureWasDirty) {
-            _nPointTextureFeatures = 0;
-            for (const GlobeGeometryFeature& g : _geometryFeatures) {
-                if (g.hasPointTexture()) {
-                    _nPointTextureFeatures++;
-                }
-            }
+            removeUnusedPointTextures();
         }
 
         _textureIsDirty = false;
@@ -865,7 +872,6 @@ void GeoJsonComponent::readFile() {
     _nExtrudableNoOverride = 0;
     _nRelativeToGroundOverride = 0;
     _nAltitudeModeNoOverride = 0;
-    _nPointTextureFeatures = 0;
 
     using Clock = std::chrono::steady_clock;
     const auto secs = [](Clock::duration d) {
@@ -931,7 +937,7 @@ void GeoJsonComponent::readFile() {
 
                 loadFromCache(*cached);
                 computeMainFeatureMetaPropeties();
-                countPointTextureFeatures();
+                removeUnusedPointTextures();
                 _loadedHeightsCache.reset();
                 LINFO(std::format(
                     "Loaded '{}' from cache: {} features in {:.2f} s",
@@ -1002,7 +1008,7 @@ void GeoJsonComponent::readFile() {
     }
 
     computeMainFeatureMetaPropeties();
-    countPointTextureFeatures();
+    removeUnusedPointTextures();
     _loadedHeightsCache.reset();
 
     Clock::duration cacheWrite{};
@@ -1035,13 +1041,19 @@ void GeoJsonComponent::decidePerFeatureProps(size_t nFeatures) {
     }
 }
 
-void GeoJsonComponent::countPointTextureFeatures() {
-    _nPointTextureFeatures = 0;
+void GeoJsonComponent::removeUnusedPointTextures() {
+    std::unordered_set<const TextureComponent*> used;
     for (const GlobeGeometryFeature& g : _geometryFeatures) {
-        if (g.hasPointTexture()) {
-            _nPointTextureFeatures++;
-        }
+        used.insert(g.pointTexture());
     }
+    std::erase_if(
+        _pointTextures,
+        [&used](const auto& entry) { return !used.contains(entry.second.get()); }
+    );
+    LDEBUG(std::format(
+        "GeoJson layer '{}' uses {} point texture(s) for {} feature(s)",
+        identifier(), _pointTextures.size(), _geometryFeatures.size()
+    ));
 }
 
 void GeoJsonComponent::installCachedHeights(int index) {
@@ -1126,7 +1138,7 @@ void GeoJsonComponent::parseSingleFeature(const geojson::ParsedFeature& feature,
             const Clock::time_point deriveStart = Clock::now();
             GlobeGeometryFeature g(_globeNode, _defaultProperties, propsFromFile);
             g.createFromSingleGeosGeometry(geometry, index, _ignoreHeightsFromFile);
-            g.initializeGL(_pointsBatch, _linesBatch, _polygonsBatch);
+            g.initializeGL(_pointsBatch, _linesBatch, _polygonsBatch, _pointTextures);
             _geometryFeatures.push_back(std::move(g));
             installCachedHeights(index);
             stats.derive += Clock::now() - deriveStart;
@@ -1238,7 +1250,7 @@ void GeoJsonComponent::loadFromCache(const geojson::GeoJsonCacheFile& cache) {
                 geojson::fromCached(r.heightUpdateReferencePoints),
                 r.key
             );
-            g.initializeGL(_pointsBatch, _linesBatch, _polygonsBatch);
+            g.initializeGL(_pointsBatch, _linesBatch, _polygonsBatch, _pointTextures);
             _geometryFeatures.push_back(std::move(g));
             installCachedHeights(index);
 

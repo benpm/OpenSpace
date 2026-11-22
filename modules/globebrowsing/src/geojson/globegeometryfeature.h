@@ -32,6 +32,7 @@
 #include <openspace/rendering/multidrawbatch.h>
 #include <openspace/rendering/texturecomponent.h>
 #include <cstdint>
+#include <filesystem>
 #include <limits>
 #include <map>
 #include <memory>
@@ -103,6 +104,11 @@ class GlobeGeometryFeature {
 public:
     using Vertex = rendering::VertexXYZNormal;
 
+    /// Point textures keyed by file path. Owned by the GeoJson component and shared by
+    /// all of its features, so that each texture file is loaded only once
+    using PointTextureCache =
+        std::map<std::filesystem::path, std::unique_ptr<TextureComponent>>;
+
     GlobeGeometryFeature(const RenderableGlobe& globe,
         GeoJsonProperties& defaultProperties,
         GeoJsonOverrideProperties& overrideProperties);
@@ -171,14 +177,15 @@ public:
     void setOffsets(glm::vec3 offsets);
 
     void initializeGL(rendering::MultiDrawBatch* pointsBatch,
-        rendering::MultiDrawBatch* linesBatch, rendering::MultiDrawBatch* polygonsBatch);
+        rendering::MultiDrawBatch* linesBatch, rendering::MultiDrawBatch* polygonsBatch,
+        PointTextureCache& pointTextures);
     void deinitializeGL();
     bool isReady() const;
     bool isPoints() const;
     bool useHeightMap() const;
-    bool hasPointTexture() const;
+    const TextureComponent* pointTexture() const;
 
-    void updateTexture(bool isInitializeStep = false);
+    void updateTexture(PointTextureCache& pointTextures, bool isInitializeStep = false);
 
     void createFromSingleGeosGeometry(const geos::geom::Geometry* geo, int index,
         bool ignoreHeights);
@@ -380,7 +387,8 @@ private:
     bool _pendingHeightsValid = false;
 
     bool _hasTexture = false;
-    std::unique_ptr<TextureComponent> _pointTexture;
+    /// Non-owning; points into the component's PointTextureCache
+    TextureComponent* _pointTexture = nullptr;
 
     rendering::MultiDrawBatch* _pointsBatch = nullptr;
     rendering::MultiDrawBatch* _linesBatch = nullptr;
