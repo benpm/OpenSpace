@@ -58,20 +58,21 @@
 
 #include <modules/atmosphere/rendering/renderableatmosphere.h>
 #include <openspace/engine/globals.h>
+#include <openspace/filesystem/filesystem.h>
+#include <openspace/format.h>
+#include <openspace/logging/logmanager.h>
+#include <openspace/misc/assert.h>
+#include <openspace/misc/profiling.h>
 #include <openspace/query/query.h>
+#include <openspace/opengl/gl.h>
+#include <openspace/opengl/openglstatecache.h>
+#include <openspace/opengl/programobject.h>
 #include <openspace/rendering/renderengine.h>
 #include <openspace/scene/scene.h>
 #include <openspace/scene/scenegraphnode.h>
+#include <openspace/util/distanceconstants.h>
 #include <openspace/util/spicemanager.h>
 #include <openspace/util/updatestructures.h>
-#include <ghoul/filesystem/filesystem.h>
-#include <ghoul/format.h>
-#include <ghoul/logging/logmanager.h>
-#include <ghoul/misc/assert.h>
-#include <ghoul/misc/profiling.h>
-#include <ghoul/opengl/ghoul_gl.h>
-#include <ghoul/opengl/openglstatecache.h>
-#include <ghoul/opengl/programobject.h>
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -187,7 +188,7 @@ namespace {
     }
 
     GLuint createTexture(const glm::ivec3& size, std::string_view name, int components) {
-        ghoul_assert(components == 3 || components == 4, "Only 3-4 components supported");
+        assert_msg(components == 3 || components == 4, "Only 3-4 components supported");
 
         GLuint t = 0;
         glCreateTextures(GL_TEXTURE_3D, 1, &t);
@@ -288,7 +289,7 @@ float AtmosphereDeferredcaster::eclipseShadow(const glm::dvec3& position) {
 }
 
 void AtmosphereDeferredcaster::preRaycast(const RenderData& data, const DeferredcastData&,
-                                          ghoul::opengl::ProgramObject& program)
+                                          opengl::ProgramObject& program)
 {
     ZoneScoped;
     TracyGpuZone("Atmosphere preRaycast");
@@ -386,16 +387,34 @@ void AtmosphereDeferredcaster::preRaycast(const RenderData& data, const Deferred
 
     // Shadow calculations
     _shadowDataArrayCache.clear();
+    const double time = data.time.j2000Seconds();
     for (ShadowConfiguration& shadowConf : _shadowConfArray) {
         // All distances and lengths in world coordinates are in meters. We need to move
         // this to view space
+        // The shadow that reaches the planet now was cast by the caster one light time
+        // earlier. Ignoring the light time would place the shadow behind its actual
+        // position. The light time between the source and the caster only has a
+        // negligible effect and is ignored
+        
         double lt = 0.0;
+        const glm::dvec3 currentCasterPos = SpiceManager::ref().targetPosition(
+            shadowConf.caster.first,
+            "SSB",
+            "GALACTIC",
+            {},
+            time,
+            lt
+        ) * KilometerToMeter;
+        const double lightTime =
+            glm::length(currentCasterPos - data.modelTransform.translation) /
+            distanceconstants::LightSecond;
+
         const glm::dvec3 sourcePos = SpiceManager::ref().targetPosition(
             shadowConf.source.first,
             "SSB",
             "GALACTIC",
             {},
-            data.time.j2000Seconds(),
+            time - lightTime,
             lt
         ) * KilometerToMeter;
         const glm::dvec3 casterPos = SpiceManager::ref().targetPosition(
@@ -403,9 +422,9 @@ void AtmosphereDeferredcaster::preRaycast(const RenderData& data, const Deferred
             "SSB",
             "GALACTIC",
             {},
-            data.time.j2000Seconds(),
+            time - lightTime,
             lt
-        )* KilometerToMeter;
+        ) * KilometerToMeter;
 
         SceneGraphNode* sourceNode = sceneGraphNode(shadowConf.source.first);
         if (!sourceNode) {
@@ -456,8 +475,8 @@ void AtmosphereDeferredcaster::preRaycast(const RenderData& data, const Deferred
         {
             // The current caster is shadowing the current planet
             shadow = {
-                .umbra = shadow.radiusCaster * scLength /
-                         (shadow.radiusSource - shadow.radiusCaster),
+                .umbra = actualCasterRadius * scLength /
+                         (actualSourceRadius - actualCasterRadius),
                 .penumbra = xpTest,
                 .radiusSource = actualSourceRadius,
                 .radiusCaster = actualCasterRadius,
@@ -496,7 +515,7 @@ void AtmosphereDeferredcaster::preRaycast(const RenderData& data, const Deferred
 }
 
 void AtmosphereDeferredcaster::postRaycast(const RenderData&, const DeferredcastData&,
-                                           ghoul::opengl::ProgramObject&)
+                                           opengl::ProgramObject&)
 {
     ZoneScoped;
     TracyGpuZone("Atmosphere postRaycast");
@@ -519,10 +538,8 @@ std::filesystem::path AtmosphereDeferredcaster::helperPath() const {
     return "";
 }
 
-void AtmosphereDeferredcaster::initializeCachedVariables(
-                                                    ghoul::opengl::ProgramObject& program)
-{
-    ghoul::opengl::updateUniformLocations(program, _uniformCache);
+void AtmosphereDeferredcaster::initializeCachedVariables(opengl::ProgramObject& program) {
+    opengl::updateUniformLocations(program, _uniformCache);
 }
 
 void AtmosphereDeferredcaster::setModelTransform(glm::dmat4 transform) {
@@ -580,8 +597,7 @@ void AtmosphereDeferredcaster::calculateTransmittance() {
 
     glNamedFramebufferTexture(fbo, GL_COLOR_ATTACHMENT0, _transmittanceTableTexture, 0);
     glViewport(0, 0, _transmittanceTableSize.x, _transmittanceTableSize.y);
-    using ProgramObject = ghoul::opengl::ProgramObject;
-    std::unique_ptr<ProgramObject> program = ProgramObject::Build(
+    std::unique_ptr<opengl::ProgramObject> program = opengl::ProgramObject::Build(
         "Transmittance Program",
         absPath("${MODULE_ATMOSPHERE}/shaders/calculation_vs.glsl"),
         absPath("${MODULE_ATMOSPHERE}/shaders/transmittance_calc_fs.glsl")
@@ -622,14 +638,13 @@ GLuint AtmosphereDeferredcaster::calculateDeltaE() {
     const GLuint deltaE = createTexture(_deltaETableSize, "DeltaE");
     glNamedFramebufferTexture(fbo, GL_COLOR_ATTACHMENT0, deltaE, 0);
     glViewport(0, 0, _deltaETableSize.x, _deltaETableSize.y);
-    using ProgramObject = ghoul::opengl::ProgramObject;
-    std::unique_ptr<ProgramObject> program = ProgramObject::Build(
+    std::unique_ptr<opengl::ProgramObject> program = opengl::ProgramObject::Build(
         "Irradiance Program",
         absPath("${MODULE_ATMOSPHERE}/shaders/calculation_vs.glsl"),
         absPath("${MODULE_ATMOSPHERE}/shaders/irradiance_calc_fs.glsl")
     );
     program->activate();
-    ghoul::opengl::TextureUnit unit;
+    opengl::TextureUnit unit;
     unit.bind(_transmittanceTableTexture);
     program->setUniform("transmittanceTexture", unit);
     program->setUniform("rPlanet", _atmospherePlanetRadius);
@@ -663,15 +678,14 @@ std::pair<GLuint, GLuint> AtmosphereDeferredcaster::calculateDeltaS() {
     glNamedFramebufferDrawBuffers(fbo, 2, colorBuffers.data());
 
     glViewport(0, 0, _textureSize.x, _textureSize.y);
-    using ProgramObject = ghoul::opengl::ProgramObject;
-    std::unique_ptr<ProgramObject> program = ProgramObject::Build(
+    std::unique_ptr<opengl::ProgramObject> program = opengl::ProgramObject::Build(
         "InScattering Program",
         absPath("${MODULE_ATMOSPHERE}/shaders/calculation_vs.glsl"),
         absPath("${MODULE_ATMOSPHERE}/shaders/inscattering_calc_fs.glsl"),
         absPath("${MODULE_ATMOSPHERE}/shaders/calculation_gs.glsl")
     );
     program->activate();
-    ghoul::opengl::TextureUnit unit;
+    opengl::TextureUnit unit;
     unit.bind(_transmittanceTableTexture);
     program->setUniform("transmittanceTexture", unit);
     program->setUniform("rPlanet", _atmospherePlanetRadius);
@@ -719,8 +733,7 @@ void AtmosphereDeferredcaster::calculateIrradiance() {
     glNamedFramebufferDrawBuffer(fbo, GL_COLOR_ATTACHMENT0);
 
     glViewport(0, 0, _deltaETableSize.x, _deltaETableSize.y);
-    using ProgramObject = ghoul::opengl::ProgramObject;
-    std::unique_ptr<ProgramObject> program = ProgramObject::Build(
+    std::unique_ptr<opengl::ProgramObject> program = opengl::ProgramObject::Build(
         "DeltaE Program",
         absPath("${MODULE_ATMOSPHERE}/shaders/calculation_vs.glsl"),
         absPath("${MODULE_ATMOSPHERE}/shaders/delta_e_calc_fs.glsl")
@@ -749,8 +762,7 @@ void AtmosphereDeferredcaster::calculateInscattering(GLuint deltaSRayleigh,
     glNamedFramebufferTexture(fbo, GL_COLOR_ATTACHMENT0, _inScatteringTableTexture, 0);
 
     glViewport(0, 0, _textureSize.x, _textureSize.y);
-    using ProgramObject = ghoul::opengl::ProgramObject;
-    std::unique_ptr<ProgramObject> program = ProgramObject::Build(
+    std::unique_ptr<opengl::ProgramObject> program = opengl::ProgramObject::Build(
         "deltaSCalcProgram",
         absPath("${MODULE_ATMOSPHERE}/shaders/calculation_vs.glsl"),
         absPath("${MODULE_ATMOSPHERE}/shaders/delta_s_calc_fs.glsl"),
@@ -758,11 +770,11 @@ void AtmosphereDeferredcaster::calculateInscattering(GLuint deltaSRayleigh,
     );
     program->activate();
 
-    ghoul::opengl::TextureUnit deltaSRayleighUnit;
+    opengl::TextureUnit deltaSRayleighUnit;
     deltaSRayleighUnit.bind(deltaSRayleigh);
     program->setUniform("deltaSRTexture", deltaSRayleighUnit);
 
-    ghoul::opengl::TextureUnit deltaSMieUnit;
+    opengl::TextureUnit deltaSMieUnit;
     deltaSMieUnit.bind(deltaSMie);
     program->setUniform("deltaSMTexture", deltaSMieUnit);
 
@@ -786,7 +798,7 @@ void AtmosphereDeferredcaster::calculateInscattering(GLuint deltaSRayleigh,
 }
 
 void AtmosphereDeferredcaster::calculateDeltaJ(int scatteringOrder,
-                                               ghoul::opengl::ProgramObject& program,
+                                               opengl::ProgramObject& program,
                                                GLuint deltaJ, GLuint deltaE,
                                                GLuint deltaSRayleigh, GLuint deltaSMie)
 {
@@ -801,19 +813,19 @@ void AtmosphereDeferredcaster::calculateDeltaJ(int scatteringOrder,
     glViewport(0, 0, _textureSize.x, _textureSize.y);
     program.activate();
 
-    ghoul::opengl::TextureUnit transmittanceUnit;
+    opengl::TextureUnit transmittanceUnit;
     transmittanceUnit.bind(_transmittanceTableTexture);
     program.setUniform("transmittanceTexture", transmittanceUnit);
 
-    ghoul::opengl::TextureUnit deltaEUnit;
+    opengl::TextureUnit deltaEUnit;
     deltaEUnit.bind(deltaE);
     program.setUniform("deltaETexture", deltaEUnit);
 
-    ghoul::opengl::TextureUnit deltaSRayleighUnit;
+    opengl::TextureUnit deltaSRayleighUnit;
     deltaSRayleighUnit.bind(deltaSRayleigh);
     program.setUniform("deltaSRTexture", deltaSRayleighUnit);
 
-    ghoul::opengl::TextureUnit deltaSMieUnit;
+    opengl::TextureUnit deltaSMieUnit;
     deltaSMieUnit.bind(deltaSMie);
     program.setUniform("deltaSMTexture", deltaSMieUnit);
 
@@ -848,7 +860,7 @@ void AtmosphereDeferredcaster::calculateDeltaJ(int scatteringOrder,
 }
 
 void AtmosphereDeferredcaster::calculateDeltaE(int scatteringOrder,
-                                               ghoul::opengl::ProgramObject& program,
+                                               opengl::ProgramObject& program,
                                                GLuint deltaE, GLuint deltaSRayleigh,
                                                GLuint deltaSMie)
 {
@@ -863,11 +875,11 @@ void AtmosphereDeferredcaster::calculateDeltaE(int scatteringOrder,
     glViewport(0, 0, _deltaETableSize.x, _deltaETableSize.y);
     program.activate();
 
-    ghoul::opengl::TextureUnit deltaSRayleighUnit;
+    opengl::TextureUnit deltaSRayleighUnit;
     deltaSRayleighUnit.bind(deltaSRayleigh);
     program.setUniform("deltaSRTexture", deltaSRayleighUnit);
 
-    ghoul::opengl::TextureUnit deltaSMieUnit;
+    opengl::TextureUnit deltaSMieUnit;
     deltaSMieUnit.bind(deltaSMie);
     program.setUniform("deltaSMTexture", deltaSMieUnit);
 
@@ -894,7 +906,7 @@ void AtmosphereDeferredcaster::calculateDeltaE(int scatteringOrder,
 }
 
 void AtmosphereDeferredcaster::calculateDeltaS(int scatteringOrder,
-                                               ghoul::opengl::ProgramObject& program,
+                                               opengl::ProgramObject& program,
                                                GLuint deltaSRayleigh, GLuint deltaJ)
 {
     ZoneScoped;
@@ -908,11 +920,11 @@ void AtmosphereDeferredcaster::calculateDeltaS(int scatteringOrder,
     glViewport(0, 0, _textureSize.x, _textureSize.y);
     program.activate();
 
-    ghoul::opengl::TextureUnit transmittanceUnit;
+    opengl::TextureUnit transmittanceUnit;
     transmittanceUnit.bind(_transmittanceTableTexture);
     program.setUniform("transmittanceTexture", transmittanceUnit);
 
-    ghoul::opengl::TextureUnit deltaJUnit;
+    opengl::TextureUnit deltaJUnit;
     deltaJUnit.bind(deltaJ);
     program.setUniform("deltaJTexture", deltaJUnit);
 
@@ -940,7 +952,7 @@ void AtmosphereDeferredcaster::calculateDeltaS(int scatteringOrder,
 }
 
 void AtmosphereDeferredcaster::calculateIrradiance(int scatteringOrder,
-                                                   ghoul::opengl::ProgramObject& program,
+                                                   opengl::ProgramObject& program,
                                                    GLuint deltaE)
 {
     ZoneScoped;
@@ -954,7 +966,7 @@ void AtmosphereDeferredcaster::calculateIrradiance(int scatteringOrder,
     glViewport(0, 0, _deltaETableSize.x, _deltaETableSize.y);
     program.activate();
 
-    ghoul::opengl::TextureUnit unit;
+    opengl::TextureUnit unit;
     unit.bind(deltaE);
     program.setUniform("deltaETexture", unit);
     program.setUniform("deltaESize", _deltaETableSize);
@@ -972,8 +984,8 @@ void AtmosphereDeferredcaster::calculateIrradiance(int scatteringOrder,
 }
 
 void AtmosphereDeferredcaster::calculateInscattering(int scatteringOrder,
-                                                    ghoul::opengl::ProgramObject& program,
-                                                              GLuint deltaSRayleigh) const
+                                                     opengl::ProgramObject& program,
+                                                     GLuint deltaSRayleigh) const
 
 {
     ZoneScoped;
@@ -987,7 +999,7 @@ void AtmosphereDeferredcaster::calculateInscattering(int scatteringOrder,
     glViewport(0, 0, _textureSize.x, _textureSize.y);
     program.activate();
 
-    ghoul::opengl::TextureUnit unit;
+    opengl::TextureUnit unit;
     unit.bind(deltaSRayleigh);
     program.setUniform("deltaSTexture", unit);
     program.setUniform("muSSamples", _muSSamples);
@@ -1013,7 +1025,7 @@ void AtmosphereDeferredcaster::calculateInscattering(int scatteringOrder,
 void AtmosphereDeferredcaster::calculateAtmosphereParameters() {
     ZoneScoped;
 
-    using ProgramObject = ghoul::opengl::ProgramObject;
+    using ProgramObject = opengl::ProgramObject;
     std::unique_ptr<ProgramObject> deltaJProgram = ProgramObject::Build(
         "DeltaJ Program",
         absPath("${MODULE_ATMOSPHERE}/shaders/calculation_vs.glsl"),
@@ -1164,8 +1176,7 @@ void AtmosphereDeferredcaster::calculateAtmosphereParameters() {
     LDEBUG("Ended precalculations for Atmosphere effects");
 }
 
-void AtmosphereDeferredcaster::step3DTexture(ghoul::opengl::ProgramObject& prg,
-                                             int layer) const
+void AtmosphereDeferredcaster::step3DTexture(opengl::ProgramObject& prg, int layer) const
 {
     // See OpenGL redbook 8th Edition page 556 for Layered Rendering
     const float planet2 = _atmospherePlanetRadius * _atmospherePlanetRadius;

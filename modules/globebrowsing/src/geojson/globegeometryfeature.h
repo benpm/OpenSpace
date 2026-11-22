@@ -26,11 +26,11 @@
 #define __OPENSPACE_MODULE_GLOBEBROWSING___GLOBEGEOMETRYFEATURE___H__
 
 #include <modules/globebrowsing/src/geojson/geojsonproperties.h>
+#include <openspace/glm.h>
+#include <openspace/opengl/gl.h>
 #include <openspace/rendering/helper.h>
 #include <openspace/rendering/multidrawbatch.h>
 #include <openspace/rendering/texturecomponent.h>
-#include <ghoul/glm.h>
-#include <ghoul/opengl/ghoul_gl.h>
 #include <cstdint>
 #include <limits>
 #include <map>
@@ -40,13 +40,13 @@
 #include <vector>
 
 namespace geos::geom { class Geometry; }
-namespace ghoul::opengl {
-    class ProgramObject;
-    class Texture;
-} // namespace ghoul::opengl
 
 namespace openspace {
 
+namespace opengl {
+    class ProgramObject;
+    class Texture;
+} // namespace opengl
 namespace rendering {
     struct LightSourceRenderData;
     struct VertexXYZNormal;
@@ -96,7 +96,7 @@ struct GeoJsonDrawRecord {
 static_assert(sizeof(GeoJsonDrawRecord) == 32);
 
 /**
- * This class is responsible for rendering the geomoetry features of globes, created e.g.
+ * This class is responsible for rendering the geometry features of globes, created e.g.
  * from GeoJson files.
  */
 class GlobeGeometryFeature {
@@ -207,7 +207,7 @@ public:
      * texture per group.
      */
     void emitBatchedDraws(float mainOpacity, const ExtraRenderData& extraRenderData,
-        bool wireframe, std::map<int64_t, ghoul::opengl::Texture*>& pointTextures);
+        bool wireframe, std::map<int64_t, opengl::Texture*>& pointTextures);
 
     /**
      * Install per-render-feature heights loaded from the heights cache, along with

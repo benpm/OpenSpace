@@ -24,24 +24,24 @@
 
 #include <openspace/rendering/multidrawbatch.h>
 
-#include <ghoul/misc/assert.h>
-#include <ghoul/misc/profiling.h>
+#include <openspace/misc/assert.h>
+#include <openspace/misc/profiling.h>
 #include <algorithm>
 #include <cstring>
 
 namespace openspace::rendering {
 
 MultiDrawBatch::~MultiDrawBatch() {
-    ghoul_assert(_vao == 0, "deinitialize() must be called before destruction");
+    assert_msg(_vao == 0, "deinitialize() must be called before destruction");
 }
 
 void MultiDrawBatch::initialize(std::vector<StreamSpec> streams,
                                 std::vector<AttributeSpec> attributes,
                                 size_t drawRecordSize)
 {
-    ghoul_assert(_vao == 0, "MultiDrawBatch is already initialized");
-    ghoul_assert(!streams.empty(), "At least one vertex stream is required");
-    ghoul_assert(drawRecordSize > 0, "Draw record size must be non-zero");
+    assert_msg(_vao == 0, "MultiDrawBatch is already initialized");
+    assert_msg(!streams.empty(), "At least one vertex stream is required");
+    assert_msg(drawRecordSize > 0, "Draw record size must be non-zero");
 
     _streams = std::move(streams);
     _drawRecordSize = drawRecordSize;
@@ -61,7 +61,7 @@ void MultiDrawBatch::initialize(std::vector<StreamSpec> streams,
         );
     }
     for (const AttributeSpec& a : attributes) {
-        ghoul_assert(a.streamIndex < _streams.size(), "Invalid stream index");
+        assert_msg(a.streamIndex < _streams.size(), "Invalid stream index");
         glEnableVertexArrayAttrib(_vao, a.location);
         glVertexArrayAttribFormat(
             _vao,
@@ -108,15 +108,15 @@ bool MultiDrawBatch::isInitialized() const {
 MultiDrawBatch::DrawHandle MultiDrawBatch::addDraw(GLsizei nVertices,
                                   std::span<const std::span<const std::byte>> streamData)
 {
-    ghoul_assert(isInitialized(), "MultiDrawBatch must be initialized");
-    ghoul_assert(streamData.size() == _streams.size(), "One data span per stream");
+    assert_msg(isInitialized(), "MultiDrawBatch must be initialized");
+    assert_msg(streamData.size() == _streams.size(), "One data span per stream");
 
     DrawEntry entry;
     entry.isActive = true;
     entry.nVertices = nVertices;
     entry.streamData.reserve(streamData.size());
     for (size_t i = 0; i < streamData.size(); i++) {
-        ghoul_assert(
+        assert_msg(
             streamData[i].size() ==
                 static_cast<size_t>(nVertices) * _streams[i].stride,
             "Stream data size must match vertex count and stride"
@@ -138,7 +138,7 @@ MultiDrawBatch::DrawHandle MultiDrawBatch::addDraw(GLsizei nVertices,
 }
 
 void MultiDrawBatch::removeDraw(DrawHandle handle) {
-    ghoul_assert(
+    assert_msg(
         handle < _draws.size() && _draws[handle].isActive,
         "Invalid draw handle"
     );
@@ -150,7 +150,7 @@ void MultiDrawBatch::removeDraw(DrawHandle handle) {
 void MultiDrawBatch::commit() {
     ZoneScoped;
 
-    ghoul_assert(isInitialized(), "MultiDrawBatch must be initialized");
+    assert_msg(isInitialized(), "MultiDrawBatch must be initialized");
 
     GLint first = 0;
     for (DrawEntry& d : _draws) {
@@ -187,14 +187,14 @@ void MultiDrawBatch::commit() {
 void MultiDrawBatch::updateStreamRange(DrawHandle handle, GLuint streamIndex,
                                        std::span<const std::byte> data)
 {
-    ghoul_assert(
+    assert_msg(
         handle < _draws.size() && _draws[handle].isActive,
         "Invalid draw handle"
     );
-    ghoul_assert(streamIndex < _streams.size(), "Invalid stream index");
+    assert_msg(streamIndex < _streams.size(), "Invalid stream index");
 
     DrawEntry& d = _draws[handle];
-    ghoul_assert(
+    assert_msg(
         data.size() == d.streamData[streamIndex].size(),
         "Updated data must have the same size as the original data"
     );
@@ -223,11 +223,11 @@ void MultiDrawBatch::beginFrame() {
 }
 
 void MultiDrawBatch::emitDraw(DrawHandle handle, const void* record, int64_t groupKey) {
-    ghoul_assert(
+    assert_msg(
         handle < _draws.size() && _draws[handle].isActive,
         "Invalid draw handle"
     );
-    ghoul_assert(_isCommitted, "commit() must be called before emitting draws");
+    assert_msg(_isCommitted, "commit() must be called before emitting draws");
 
     const size_t offset = _recordStaging.size();
     _recordStaging.resize(offset + _drawRecordSize);
@@ -339,7 +339,7 @@ void MultiDrawBatch::bindVertexArray() const {
 }
 
 void MultiDrawBatch::renderGroup(GLenum mode, const Group& group) const {
-    ghoul_assert(
+    assert_msg(
         &group >= _groups.data() && &group < _groups.data() + _groups.size(),
         "Group must be an element of groups()"
     );

@@ -39,18 +39,18 @@ namespace {
 }
 
 /**
- * Removes the asset with the specfied name from the scene. The parameter to this function
- * is the same that was originally used to load this asset, i.e. the path to the asset
- * file.
+ * Removes the asset with the specified name from the scene. The parameter to this
+ * function is the same that was originally used to load this asset, i.e. the path to the
+ * asset file.
  */
 [[codegen::luawrap]] void remove(std::string assetName) {
     global::openSpaceEngine->assetManager().remove(assetName);
 }
 
 /**
- * Reloads the asset with the specified name. If the asset was previously loaded explicity
- * it will be removed and then re-added. If the asset was not previously loaded, it will
- * only be loaded instead.
+ * Reloads the asset with the specified name. If the asset was previously loaded
+ * explicitly it will be removed and then re-added. If the asset was not previously
+ * loaded, it will only be loaded instead.
  */
 [[codegen::luawrap]] void reload(std::string assetName) {
     global::openSpaceEngine->assetManager().reload(assetName);
@@ -101,13 +101,7 @@ namespace {
  * either through a profile or by calling the `openspace.asset.add` method.
  */
 [[codegen::luawrap]] std::vector<std::filesystem::path> rootAssets() {
-    std::vector<const Asset*> as = global::openSpaceEngine->assetManager().rootAssets();
-    std::vector<std::filesystem::path> res;
-    res.reserve(as.size());
-    for (const Asset* a : as) {
-        res.push_back(a->path());
-    }
-    return res;
+    return global::openSpaceEngine->assetManager().rootAssetPaths();
 }
 
 /**

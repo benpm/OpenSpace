@@ -26,10 +26,9 @@
 
 #include <sgctedit/displaywindowunion.h>
 #include <sgctedit/monitorbox.h>
-#include <sgct/math.h>
-#include <ghoul/filesystem/filesystem.h>
-#include <ghoul/format.h>
-#include <ghoul/misc/assert.h>
+#include <openspace/filesystem/filesystem.h>
+#include <openspace/format.h>
+#include <openspace/misc/assert.h>
 #include <QApplication>
 #include <QCheckBox>
 #include <QFileDialog>
@@ -55,7 +54,7 @@ namespace {
     // https://github.com/OpenSpace/OpenSpace/issues/507
     // is fixed
     bool hasWindowIssues(const sgct::config::Cluster& cluster) {
-        sgct::ivec2 size = sgct::ivec2(
+        glm::ivec2 size = glm::ivec2(
             std::numeric_limits<int>::max(),
             std::numeric_limits<int>::max()
         );
@@ -176,11 +175,10 @@ SgctEdit::SgctEdit(sgct::config::Cluster cluster, std::string configName,
     settingsLayout->addWidget(orientationContainer);
     QGridLayout* layoutWindow = new QGridLayout(orientationContainer);
 
-    sgct::quat orientation = sgct::quat(0.f, 0.f, 0.f, 0.f);
+    glm::quat q = glm::quat(1.f, 0.f, 0.f, 0.f);
     if (_cluster.scene.has_value() && _cluster.scene->orientation.has_value()) {
-        orientation = *_cluster.scene->orientation;
+        q = *_cluster.scene->orientation;
     }
-    glm::quat q = glm::quat(orientation.w, orientation.x, orientation.y, orientation.z);
 
     {
         const QString pitchTip = "Pitch or elevation: negative numbers tilt the camera "
@@ -287,13 +285,12 @@ void SgctEdit::saveCluster() {
     const float yaw = glm::radians(_lineYaw->text().toFloat());
     const float roll = glm::radians(_lineRoll->text().toFloat());
     if (pitch != 0.f && yaw != 0.f && roll != 0.f) {
-        glm::quat q = glm::quat(glm::vec3(pitch, yaw, roll));
         _cluster.scene = {
-            .orientation = sgct::quat(q.x, q.y, q.z, q.w)
+            .orientation = glm::quat(glm::vec3(pitch, yaw, roll))
         };
     }
 
-    ghoul_assert(!_cluster.nodes.empty(), "There must be at least one node");
+    assert_msg(!_cluster.nodes.empty(), "There must be at least one node");
     sgct::config::Node& node = _cluster.nodes.back();
 
     //
@@ -362,7 +359,7 @@ void SgctEdit::saveCluster() {
             "Window Configuration (*.json)",
             nullptr
 #ifdef __linux__
-            // Linux in Qt5 and Qt6 crashes when trying to access the native dialog here
+            // Linux in Qt6 crashes when trying to access the native dialog here
             , QFileDialog::DontUseNativeDialog
 #endif // __linux__
         );
@@ -376,7 +373,7 @@ void SgctEdit::saveCluster() {
 
     //
     // Save the cluster configuration
-    ghoul_assert(!_configurationFilename.empty(), "Filename must not be empty");
+    assert_msg(!_configurationFilename.empty(), "Filename must not be empty");
     std::ofstream outFile;
     outFile.open(_configurationFilename, std::ofstream::out);
     if (outFile.good()) {

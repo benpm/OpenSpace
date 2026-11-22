@@ -24,7 +24,7 @@
 
 #include <modules/globebrowsing/src/geojson/geojsonparser.h>
 
-#include <ghoul/misc/exception.h>
+#include <openspace/misc/exception.h>
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateSequence.h>
 #include <geos/geom/GeometryFactory.h>
@@ -83,7 +83,7 @@ namespace {
         T value{};
         const glz::error_ctx ec = glz::read<ReadOpts>(value, buffer);
         if (ec) {
-            throw ghoul::RuntimeError(
+            throw RuntimeError(
                 std::format("Error parsing {}: {}", what, glz::format_error(ec, buffer)),
                 "GeoJsonParser"
             );
@@ -119,7 +119,7 @@ namespace {
 
     geojson::Position toPosition(const std::vector<double>& coords) {
         if (coords.size() < 2 || coords.size() > 3) {
-            throw ghoul::RuntimeError(
+            throw RuntimeError(
                 std::format("Expected two or three coordinates, found {}", coords.size()),
                 "GeoJsonParser"
             );
@@ -202,7 +202,7 @@ namespace {
                 break;
             }
             case geojson::GeometryKind::None:
-                throw ghoul::RuntimeError(
+                throw RuntimeError(
                     std::format("Unknown geometry type '{}'", raw.type),
                     "GeoJsonParser"
                 );
@@ -306,7 +306,7 @@ ParsedGeoJson parseGeoJson(const std::string& content) {
     TypeProbe probe;
     const glz::error_ctx ec = glz::read<ReadOpts>(probe, content);
     if (ec) {
-        throw ghoul::RuntimeError(
+        throw RuntimeError(
             std::format("Error parsing GeoJSON: {}", glz::format_error(ec, content)),
             "GeoJsonParser"
         );
@@ -334,7 +334,7 @@ ParsedGeoJson parseGeoJson(const std::string& content) {
         res.features.push_back(std::move(f));
     }
     else {
-        throw ghoul::RuntimeError(
+        throw RuntimeError(
             std::format("Unknown GeoJSON type '{}'", probe.type),
             "GeoJsonParser"
         );

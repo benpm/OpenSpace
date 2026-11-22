@@ -29,21 +29,20 @@
 
 #include <modules/globebrowsing/src/geojson/geojsoncomponent.h>
 #include <modules/globebrowsing/src/geojson/geojsonculling.h>
+#include <openspace/opengl/bufferbinding.h>
 #include <openspace/properties/scalar/boolproperty.h>
 #include <openspace/rendering/multidrawbatch.h>
-#include <ghoul/opengl/bufferbinding.h>
 #include <chrono>
 #include <map>
 #include <memory>
 
-namespace ghoul { class Dictionary; }
-namespace ghoul::opengl {
-    class ProgramObject;
-    class Texture;
-} // namespace ghoul::opengl
-
 namespace openspace {
 
+namespace opengl {
+    class ProgramObject;
+    class Texture;
+} // namespace opengl
+class Dictionary;
 struct Documentation;
 struct RenderData;
 class RenderableGlobe;
@@ -60,15 +59,15 @@ public:
 
     bool isReady() const;
 
-    void addGeoJsonLayer(const ghoul::Dictionary& layerDict);
+    void addGeoJsonLayer(const Dictionary& layerDict);
     void deleteLayer(const std::string& layerIdentifier);
 
     void update();
     void render(const RenderData& data);
 
 private:
-    using SsboBinding = ghoul::opengl::BufferBinding<
-        ghoul::opengl::bufferbinding::Buffer::ShaderStorage
+    using SsboBinding = opengl::BufferBinding<
+        opengl::bufferbinding::Buffer::ShaderStorage
     >;
 
     /**
@@ -93,12 +92,12 @@ private:
     std::unique_ptr<SsboBinding> _linesSsboBinding;
     std::unique_ptr<SsboBinding> _polygonsSsboBinding;
 
-    std::unique_ptr<ghoul::opengl::ProgramObject> _polygonsProgram;
-    std::unique_ptr<ghoul::opengl::ProgramObject> _linesProgram;
-    std::unique_ptr<ghoul::opengl::ProgramObject> _pointsProgram;
+    std::unique_ptr<opengl::ProgramObject> _polygonsProgram;
+    std::unique_ptr<opengl::ProgramObject> _linesProgram;
+    std::unique_ptr<opengl::ProgramObject> _pointsProgram;
 
     /// Textures used by this frame's point draws, keyed by draw group key
-    std::map<int64_t, ghoul::opengl::Texture*> _pointTextures;
+    std::map<int64_t, opengl::Texture*> _pointTextures;
 
     /// Forces a rebuild of the emitted draw lists (set when batch geometry changes)
     bool _emitIsDirty = true;

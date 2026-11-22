@@ -24,8 +24,8 @@
 
 #include <modules/globebrowsing/src/geojson/geojsoncache.h>
 
+#include <openspace/logging/logmanager.h>
 #include <openspace/util/geodetic.h>
-#include <ghoul/logging/logmanager.h>
 #include <glaze/glaze.hpp>
 #include <fstream>
 #include <iterator>

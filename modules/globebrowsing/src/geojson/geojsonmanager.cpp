@@ -28,19 +28,19 @@
 #include <modules/globebrowsing/src/renderableglobe.h>
 #include <openspace/documentation/documentation.h>
 #include <openspace/engine/globals.h>
+#include <openspace/filesystem/filesystem.h>
+#include <openspace/logging/logmanager.h>
+#include <openspace/misc/assert.h>
+#include <openspace/misc/dictionary.h>
+#include <openspace/misc/exception.h>
+#include <openspace/misc/profiling.h>
+#include <openspace/opengl/openglstatecache.h>
+#include <openspace/opengl/programobject.h>
+#include <openspace/opengl/texture.h>
+#include <openspace/opengl/textureunit.h>
 #include <openspace/rendering/helper.h>
 #include <openspace/rendering/renderengine.h>
 #include <openspace/util/updatestructures.h>
-#include <ghoul/filesystem/filesystem.h>
-#include <ghoul/logging/logmanager.h>
-#include <ghoul/misc/assert.h>
-#include <ghoul/misc/dictionary.h>
-#include <ghoul/misc/exception.h>
-#include <ghoul/misc/profiling.h>
-#include <ghoul/opengl/openglstatecache.h>
-#include <ghoul/opengl/programobject.h>
-#include <ghoul/opengl/texture.h>
-#include <ghoul/opengl/textureunit.h>
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -48,27 +48,36 @@
 #include <utility>
 
 namespace {
+    using namespace openspace;
+
     constexpr std::string_view _loggerCat = "GeoJsonManager";
 
     // How often the rolling performance counters are logged at debug level
     constexpr std::chrono::seconds PerfLogInterval(10);
 
-    constexpr openspace::Property::PropertyInfo FrustumCullingInfo = {
-        "PerformFrustumCulling",
-        "Perform Frustum Culling",
-        "If enabled, GeoJson features whose bounds are outside the view frustum are "
-        "skipped when the draw lists are built. The culling is conservative: a guard "
-        "band around the frustum prevents visible features from ever being skipped.",
-        openspace::Property::Visibility::AdvancedUser
+    constexpr BoolPropertyInfo FrustumCullingInfo = {
+        .identifier = "PerformFrustumCulling",
+        .name = "Perform Frustum Culling",
+        .description = "If enabled, GeoJson features whose bounds are outside the view "
+            "frustum are skipped when the draw lists are built. The culling is "
+            "conservative: a guard band around the frustum prevents visible features "
+            "from ever being skipped.",
+        .visibility = Visibility::AdvancedUser,
+        .defaults = {
+            .value = true
+        }
     };
 
-    constexpr openspace::Property::PropertyInfo HorizonCullingInfo = {
-        "PerformHorizonCulling",
-        "Perform Horizon Culling",
-        "If enabled, GeoJson features that are entirely occluded by the globe are "
-        "skipped when the draw lists are built. The culling is conservative: features "
-        "near the horizon are always kept.",
-        openspace::Property::Visibility::AdvancedUser
+    constexpr BoolPropertyInfo HorizonCullingInfo = {
+        .identifier = "PerformHorizonCulling",
+        .name = "Perform Horizon Culling",
+        .description = "If enabled, GeoJson features that are entirely occluded by the "
+            "globe are skipped when the draw lists are built. The culling is "
+            "conservative: features near the horizon are always kept.",
+        .visibility = Visibility::AdvancedUser,
+        .defaults = {
+            .value = true
+        }
     };
 } // namespace
 
@@ -76,8 +85,8 @@ namespace openspace {
 
 GeoJsonManager::GeoJsonManager()
     : PropertyOwner({ "GeographicOverlays", "Geographic Overlays" })
-    , _performFrustumCulling(FrustumCullingInfo, true)
-    , _performHorizonCulling(HorizonCullingInfo, true)
+    , _performFrustumCulling(FrustumCullingInfo)
+    , _performHorizonCulling(HorizonCullingInfo)
 {
     const auto invalidateCulling = [this]() {
         _emitIsDirty = true;
@@ -90,7 +99,7 @@ GeoJsonManager::GeoJsonManager()
 }
 
 void GeoJsonManager::initialize(RenderableGlobe* globe) {
-    ghoul_assert(globe, "No globe provided");
+    assert_msg(globe, "No globe provided");
     _parentGlobe = globe;
 }
 
@@ -128,7 +137,7 @@ bool GeoJsonManager::isReady() const {
     );
 }
 
-void GeoJsonManager::addGeoJsonLayer(const ghoul::Dictionary& layerDict) {
+void GeoJsonManager::addGeoJsonLayer(const Dictionary& layerDict) {
     ZoneScoped;
 
     try {
@@ -155,7 +164,7 @@ void GeoJsonManager::addGeoJsonLayer(const ghoul::Dictionary& layerDict) {
     catch (const SpecificationError& e) {
         logError(e);
     }
-    catch (const ghoul::RuntimeError& e) {
+    catch (const RuntimeError& e) {
         LERRORC(e.component, e.message);
     }
 }
@@ -563,8 +572,8 @@ void GeoJsonManager::renderBatchedPoints(const RenderData& data) {
         const bool wireframe = (g.groupKey & GeoJsonDrawRecord::WireframeGroupBit) != 0;
         glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
 
-        ghoul::opengl::TextureUnit unit;
-        ghoul::opengl::Texture* texture = _pointTextures[g.groupKey];
+        opengl::TextureUnit unit;
+        opengl::Texture* texture = _pointTextures[g.groupKey];
         if (texture) {
             unit.bind(*texture);
             _pointsProgram->setUniform("pointTexture", unit);

@@ -50,16 +50,13 @@
 
 namespace geos::geom { class Geometry; }
 
-namespace ghoul {
-    namespace opengl {
-        class ProgramObject;
-        class Texture;
-    } // namespace opengl
-    class Dictionary;
-} // namespace ghoul
-
 namespace openspace {
 
+namespace opengl {
+    class ProgramObject;
+    class Texture;
+} // namespace opengl
+class Dictionary;
 struct Documentation;
 class LightSource;
 struct RenderData;
@@ -71,7 +68,7 @@ class RenderableGlobe;
  */
 class GeoJsonComponent : public PropertyOwner, public Fadeable {
 public:
-    GeoJsonComponent(const ghoul::Dictionary& dictionary, RenderableGlobe& globe);
+    GeoJsonComponent(const Dictionary& dictionary, RenderableGlobe& globe);
     ~GeoJsonComponent() override;
 
     void initialize();
@@ -111,7 +108,7 @@ public:
      * When \p cullContext is set, features whose bounding spheres are outside the
      * frustum or beyond the horizon are skipped.
      */
-    void emitBatchedDraws(std::map<int64_t, ghoul::opengl::Texture*>& pointTextures,
+    void emitBatchedDraws(std::map<int64_t, opengl::Texture*>& pointTextures,
         int componentIndex, const geojson::GeoJsonCullContext* cullContext);
 
     /**
@@ -125,7 +122,7 @@ public:
 private:
     /**
      * Small helper class whose purpose is to encapsulate properties related to a specific
-     * geomoetry feature, and allow things like flying to or fadin out individual
+     * geometry feature, and allow things like flying to or fadin out individual
      * subfeatures.
      */
     class SubFeatureProps : public PropertyOwner, public Fadeable {

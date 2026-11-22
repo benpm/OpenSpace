@@ -27,6 +27,7 @@
 
 #include <openspace/properties/propertyowner.h>
 
+#include <openspace/glm.h>
 #include <openspace/navigation/keyframenavigator.h>
 #include <openspace/navigation/navigationstate.h>
 #include <openspace/navigation/orbitalnavigator/orbitalnavigator.h>
@@ -35,7 +36,6 @@
 #include <openspace/properties/scalar/floatproperty.h>
 #include <openspace/util/keys.h>
 #include <openspace/util/mouse.h>
-#include <ghoul/glm.h>
 #include <filesystem>
 #include <functional>
 #include <optional>
@@ -94,7 +94,7 @@ public:
      * Set camera state from a provided navigation state next frame. The actual position
      * will computed from the scene in the same frame as it is set.
      *
-     * \param state The navigation state to compute a camera positon from
+     * \param state The navigation state to compute a camera position from
      * \param useTimeStamp If `true`, also set the time based on the time stamp in the
      *        navigation state, if it is provided. If `false`, do not change time
      */

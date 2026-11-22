@@ -27,11 +27,11 @@
 
 #include <openspace/properties/propertyowner.h>
 
+#include <openspace/misc/boolean.h>
+#include <openspace/misc/easing.h>
+#include <openspace/misc/managedmemoryuniqueptr.h>
+#include <openspace/misc/map.h>
 #include <openspace/scene/scenegraphnode.h>
-#include <ghoul/misc/boolean.h>
-#include <ghoul/misc/easing.h>
-#include <ghoul/misc/managedmemoryuniqueptr.h>
-#include <ghoul/misc/map.h>
 #include <chrono>
 #include <functional>
 #include <memory>
@@ -43,15 +43,12 @@
 #include <unordered_map>
 #include <vector>
 
-namespace ghoul {
-    namespace lua { class LuaState; }
-    namespace opengl { class ProgramObject; }
-    class Dictionary;
-} // namespace ghoul
-
 namespace openspace {
 
+namespace lua { class LuaState; }
+namespace opengl { class ProgramObject; }
 class Camera;
+class Dictionary;
 struct Documentation;
 struct LuaLibrary;
 class Profile;
@@ -90,12 +87,12 @@ public:
     /**
      * Attach node to the root.
      */
-    void attachNode(ghoul::mm_unique_ptr<SceneGraphNode> node);
+    void attachNode(mm_unique_ptr<SceneGraphNode> node);
 
     /**
      * Detach node from the root.
      */
-    ghoul::mm_unique_ptr<SceneGraphNode> detachNode(SceneGraphNode& node);
+    mm_unique_ptr<SceneGraphNode> detachNode(SceneGraphNode& node);
 
     /**
      * Return the camera.
@@ -151,7 +148,7 @@ public:
     /**
      * Load a scene graph node from a dictionary and return it.
      */
-    SceneGraphNode* loadNode(const ghoul::Dictionary& nodeDictionary);
+    SceneGraphNode* loadNode(const Dictionary& nodeDictionary);
 
     /**
      * Initialize a scene graph node.
@@ -187,7 +184,7 @@ public:
      */
     void addPropertyInterpolation(Property* prop, float durationSeconds,
         std::string postScript = "",
-        ghoul::EasingFunction easingFunction = ghoul::EasingFunction::Linear,
+        EasingFunction easingFunction = EasingFunction::Linear,
         bool shouldBounce = false);
 
     /**
@@ -289,7 +286,7 @@ public:
      * \return A dictionary containing key value pairs with custom item orderings for
      *         specific paths in the Scene GUI tree
      */
-    ghoul::Dictionary guiTreeOrder() const;
+    Dictionary guiTreeOrder() const;
 
 private:
     /**
@@ -299,7 +296,7 @@ private:
      * \param L The Lua state to push value to
      * \param value String representation of the value with which to set property
      */
-    void propertyPushProfileValueToLua(ghoul::lua::LuaState& L, const std::string& value);
+    void propertyPushProfileValueToLua(lua::LuaState& L, const std::string& value);
 
     /**
      * Update dependencies.
@@ -322,8 +319,8 @@ private:
     bool _valueIsTable = false;
 
     std::mutex _programUpdateLock;
-    std::set<ghoul::opengl::ProgramObject*> _programsToUpdate;
-    std::vector<std::unique_ptr<ghoul::opengl::ProgramObject>> _programs;
+    std::set<opengl::ProgramObject*> _programsToUpdate;
+    std::vector<std::unique_ptr<opengl::ProgramObject>> _programs;
 
     struct PropertyInterpolationInfo {
         Property* prop;
@@ -331,7 +328,7 @@ private:
         float durationSeconds;
         std::string postScript;
 
-        ghoul::EasingFunc<float> easingFunction;
+        EasingFunc<float> easingFunction;
         bool isExpired = false;
 
         bool isBouncing = false;

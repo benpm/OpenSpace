@@ -25,7 +25,7 @@
 #ifndef __OPENSPACE_CORE___MULTIDRAWBATCH___H__
 #define __OPENSPACE_CORE___MULTIDRAWBATCH___H__
 
-#include <ghoul/opengl/ghoul_gl.h>
+#include <openspace/opengl/gl.h>
 #include <cstddef>
 #include <cstdint>
 #include <span>

@@ -102,7 +102,7 @@ struct ParsedGeoJson {
  * \param content The GeoJSON text to parse
  * \return The parsed features
  *
- * \throw ghoul::RuntimeError If the input is malformed; the message includes a
+ * \throw RuntimeError If the input is malformed; the message includes a
  *        formatted parse error with location context
  */
 ParsedGeoJson parseGeoJson(const std::string& content);

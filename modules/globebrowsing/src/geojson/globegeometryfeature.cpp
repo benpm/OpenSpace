@@ -29,16 +29,17 @@
 #include <modules/globebrowsing/src/renderableglobe.h>
 #include <openspace/engine/globals.h>
 #include <openspace/engine/moduleengine.h>
+#include <openspace/format.h>
+#include <openspace/logging/logmanager.h>
+#include <openspace/misc/assert.h>
+#include <openspace/misc/exception.h>
+#include <openspace/opengl/openglstatecache.h>
+#include <openspace/opengl/programobject.h>
+#include <openspace/opengl/texture.h>
+#include <openspace/opengl/textureunit.h>
 #include <openspace/rendering/renderengine.h>
 #include <openspace/util/geodetic.h>
 #include <openspace/util/updatestructures.h>
-#include <ghoul/format.h>
-#include <ghoul/logging/logmanager.h>
-#include <ghoul/misc/assert.h>
-#include <ghoul/misc/exception.h>
-#include <ghoul/opengl/openglstatecache.h>
-#include <ghoul/opengl/programobject.h>
-#include <ghoul/opengl/texture.h>
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/Geometry.h>
 #include <geos/geom/LinearRing.h>
@@ -144,10 +145,8 @@ void GlobeGeometryFeature::updateTexture(bool isInitializeStep) {
 
     if (isInitializeStep || !_pointTexture) {
         _pointTexture = std::make_unique<TextureComponent>(2);
-        _pointTexture->setFilterMode(
-            ghoul::opengl::Texture::FilterMode::AnisotropicMipMap
-        );
-        _pointTexture->setWrapping(ghoul::opengl::Texture::WrappingMode::ClampToEdge);
+        _pointTexture->setFilterMode(opengl::Texture::FilterMode::AnisotropicMipMap);
+        _pointTexture->setWrapping(opengl::Texture::WrappingMode::ClampToEdge);
     }
 
     if (std::filesystem::is_regular_file(texture)) {
@@ -167,7 +166,7 @@ void GlobeGeometryFeature::createFromSingleGeosGeometry(const geos::geom::Geomet
     if (!geo) {
         throw std::logic_error("No geometry provided");
     }
-    ghoul_assert(
+    assert_msg(
         (geo && geo->isPuntal()) || (geo && !geo->isCollection()),
         "Non-point geometry can not be a collection"
     );
@@ -240,19 +239,15 @@ void GlobeGeometryFeature::createFromSingleGeosGeometry(const geos::geom::Geomet
                 _type = GeometryType::Polygon;
             }
             catch (geos::util::IllegalStateException& e) {
-                throw ghoul::RuntimeError(std::format(
-                    "GEOS illegal state error: {}", e.what()
-                ));
+                throw RuntimeError(std::format("GEOS illegal state error: {}", e.what()));
             }
             catch (geos::util::GEOSException& e) {
-                throw ghoul::RuntimeError(std::format(
-                    "Unknown geos error: {}", e.what()
-                ));
+                throw RuntimeError(std::format("Unknown geos error: {}", e.what()));
             }
             break;
         }
         default:
-            throw ghoul::MissingCaseException();
+            throw MissingCaseException();
     }
 
     // Reset height values if we don't care about them
@@ -319,7 +314,7 @@ void GlobeGeometryFeature::setFromCachedData(GeometryType type,
 void GlobeGeometryFeature::emitBatchedDraws(float mainOpacity,
                                             const ExtraRenderData& extraRenderData,
                                             bool wireframe,
-                              std::map<int64_t, ghoul::opengl::Texture*>& pointTextures)
+                              std::map<int64_t, opengl::Texture*>& pointTextures)
 {
     const float opacity = mainOpacity * _properties.opacity();
     const float fillOpacity = mainOpacity * _properties.fillOpacity();
@@ -355,7 +350,7 @@ void GlobeGeometryFeature::emitBatchedDraws(float mainOpacity,
             record.sizeOrWidth =
                 0.001f * extraRenderData.pointSizeScale * _properties.pointSize() * bs;
 
-            ghoul::opengl::Texture* texture =
+            opengl::Texture* texture =
                 _pointTexture ? _pointTexture->texture() : nullptr;
             record.textureWidthFactor = texture ?
                 static_cast<float>(texture->dimensions().x) /
@@ -769,7 +764,7 @@ void GlobeGeometryFeature::createPolygonGeometry() {
 
             if (_properties.tessellationEnabled()) {
                 // First determine the step size for the tessellation (larger features
-                // will not be tesselated)
+                // will not be tessellated)
                 const float stepSize = tessellationStepSize();
 
                 std::vector<Vertex> verts = subdivideTriangle(
@@ -841,7 +836,7 @@ void GlobeGeometryFeature::initializeRenderFeature(RenderFeature& feature,
     if (feature.type == RenderType::Polygon) {
         // Polygons are flat shaded with normals derived in the fragment shader, so
         // their batch's vertex stream holds positions only
-        ghoul_assert(_polygonsBatch, "Batch must be initialized");
+        assert_msg(_polygonsBatch, "Batch must be initialized");
         std::vector<glm::vec3> positions;
         positions.reserve(vertices.size());
         for (const Vertex& v : vertices) {
@@ -861,7 +856,7 @@ void GlobeGeometryFeature::initializeRenderFeature(RenderFeature& feature,
 
     rendering::MultiDrawBatch* batch =
         (feature.type == RenderType::Points) ? _pointsBatch : _linesBatch;
-    ghoul_assert(batch, "Batch must be initialized");
+    assert_msg(batch, "Batch must be initialized");
 
     const std::array<std::span<const std::byte>, 2> streamData = {
         std::as_bytes(std::span(vertices)),
@@ -884,7 +879,7 @@ rendering::MultiDrawBatch* GlobeGeometryFeature::batchForRenderType(
         case RenderType::Polygon:
             return _polygonsBatch;
         default:
-            throw ghoul::MissingCaseException();
+            throw MissingCaseException();
     }
 }
 
