@@ -2450,7 +2450,6 @@ void RenderableGlobe::calculateEclipseShadows(opengl::ProgramObject& programObje
         shadowDataArray.push_back(shadowData);
     }
 
-    const std::string uniformVarName("shadowDataArray[");
     unsigned int counter = 0;
     for (const ShadowRenderingStruct& sd : shadowDataArray) {
         constexpr std::string_view NameIsShadowing = "shadowDataArray[{}].isShadowing";

@@ -32,6 +32,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iterator>
+#include <random>
 #include <sstream>
 #include <string_view>
 #include <utility>
@@ -256,6 +257,9 @@ std::vector<float> FitsFileReader::readFitsFile(std::filesystem::path filePath,
     int nStars = table->readRows - firstRow + 1;
 
     int nNullArr = 0;
+    // A fixed seed is used so that reading the same file always produces the same data
+    std::mt19937 randomEngine;
+    std::uniform_real_distribution<float> randomFactor(0.f, 1.f);
     const int nColumnsRead = static_cast<int>(allColumnNames.size());
     const int defaultCols = 17; // Number of columns that are copied by predefined code
     if (nColumnsRead != defaultCols) {
@@ -344,8 +348,8 @@ std::vector<float> FitsFileReader::readFitsFile(std::filesystem::path filePath,
 
         // Read extra columns, if any. This will slow down the sorting tremendously
         for (int col = defaultCols; col < nColumnsRead; col++) {
-            std::vector<float> vecData = std::move(tableContent[allColumnNames[col]]);
-            values[idx++] = vecData[i];
+            const std::vector<float>& vecData = tableContent[allColumnNames[col]];
+            values[idx++] = vecData[i % nStars];
         }
 
         for (int j = 0; j < nValuesPerStar; j++) {
@@ -354,7 +358,7 @@ std::vector<float> FitsFileReader::readFitsFile(std::filesystem::path filePath,
                 values[j] = 0.f;
             }
             else if (multiplier > 1) {
-                values[j] *= static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+                values[j] *= randomFactor(randomEngine);
             }
         }
 

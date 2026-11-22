@@ -189,7 +189,7 @@ void ScriptEngine::deinitialize() {
 
     _registeredLibraries.clear();
     for (const RepeatedScriptInfo& info : _repeatedScripts) {
-        if (info.postScript.empty()) {
+        if (!info.postScript.empty()) {
             queueScript(info.postScript, info.shouldBeLogged);
         }
     }
@@ -580,13 +580,17 @@ void ScriptEngine::writeLog(const std::string& script) {
 
             LDEBUG(std::format("Using script log file '{}'", _logFilename));
 
-            // Test file and clear previous input
-            std::ofstream file(_logFilename, std::ofstream::out | std::ofstream::trunc);
+            // Clear previous input and keep the file open for all subsequent scripts
+            _logFile = std::ofstream(
+                _logFilename,
+                std::ofstream::out | std::ofstream::trunc
+            );
 
-            if (!file.good()) {
+            if (!_logFile.good()) {
                 LERROR(std::format(
                     "Could not open file '{}' for logging scripts", _logFilename
                 ));
+                _logScripts = false;
                 return;
             }
         }
@@ -596,14 +600,9 @@ void ScriptEngine::writeLog(const std::string& script) {
         }
     }
 
-    // Simple text output to logfile
-    std::ofstream file(_logFilename, std::ofstream::app);
-    if (!file.good()) {
-        LERROR(std::format("Could not open file '{}' for logging scripts", _logFilename));
-        return;
-    }
-
-    file << script << '\n';
+    // Flush after every script so that the log is complete even if the application
+    // crashes
+    _logFile << script << std::endl;
 }
 
 void ScriptEngine::preSync(bool isMaster) {
@@ -687,9 +686,12 @@ void ScriptEngine::postSync(bool isMaster) {
     else {
         const std::unique_lock lock(_clientScriptsMutex);
         while (!_clientScriptQueue.empty()) {
+            // Remove the script before running it so that a throwing script can not
+            // cause this loop to run forever
+            Script script = std::move(_clientScriptQueue.front());
+            _clientScriptQueue.pop();
             try {
-                runScript(_clientScriptQueue.front());
-                _clientScriptQueue.pop();
+                runScript(script);
             }
             catch (const RuntimeError& e) {
                 LERRORC(e.component, e.message);
@@ -701,13 +703,17 @@ void ScriptEngine::postSync(bool isMaster) {
         global::sessionRecordingHandler->isSavingFramesDuringPlayback() ?
         global::sessionRecordingHandler->currentApplicationInterpolationTime() :
         global::windowDelegate->applicationTime();
-    for (RepeatedScriptInfo& info : _repeatedScripts) {
+    // Running a script can register or remove repeated scripts, which invalidates
+    // references into `_repeatedScripts`. So we iterate by index and do not access the
+    // entry after the script was run
+    for (size_t i = 0; i < _repeatedScripts.size(); i++) {
+        RepeatedScriptInfo& info = _repeatedScripts[i];
         if (now - info.lastRun >= info.timeout) {
+            info.lastRun = now;
             runScript({
                 .code = info.script,
                 .addToLog = info.shouldBeLogged
             });
-            info.lastRun = now;
         }
     }
 

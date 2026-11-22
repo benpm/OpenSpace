@@ -1,0 +1,23 @@
+Subject: [PATCH] Send Spout and NDI output from hidden windows that render while hidden
+---
+TEMPORARY: remove this patch, and its entry in portfile.cmake, once this change is in
+SGCT upstream and the REF in portfile.cmake points at a commit that contains it.
+
+`Window::draw` already renders a hidden window whose configuration sets `alwaysrender`,
+but `Window::renderFBOTexture` returned early for every hidden window. That function is
+where SGCT sends the window's Spout (and NDI) output, so a hidden window with a `spout`
+entry never sent anything. Proposed by Marco Silva (Elumenati) as the "windowless Spout
+rendering fix", 2026-09-18.
+diff --git a/src/window.cpp b/src/window.cpp
+index 8a78aae..2432f16 100644
+--- a/src/window.cpp
++++ b/src/window.cpp
+@@ -1083,7 +1083,7 @@ void Window::draw() {
+ void Window::renderFBOTexture() {
+     ZoneScoped;
+ 
+-    if (!isVisible()) [[unlikely]] {
++    if (!(isVisible() || isRenderingWhileHidden())) [[unlikely]] {
+         return;
+     }
+ 

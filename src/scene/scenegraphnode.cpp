@@ -495,6 +495,7 @@ mm_unique_ptr<SceneGraphNode> SceneGraphNode::createFromDictionary(
             result->_transform.translation = Translation::createFromDictionary(
                 *p.transform->translation
             );
+            result->_transform.translation->setOwnerNode(result.get());
 
             LDEBUG(std::format(
                 "Successfully created ephemeris for '{}'", result->identifier()
@@ -505,6 +506,7 @@ mm_unique_ptr<SceneGraphNode> SceneGraphNode::createFromDictionary(
             result->_transform.rotation = Rotation::createFromDictionary(
                 *p.transform->rotation
             );
+            result->_transform.rotation->setOwnerNode(result.get());
 
             LDEBUG(std::format(
                 "Successfully created rotation for '{}'", result->identifier()
@@ -1047,9 +1049,10 @@ mm_unique_ptr<SceneGraphNode> SceneGraphNode::detachChild(SceneGraphNode& child)
 
     if (iter == _children.end()) {
         LERROR("Trying to detach a non-existing child");
+        return nullptr;
     }
 
-    traversePreOrder([](SceneGraphNode* node) {
+    child.traversePreOrder([](SceneGraphNode* node) {
         node->clearDependencies();
     });
 
@@ -1148,7 +1151,7 @@ void SceneGraphNode::computeScreenSpaceData(const RenderData& newData) {
     const Camera& cam = newData.camera;
     const glm::dvec3& worldPos = _worldPositionCached;
     const glm::dvec4 clipSpace = glm::dmat4(cam.projectionMatrix()) *
-                                 cam.combinedViewMatrix() * glm::vec4(worldPos, 1.0);
+                                 cam.combinedViewMatrix() * glm::dvec4(worldPos, 1.0);
     const glm::dvec2 worldPosNDC = glm::dvec2(clipSpace / clipSpace.w);
 
     const bool visible = worldPosNDC.x >= -1.0 && worldPosNDC.x <= 1.0 &&
@@ -1180,7 +1183,7 @@ void SceneGraphNode::computeScreenSpaceData(const RenderData& newData) {
     const glm::dvec3 lookUp = glm::normalize(cam.lookUpVectorWorldSpace());
     const glm::dvec3 radiusPos = worldPos + (nodeRadius * lookUp);
     const glm::dvec4 clipSpaceRadius = glm::dmat4(cam.projectionMatrix()) *
-                                    cam.combinedViewMatrix() * glm::vec4(radiusPos, 1.0);
+                                    cam.combinedViewMatrix() * glm::dvec4(radiusPos, 1.0);
     const glm::dvec3 radiusNDC = clipSpaceRadius / clipSpaceRadius.w;
 
     const glm::ivec2 centerScreenSpace = glm::ivec2(

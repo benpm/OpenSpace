@@ -44,7 +44,7 @@ namespace {
     using namespace openspace;
 
     constexpr std::string_view _loggerCat = "ModelGeometry";
-    constexpr int8_t CurrentCacheVersion = 12;
+    constexpr int8_t CurrentCacheVersion = 13;
     constexpr int FormatStringSize = 4;
     constexpr int8_t ShouldSkipMarker = -1;
     constexpr int8_t NoSkipMarker = 1;
@@ -295,8 +295,9 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
                 "No texture size was found while loading cache"
             );
         }
-        std::byte* data = new std::byte[textureSize];
-        fileStream.read(reinterpret_cast<char*>(data), textureSize);
+        std::vector<std::byte> data =
+            std::vector<std::byte>(static_cast<size_t>(textureSize));
+        fileStream.read(reinterpret_cast<char*>(data.data()), textureSize);
 
         textureEntry.texture = std::make_unique<opengl::Texture>(
             opengl::Texture::FormatInit {
@@ -309,7 +310,7 @@ std::unique_ptr<modelgeometry::ModelGeometry> ModelGeometry::loadCacheFile(
             opengl::Texture::SamplerInit {
                 .filter = opengl::Texture::FilterMode::AnisotropicMipMap
             },
-            data
+            data.data()
         );
 
         textureStorageArray.push_back(std::move(textureEntry));
@@ -1126,6 +1127,14 @@ bool ModelGeometry::isTransparent() const {
         );
     }
     return _isTransparent;
+}
+
+void ModelGeometry::setHasTextureLoadErrors(bool hasTextureLoadErrors) {
+    _hasTextureLoadErrors = hasTextureLoadErrors;
+}
+
+bool ModelGeometry::hasTextureLoadErrors() const {
+    return _hasTextureLoadErrors;
 }
 
 std::vector<io::ModelNode>& ModelGeometry::nodes() {

@@ -140,9 +140,8 @@ Documentation ServerInterface::Documentation() {
 std::unique_ptr<ServerInterface> ServerInterface::createFromDictionary(
                                                              const Dictionary& dictionary)
 {
-    // TODO: Use documentation to verify dictionary
-    auto si = std::make_unique<ServerInterface>(dictionary);
-    return si;
+    // The dictionary is verified against the documentation in the constructor
+    return std::make_unique<ServerInterface>(dictionary);
 }
 
 ServerInterface::ServerInterface(const Dictionary& dictionary)
@@ -243,11 +242,12 @@ void ServerInterface::initialize() {
 }
 
 void ServerInterface::deinitialize() {
-    if (!_enabled) {
+    if (!_socketServer) {
         return;
     }
 
     _socketServer->close();
+    _socketServer = nullptr;
 }
 
 bool ServerInterface::isEnabled() const {
@@ -255,7 +255,7 @@ bool ServerInterface::isEnabled() const {
 }
 
 bool ServerInterface::isActive() const {
-    return _socketServer->isListening();
+    return _socketServer && _socketServer->isListening();
 }
 
 int ServerInterface::port() const {
@@ -277,6 +277,13 @@ bool ServerInterface::clientHasAccessWithoutPassword(
     const Access access = static_cast<Access>(_defaultAccess.value());
     if (access == Access::Allow) {
         for (const std::string& address : _denyAddresses.value()) {
+            if (clientAddress == address) {
+                return false;
+            }
+        }
+        // Addresses that are explicitly listed as requiring a password have to provide
+        // it even if all other addresses are allowed by default
+        for (const std::string& address : _requirePasswordAddresses.value()) {
             if (clientAddress == address) {
                 return false;
             }

@@ -121,9 +121,12 @@ void RenderableSphereImageOnline::update(const UpdateData& data) {
     }
 
     if (_imageFuture.valid() && DownloadManager::futureReady(_imageFuture)) {
-        const DownloadManager::MemoryFile imageFile = _imageFuture.get();
+        DownloadManager::MemoryFile imageFile = _imageFuture.get();
 
         if (imageFile.corrupted) {
+            // The download is not attempted again until the URL changes, as it would
+            // otherwise be restarted in every frame
+            _textureIsDirty = false;
             LERRORC(
                 "RenderableSphereImageOnline",
                 std::format("Error loading image from URL '{}'", _textureUrl.value())
@@ -133,8 +136,8 @@ void RenderableSphereImageOnline::update(const UpdateData& data) {
 
         try {
             _texture = io::texture::loadTexture(
-                reinterpret_cast<void*>(imageFile.buffer),
-                imageFile.size,
+                imageFile.buffer.data(),
+                imageFile.buffer.size(),
                 2,
                 { .filter = opengl::Texture::FilterMode::LinearMipMap },
                 imageFile.format

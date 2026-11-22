@@ -33,8 +33,6 @@
 #include <curl/curl.h>
 #include <cerrno>
 #include <cstdio>
-#include <cstring>
-#include <malloc.h>
 #include <sstream>
 #include <string_view>
 #include <thread>
@@ -44,6 +42,10 @@ namespace {
     using namespace openspace;
 
     constexpr std::string_view _loggerCat = "DownloadManager";
+
+    // The protocols that are accepted for downloads. cURL would otherwise also follow
+    // URLs to local files or to a number of legacy protocols
+    constexpr const char* AllowedProtocols = "http,https,ftp,ftps";
 
     struct ProgressInformation {
         std::shared_ptr<DownloadManager::FileFuture> future;
@@ -59,16 +61,8 @@ namespace {
     size_t writeMemoryCallback(void* contents, size_t size, size_t nmemb, void* userp) {
         const size_t realsize = size * nmemb;
         auto* mem = static_cast<DownloadManager::MemoryFile*>(userp);
-
-        // @TODO(abock): Remove this and replace mem->buffer with std::vector<char>
-        mem->buffer = reinterpret_cast<char*>(
-            realloc(mem->buffer, mem->size + realsize + 1)
-        );
-
-        std::memcpy(&(mem->buffer[mem->size]), contents, realsize);
-        mem->size += realsize;
-        mem->buffer[mem->size] = 0;
-
+        const char* data = static_cast<const char*>(contents);
+        mem->buffer.insert(mem->buffer.end(), data, data + realsize);
         return realsize;
     }
 
@@ -92,18 +86,21 @@ namespace {
         i->future->totalSize = dltotal;
         i->future->progress = static_cast<float>(dlnow) / static_cast<float>(dltotal);
 
-        auto now = std::chrono::system_clock::now();
+        // The remaining time cannot be estimated before the first bytes have arrived
+        if (dlnow > 0) {
+            auto now = std::chrono::system_clock::now();
 
-        // Compute time spent transferring
-        auto transferTime = now - i->startTime;
-        // Compute estimated transfer time
-        auto estimatedTime = transferTime / i->future->progress;
-        // Compute estimated time remaining
-        auto timeRemaining = estimatedTime - transferTime;
+            // Compute time spent transferring
+            auto transferTime = now - i->startTime;
+            // Compute estimated transfer time
+            auto estimatedTime = transferTime / i->future->progress;
+            // Compute estimated time remaining
+            auto timeRemaining = estimatedTime - transferTime;
 
-        i->future->secondsRemaining = static_cast<float>(
-            std::chrono::duration_cast<std::chrono::seconds>(timeRemaining).count()
-        );
+            i->future->secondsRemaining = static_cast<float>(
+                std::chrono::duration_cast<std::chrono::seconds>(timeRemaining).count()
+            );
+        }
 
         if (*(i->callback)) {
             // The callback function is a pointer to an std::function; that is the reason
@@ -132,7 +129,7 @@ std::shared_ptr<DownloadManager::FileFuture> DownloadManager::downloadFile(
                                                         const std::filesystem::path& file,
                                                                 OverrideFile overrideFile,
                                                                   FailOnError failOnError,
-                                                                unsigned int timeout_secs,
+                                                                 unsigned int timeoutSecs,
                                                 DownloadFinishedCallback finishedCallback,
                                           DownloadProgressCallback progressCallback) const
 {
@@ -143,21 +140,22 @@ std::shared_ptr<DownloadManager::FileFuture> DownloadManager::downloadFile(
     auto future = std::make_shared<FileFuture>(file.filename());
     errno = 0;
 #ifdef WIN32
-    FILE* fp;
+    FILE* fp = nullptr;
     const std::string f = file.string();
-    errno_t error = fopen_s(&fp, f.c_str(), "wb");
-    if (error != 0) {
-        LERROR(std::format("Could not open/create file: {}. Errno: {}", file, errno));
-    }
+    fopen_s(&fp, f.c_str(), "wb");
 #else // ^^^^ WIN32 // !WIN32 vvvv
     const std::string f = file.string();
     FILE* fp = fopen(f.c_str(), "wb");
 #endif // WIN32
     if (!fp) {
-        LERROR(std::format("Could not open/create file: {}. Errno: {}", file, errno));
+        future->errorMessage = std::format(
+            "Could not open/create file: {}. Errno: {}", file, errno
+        );
+        LERROR(future->errorMessage);
+        return future;
     }
 
-    auto downloadFunction = [url, failOnError, timeout_secs,
+    auto downloadFunction = [url, failOnError, timeoutSecs,
                              finishedCb = std::move(finishedCallback),
                              progressCb = std::move(progressCallback), future, fp]()
     {
@@ -166,10 +164,11 @@ std::shared_ptr<DownloadManager::FileFuture> DownloadManager::downloadFile(
             curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
             curl_easy_setopt(curl, CURLOPT_USERAGENT, "OpenSpace");
             curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+            curl_easy_setopt(curl, CURLOPT_PROTOCOLS_STR, AllowedProtocols);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeData);
-            if (timeout_secs) {
-                curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout_secs);
+            if (timeoutSecs > 0) {
+                curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeoutSecs);
             }
             if (failOnError) {
                 curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
@@ -189,6 +188,8 @@ std::shared_ptr<DownloadManager::FileFuture> DownloadManager::downloadFile(
             curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
 
             const CURLcode res = curl_easy_perform(curl);
+            long rescode = 0;
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &rescode);
             curl_easy_cleanup(curl);
             fclose(fp);
 
@@ -196,12 +197,18 @@ std::shared_ptr<DownloadManager::FileFuture> DownloadManager::downloadFile(
                 future->isFinished = true;
             }
             else {
-                long rescode = 0;
-                curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &rescode);
                 future->errorMessage = std::format(
                     "{}. HTTP code: {}", curl_easy_strerror(res), rescode
                 );
             }
+
+            if (finishedCb) {
+                finishedCb(*future);
+            }
+        }
+        else {
+            fclose(fp);
+            future->errorMessage = "Error initializing cURL";
 
             if (finishedCb) {
                 finishedCb(*future);
@@ -236,11 +243,7 @@ std::future<DownloadManager::MemoryFile> DownloadManager::fetchFile(
     auto downloadFunction = [url, successCb = std::move(successCallback),
                              errorCb = std::move(errorCallback)]()
     {
-        DownloadManager::MemoryFile file = {
-            .buffer = reinterpret_cast<char*>(malloc(1)),
-            .size = 0,
-            .corrupted = false
-        };
+        DownloadManager::MemoryFile file;
 
         CURL* curl = curl_easy_init();
         if (!curl) {
@@ -249,11 +252,11 @@ std::future<DownloadManager::MemoryFile> DownloadManager::fetchFile(
 
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+        curl_easy_setopt(curl, CURLOPT_PROTOCOLS_STR, AllowedProtocols);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "OpenSpace");
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, reinterpret_cast<void*>(&file));
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeMemoryCallback);
         curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5L);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 
         // Will fail when response status is 400 or above
         curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
@@ -273,7 +276,9 @@ std::future<DownloadManager::MemoryFile> DownloadManager::fetchFile(
             else {
                 LWARNING("Could not get extension from file downloaded from: " + url);
             }
-            successCb(file);
+            if (successCb) {
+                successCb(file);
+            }
             curl_easy_cleanup(curl);
             return file;
         }
@@ -304,7 +309,13 @@ void DownloadManager::fileExtension(const std::string& url,
         CURL* curl = curl_easy_init();
         if (curl) {
             curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-            curl_easy_setopt(curl, CURLOPT_NOBODY, 1);
+            curl_easy_setopt(curl, CURLOPT_USERAGENT, "OpenSpace");
+            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+            curl_easy_setopt(curl, CURLOPT_PROTOCOLS_STR, AllowedProtocols);
+            curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
+            // Without a timeout, a server that never answers would block this thread
+            // indefinitely
+            curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5L);
             CURLcode res = curl_easy_perform(curl);
             if (CURLE_OK == res) {
                 char* ct = nullptr;

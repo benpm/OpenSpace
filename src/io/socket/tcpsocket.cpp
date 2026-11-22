@@ -95,6 +95,7 @@ TcpSocket::~TcpSocket() {
         disconnect();
     }
     _shouldStopThreads = true;
+    notifyAll();
     if (_inputThread.joinable()) {
         _inputThread.join();
     }
@@ -139,14 +140,29 @@ void TcpSocket::connect() {
     const std::string p = std::to_string(_port);
     const int result = getaddrinfo(_address.c_str(), p.c_str(), &hints, &addresult);
     if (result != 0) {
+        LERROR(std::format(
+            "Could not resolve address '{}:{}'. Error: {}", _address, _port, result
+        ));
         return;
     }
 
     _isConnecting = true;
 
+    // Both threads are created here so that `_inputThread` is never assigned while
+    // another thread might be joining it. The input thread waits until the output thread
+    // has finished establishing the connection
+    _inputThread = std::thread([this]() {
+        {
+            std::unique_lock lock(_inputQueueMutex);
+            _inputNotifier.wait(
+                lock,
+                [this]() { return !_isConnecting || _shouldStopThreads; }
+            );
+        }
+        streamInput();
+    });
     _outputThread = std::thread([this, addresult]() {
         establishConnection(addresult);
-        _inputThread = std::thread([this]() { streamInput(); });
         streamOutput();
     });
 }
@@ -176,9 +192,7 @@ void TcpSocket::disconnect(int) {
 
     _shouldStopThreads = true;
     closeSocket();
-
-    _inputNotifier.notify_all();
-    _outputNotifier.notify_all();
+    notifyAll();
 
     if (_inputThread.joinable()) {
         _inputThread.join();
@@ -199,14 +213,12 @@ bool TcpSocket::isConnecting() const {
 
 bool TcpSocket::getMessage(std::string& message) {
     const int delimiterIndex = waitForDelimiter();
-    if (delimiterIndex == 0) {
+    if (delimiterIndex < 0) {
         return false;
     }
     const std::unique_lock lock(_inputQueueMutex);
     message.assign(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex);
-    if (static_cast<int>(_inputQueue.size()) >= delimiterIndex + 1) {
-        _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex + 1);
-    }
+    _inputQueue.erase(_inputQueue.begin(), _inputQueue.begin() + delimiterIndex + 1);
     return true;
 }
 
@@ -222,15 +234,18 @@ void TcpSocket::setDelimiter(char delimiter) {
 }
 
 void TcpSocket::establishConnection(addrinfo* info) {
+    auto fail = [this, info]() {
+        freeaddrinfo(info);
+        // `_isConnecting` is still true at this point, so this closes the socket
+        closeSocket();
+        _shouldStopThreads = true;
+        notifyAll();
+    };
+
     _socket = socket(info->ai_family, info->ai_socktype, info->ai_protocol);
 
     if (_socket == INVALID_SOCKET) {
-        freeaddrinfo(info);
-        _isConnected = false;
-        _isConnecting = false;
-        _shouldStopThreads = true;
-        _inputNotifier.notify_all();
-        _outputNotifier.notify_all();
+        fail();
         return;
     }
 
@@ -250,30 +265,33 @@ void TcpSocket::establishConnection(addrinfo* info) {
     result = setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, falseFlag, sizeof(int));
     if (result == SOCKET_ERROR) {
         LWARNING(std::format("Socket error: {}", _ERRNO));
-        freeaddrinfo(info);
-        _isConnecting = false;
-        _isConnected = false;
-        _shouldStopThreads = true;
-        _inputNotifier.notify_all();
-        _outputNotifier.notify_all();
+        fail();
         return;
     }
     // Keep alive
     result = setsockopt(_socket, SOL_SOCKET, SO_KEEPALIVE, trueFlag, sizeof(int));
     if (result == SOCKET_ERROR) {
-        freeaddrinfo(info);
-        _isConnecting = false;
-        _isConnected = false;
-        _shouldStopThreads = true;
-        _inputNotifier.notify_all();
-        _outputNotifier.notify_all();
+        LWARNING(std::format("Socket error: {}", _ERRNO));
+        fail();
         return;
     }
 
     // Try to connect
-    ::connect(_socket, info->ai_addr, static_cast<int>(info->ai_addrlen));
+    result = ::connect(_socket, info->ai_addr, static_cast<int>(info->ai_addrlen));
+    if (result == SOCKET_ERROR) {
+        LERROR(std::format(
+            "Could not connect to '{}:{}'. Socket error: {}", _address, _port, _ERRNO
+        ));
+        fail();
+        return;
+    }
+
+    freeaddrinfo(info);
     _isConnected = true;
     _isConnecting = false;
+
+    // Wake up the input thread that is waiting for the connection to be established
+    notifyAll();
 }
 
 void TcpSocket::streamInput() {
@@ -295,9 +313,8 @@ void TcpSocket::streamInput() {
 
         if (failed(nReadBytes)) {
             _shouldStopThreads = true;
-            _inputNotifier.notify_all();
-            _outputNotifier.notify_all();
             closeSocket();
+            notifyAll();
             return;
         }
 
@@ -322,10 +339,19 @@ void TcpSocket::streamOutput() {
     while (_isConnected && !_shouldStopThreads) {
         waitForOutput(1);
 
-        size_t nBytesToSend = 0;
-        const std::unique_lock lock(_outputQueueMutex);
-        while ((nBytesToSend = std::min(_outputQueue.size(), _outputBuffer.size())) > 0) {
-            std::copy_n(_outputQueue.begin(), nBytesToSend, _outputBuffer.begin());
+        while (true) {
+            // Only hold the lock while copying from the queue so that putBytes is not
+            // blocked while the data is being sent. This is safe as only this thread
+            // removes data from the front of the queue
+            size_t nBytesToSend = 0;
+            {
+                const std::unique_lock lock(_outputQueueMutex);
+                nBytesToSend = std::min(_outputQueue.size(), _outputBuffer.size());
+                std::copy_n(_outputQueue.begin(), nBytesToSend, _outputBuffer.begin());
+            }
+            if (nBytesToSend == 0) {
+                break;
+            }
 
 #ifdef WIN32
             const int n = static_cast<int>(nBytesToSend);
@@ -345,13 +371,23 @@ void TcpSocket::streamOutput() {
             if (failed(nSentBytes)) {
                 closeSocket();
                 _shouldStopThreads = true;
-                _inputNotifier.notify_all();
-                _outputNotifier.notify_all();
+                notifyAll();
                 return;
             }
-            _outputQueue.erase(_outputQueue.begin(), _outputQueue.begin() + nSentBytes);
+            {
+                const std::unique_lock lock(_outputQueueMutex);
+                _outputQueue.erase(
+                    _outputQueue.begin(),
+                    _outputQueue.begin() + nSentBytes
+                );
+            }
         }
-        _outputNotifier.notify_all(); // Let anyone waiting on drainage know
+        {
+            // Let anyone waiting on drainage know. Notifying while holding the lock
+            // ensures that waitForOutputQueueDrained does not miss the notification
+            const std::unique_lock lock(_outputQueueMutex);
+            _outputNotifier.notify_all();
+        }
     }
 }
 
@@ -360,41 +396,41 @@ void TcpSocket::waitForInput(size_t nBytes) {
         return;
     }
 
-    auto receivedRequestedInputOrDisconnected = [this, nBytes]() {
-        if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
-            return true;
+    // Block execution until enough data has come into the input queue. The predicate is
+    // evaluated while holding the input queue mutex
+    std::unique_lock lock(_inputQueueMutex);
+    _inputNotifier.wait(
+        lock,
+        [this, nBytes]() {
+            return _shouldStopThreads || (!_isConnected && !_isConnecting) ||
+                _inputQueue.size() >= nBytes;
         }
-        const std::unique_lock lock(_inputQueueMutex);
-        return _inputQueue.size() >= nBytes;
-    };
-
-    // Block execution until enough data has come into the input queue
-    if (!receivedRequestedInputOrDisconnected()) {
-        std::unique_lock lock(_inputBufferMutex);
-        _inputNotifier.wait(lock, receivedRequestedInputOrDisconnected);
-    }
+    );
 }
 
 int TcpSocket::waitForDelimiter() {
     size_t currentIndex = 0;
-    auto receivedRequestedInputOrDisconnected =
-        [this, &currentIndex, d = _delimiter.load()]()
-    {
-        if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
-            return true;
+    bool foundDelimiter = false;
+    // Block execution until the delimiter character was found in the input queue. The
+    // predicate is evaluated while holding the input queue mutex
+    std::unique_lock lock(_inputQueueMutex);
+    _inputNotifier.wait(
+        lock,
+        [this, &currentIndex, &foundDelimiter, d = _delimiter.load()]() {
+            if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
+                return true;
+            }
+            auto it = std::find(
+                _inputQueue.begin() + currentIndex,
+                _inputQueue.end(),
+                d
+            );
+            currentIndex = it - _inputQueue.begin();
+            foundDelimiter = it != _inputQueue.end();
+            return foundDelimiter;
         }
-        const std::unique_lock lock(_inputQueueMutex);
-        auto it = std::find(_inputQueue.begin() + currentIndex, _inputQueue.end(), d);
-        currentIndex = it - _inputQueue.begin();
-        return it != _inputQueue.end();
-    };
-
-    // Block execution until the delimiter character was found in the input queue
-    if (!receivedRequestedInputOrDisconnected()) {
-        std::unique_lock lock(_inputBufferMutex);
-        _inputNotifier.wait(lock, receivedRequestedInputOrDisconnected);
-    }
-    return static_cast<int>(currentIndex);
+    );
+    return foundDelimiter ? static_cast<int>(currentIndex) : -1;
 }
 
 void TcpSocket::waitForOutput(size_t nBytes) {
@@ -402,19 +438,16 @@ void TcpSocket::waitForOutput(size_t nBytes) {
         return;
     }
 
-    auto receivedRequestedOutputOrDisconnected = [this, nBytes]() {
-        if (_shouldStopThreads || (!_isConnected && !_isConnecting)) {
-            return true;
+    // Block execution until enough data has come into the output queue. The predicate is
+    // evaluated while holding the output queue mutex
+    std::unique_lock lock(_outputQueueMutex);
+    _outputNotifier.wait(
+        lock,
+        [this, nBytes]() {
+            return _shouldStopThreads || (!_isConnected && !_isConnecting) ||
+                _outputQueue.size() >= nBytes;
         }
-        const std::unique_lock lock(_outputQueueMutex);
-        return _outputQueue.size() >= nBytes;
-    };
-
-    // Block execution until enough data has come into the output queue
-    if (!receivedRequestedOutputOrDisconnected()) {
-        std::unique_lock lock(_outputBufferMutex);
-        _outputNotifier.wait(lock, receivedRequestedOutputOrDisconnected);
-    }
+    );
 }
 
 void TcpSocket::initializeNetworkApi() {
@@ -450,7 +483,20 @@ void TcpSocket::uninterceptInput() {
 void TcpSocket::closeConnection() {
     _shouldStopThreads = true;
     closeSocket();
+    notifyAll();
+}
+
+void TcpSocket::notifyAll() {
+    // The state flags are not protected by the queue mutexes. Briefly acquiring each
+    // mutex guarantees that a waiter is either before its predicate check, and will see
+    // the new state, or already blocked in `wait`, so the notification can not be lost
+    {
+        const std::lock_guard lock(_inputQueueMutex);
+    }
     _inputNotifier.notify_all();
+    {
+        const std::lock_guard lock(_outputQueueMutex);
+    }
     _outputNotifier.notify_all();
 }
 

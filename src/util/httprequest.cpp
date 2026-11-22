@@ -62,6 +62,9 @@ bool HttpRequest::perform(std::chrono::milliseconds timeout) {
     curl_easy_setopt(curl, CURLOPT_URL, _url.data());
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "OpenSpace");
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    // cURL would otherwise also follow URLs to local files or to a number of legacy
+    // protocols
+    curl_easy_setopt(curl, CURLOPT_PROTOCOLS_STR, "http,https,ftp,ftps");
 
     // The leading + in all of the lambda expressions are to cause an implicit conversion
     // to a standard C function pointer. Since the `curl_easy_setopt` function just takes
@@ -187,12 +190,21 @@ bool HttpDownload::hasSucceeded() const {
 }
 
 void HttpDownload::start(std::chrono::milliseconds timeout) {
-    if (_isDownloading) {
+    if (_isDownloading.exchange(true)) {
         return;
     }
-    _isDownloading = true;
-    _downloadThread = std::thread([this, timeout]() {
+
+    if (_downloadThread.joinable()) {
+        _downloadThread.join();
+    }
+
+    {
+        const std::lock_guard lock(_downloadFinishMutex);
         _isFinished = false;
+        _isSuccessful = false;
+    }
+
+    _downloadThread = std::thread([this, timeout]() {
         LTRACEC("HttpDownload", std::format("Start download '{}'", _httpRequest.url()));
 
         const bool setupSuccess = setup();
@@ -206,7 +218,12 @@ void HttpDownload::start(std::chrono::milliseconds timeout) {
             _isSuccessful = false;
         }
 
-        _isFinished = true;
+        {
+            // Setting the flag while holding the mutex prevents the notification from
+            // being lost if `wait` is between its predicate check and going to sleep
+            const std::lock_guard lock(_downloadFinishMutex);
+            _isFinished = true;
+        }
         if (_isSuccessful) {
             LTRACEC(
                 "HttpDownload",
@@ -226,16 +243,21 @@ void HttpDownload::start(std::chrono::milliseconds timeout) {
 }
 
 void HttpDownload::cancel() {
-    _shouldCancel = true;
+    {
+        const std::lock_guard lock(_downloadFinishMutex);
+        _shouldCancel = true;
+    }
+    _downloadFinishCondition.notify_all();
 }
 
 bool HttpDownload::wait() {
-    std::mutex conditionMutex;
-    std::unique_lock lock(conditionMutex);
-    _downloadFinishCondition.wait(
-        lock,
-        [this]() { return _isFinished || _shouldCancel; }
-    );
+    {
+        std::unique_lock lock(_downloadFinishMutex);
+        _downloadFinishCondition.wait(
+            lock,
+            [this]() { return _isFinished || _shouldCancel; }
+        );
+    }
     if (_downloadThread.joinable()) {
         _downloadThread.join();
     }
@@ -277,17 +299,30 @@ bool HttpFileDownload::setup() {
         }
     }
 
-    while (nCurrentFileHandles >= MaxFileHandles) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    // Take one of the limited file handles, waiting until one becomes available. The
+    // check and the increment have to happen atomically, or multiple downloads could
+    // take the last handle at the same time
+    int nHandles = nCurrentFileHandles;
+    while (nHandles >= MaxFileHandles ||
+           !nCurrentFileHandles.compare_exchange_weak(nHandles, nHandles + 1))
+    {
+        if (nHandles >= MaxFileHandles) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            nHandles = nCurrentFileHandles;
+        }
     }
 
-    nCurrentFileHandles++;
     _hasHandle = true;
     _file = std::ofstream(_destination, std::ofstream::binary);
 
     if (_file.good()) {
         return true;
     }
+
+    // The teardown is not called when the setup fails, so the handle has to be returned
+    // here. This does not modify `errno` or the Windows last error used below
+    _hasHandle = false;
+    nCurrentFileHandles--;
 
 #ifdef WIN32
     // GetLastError() gives more details than errno.
@@ -298,8 +333,7 @@ bool HttpFileDownload::setup() {
     }
     std::array<char, 256> Buffer;
     size_t size = FormatMessageA(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
-            FORMAT_MESSAGE_IGNORE_INSERTS,
+        FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
         nullptr,
         errorId,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),

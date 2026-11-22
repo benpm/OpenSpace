@@ -50,7 +50,6 @@
 #include <cmath>
 #include <cstring>
 #include <iterator>
-#include <limits>
 #include <source_location>
 #include <stack>
 #include <utility>
@@ -118,9 +117,11 @@ namespace {
     PropertyValueType propertyValueType(const std::string& value) {
         auto isFloatValue = [](const std::string& s) {
             try {
-                float converted = std::numeric_limits<float>::min();
-                converted = std::stof(s);
-                return (converted != std::numeric_limits<float>::min());
+                // Only accept the value if the entire string is a finite number, so that
+                // strings such as "3 apples", "nan", or "inf" are not treated as numbers
+                size_t nProcessed = 0;
+                const float converted = std::stof(s, &nProcessed);
+                return nProcessed == s.size() && std::isfinite(converted);
             }
             catch (...) {
                 return false;
@@ -136,7 +137,7 @@ namespace {
         else if (value == "nil") {
             return PropertyValueType::Nil;
         }
-        else if ((value.front() == '{') && (value.back() == '}')) {
+        else if (!value.empty() && value.front() == '{' && value.back() == '}') {
             return PropertyValueType::Table;
         }
         else {
@@ -519,19 +520,6 @@ void Scene::render(const RenderData& data, RendererTasks& tasks) {
         if (global::callback::webBrowserPerformanceHotfix) {
             (*global::callback::webBrowserPerformanceHotfix)();
         }
-    }
-
-    {
-        ZoneScopedN("Get Error Hack");
-
-        // @TODO(abock 2019-08-19) This glGetError call is a hack to prevent the GPU
-        // thread and the CPU thread from diverging too much, particularly the uploading
-        // of a lot of textures for the globebrowsing planets can cause a hard stuttering
-        // effect. Asking for a glGetError after every rendering call will force the
-        // threads to implicitly synchronize and thus prevent the stuttering.  The better
-        // solution would be to reduce the number of uploads per frame, use a staggered
-        // buffer, or something else like that preventing a large spike in uploads
-        glGetError();
     }
 }
 

@@ -162,9 +162,7 @@ SgctEdit::SgctEdit(sgct::config::Cluster cluster, std::string configName,
         "If enabled the framerate will be locked to the refresh rate of the monitor"
     );
     _checkBoxVsync->setChecked(
-        _cluster.settings.has_value() &&
-        _cluster.settings->display.has_value() &&
-        _cluster.settings->display->swapInterval
+        !_cluster.nodes.empty() && _cluster.nodes.back().vsync.value_or(false)
     );
     settingsLayout->addWidget(_checkBoxVsync);
 
@@ -295,20 +293,7 @@ void SgctEdit::saveCluster() {
 
     //
     // Generate vsync setup
-    if (_checkBoxVsync->isChecked()) {
-        if (!_cluster.settings || !_cluster.settings->display ||
-            !_cluster.settings->display->swapInterval)
-        {
-            _cluster.settings = sgct::config::Settings{
-                .display = sgct::config::Settings::Display {
-                    .swapInterval = 1
-                }
-            };
-        }
-    }
-    else {
-        _cluster.settings = std::nullopt;
-    }
+    node.vsync = _checkBoxVsync->isChecked();
 
     _displayWidget->applyWindowSettings(node.windows);
 
@@ -352,22 +337,21 @@ void SgctEdit::saveCluster() {
     }
 
     if (_configurationFilename.empty()) {
-        const QString fileName = QFileDialog::getSaveFileName(
+        QFileDialog dialog = QFileDialog(
             this,
             "Save Window Configuration File",
             QString::fromStdString(_userConfigPath.string()),
-            "Window Configuration (*.json)",
-            nullptr
-#ifdef __linux__
-            // Linux in Qt6 crashes when trying to access the native dialog here
-            , QFileDialog::DontUseNativeDialog
-#endif // __linux__
+            "Window Configuration (*.json)"
         );
-        if (fileName.isEmpty()) {
+        dialog.setAcceptMode(QFileDialog::AcceptSave);
+        // Without this, the non-native dialog does not add the extension of the filter
+        dialog.setDefaultSuffix("json");
+
+        if (dialog.exec() != QDialog::Accepted || dialog.selectedFiles().isEmpty()) {
             return;
         }
 
-        _configurationFilename = fileName.toStdString();
+        _configurationFilename = dialog.selectedFiles().first().toStdString();
     }
 
 
