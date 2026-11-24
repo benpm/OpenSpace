@@ -174,9 +174,9 @@ private:
     void decidePerFeatureProps(size_t nFeatures);
 
     /**
-     * Recount how many features own a point texture (needing per-frame updates).
+     * Remove the point textures that no geometry feature uses anymore.
      */
-    void countPointTextureFeatures();
+    void removeUnusedPointTextures();
 
     /**
      * Hand the most recently created geometry feature its cached heights (if the
@@ -272,7 +272,9 @@ private:
     int _nExtrudableNoOverride = 0;
     int _nRelativeToGroundOverride = 0;
     int _nAltitudeModeNoOverride = 0;
-    int _nPointTextureFeatures = 0;
+
+    /// Point textures shared by the geometry features, one per texture file
+    GlobeGeometryFeature::PointTextureCache _pointTextures;
 
     Vec2Property _centerLatLong;
     float _bboxDiagonalSize = 0.f;

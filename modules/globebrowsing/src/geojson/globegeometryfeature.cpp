@@ -86,14 +86,15 @@ void GlobeGeometryFeature::setOffsets(glm::vec3 offsets) {
 
 void GlobeGeometryFeature::initializeGL(rendering::MultiDrawBatch* pointsBatch,
                                         rendering::MultiDrawBatch* linesBatch,
-                                        rendering::MultiDrawBatch* polygonsBatch)
+                                        rendering::MultiDrawBatch* polygonsBatch,
+                                        PointTextureCache& pointTextures)
 {
     _pointsBatch = pointsBatch;
     _linesBatch = linesBatch;
     _polygonsBatch = polygonsBatch;
 
     if (isPoints()) {
-        updateTexture(true);
+        updateTexture(pointTextures, true);
     }
 }
 
@@ -117,11 +118,13 @@ bool GlobeGeometryFeature::useHeightMap() const {
         GeoJsonProperties::AltitudeMode::RelativeToGround;
 }
 
-bool GlobeGeometryFeature::hasPointTexture() const {
-    return _pointTexture != nullptr;
+const TextureComponent* GlobeGeometryFeature::pointTexture() const {
+    return _pointTexture;
 }
 
-void GlobeGeometryFeature::updateTexture(bool isInitializeStep) {
+void GlobeGeometryFeature::updateTexture(PointTextureCache& pointTextures,
+                                         bool isInitializeStep)
+{
     std::filesystem::path texture;
     GlobeBrowsingModule* m = global::moduleEngine->module<GlobeBrowsingModule>();
 
@@ -143,15 +146,19 @@ void GlobeGeometryFeature::updateTexture(bool isInitializeStep) {
         return;
     }
 
-    if (isInitializeStep || !_pointTexture) {
-        _pointTexture = std::make_unique<TextureComponent>(2);
-        _pointTexture->setFilterMode(opengl::Texture::FilterMode::AnisotropicMipMap);
-        _pointTexture->setWrapping(opengl::Texture::WrappingMode::ClampToEdge);
-    }
-
     if (std::filesystem::is_regular_file(texture)) {
+        // Every feature of a layer usually uses the same texture file. Loading it once
+        // per feature creates one GL texture per feature, which runs out of memory for
+        // layers with tens of thousands of points
+        std::unique_ptr<TextureComponent>& shared = pointTextures[texture];
+        if (!shared) {
+            shared = std::make_unique<TextureComponent>(2);
+            shared->setFilterMode(opengl::Texture::FilterMode::AnisotropicMipMap);
+            shared->setWrapping(opengl::Texture::WrappingMode::ClampToEdge);
+            shared->loadFromFile(texture);
+        }
         _hasTexture = true;
-        _pointTexture->loadFromFile(texture);
+        _pointTexture = shared.get();
     }
     else {
         LERROR(std::format(
@@ -525,9 +532,6 @@ bool GlobeGeometryFeature::update(bool dataIsDirty) {
         geometryChanged = true;
     }
 
-    if (_pointTexture) {
-        _pointTexture->update();
-    }
     return geometryChanged;
 }
 
