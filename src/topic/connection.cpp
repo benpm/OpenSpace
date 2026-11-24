@@ -176,6 +176,17 @@ void Connection::handleJson(const nlohmann::json& json) {
         }
 
         if (_topics.size() >= MaxTopics) {
+            // A topic that finishes after its first message, such as a script that
+            // sends its return value later, is not removed anywhere else
+            std::erase_if(
+                _topics,
+                [](const std::pair<const TopicId, std::unique_ptr<Topic>>& t) {
+                    return t.second->isDone();
+                }
+            );
+        }
+
+        if (_topics.size() >= MaxTopics) {
             LERROR("Connection has too many active topics");
             return;
         }

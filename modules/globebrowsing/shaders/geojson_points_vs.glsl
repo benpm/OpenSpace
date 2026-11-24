@@ -31,11 +31,18 @@ layout(location = 2) in float in_height;
 out Data {
   vec3 normal;
   float dynamicHeight;
+  flat int drawIndex;
 } out_data;
+
+// gl_DrawID is only available in the vertex stage, so resolve the per-draw record
+// index here and pass it on to the geometry shader. Matches the declaration in
+// geojson_drawdata.glsl
+uniform int baseDrawId;
 
 
 void main() {
   gl_Position = vec4(in_position, 1.0);
   out_data.normal = in_normal;
   out_data.dynamicHeight = in_height;
+  out_data.drawIndex = baseDrawId + gl_DrawID;
 }

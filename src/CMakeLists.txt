@@ -297,6 +297,7 @@ target_sources(
     ${PROJECT_SOURCE_DIR}/include/openspace/rendering/luaconsole.h
     ${PROJECT_SOURCE_DIR}/include/openspace/rendering/helper.h
     ${PROJECT_SOURCE_DIR}/include/openspace/rendering/labelscomponent.h
+    ${PROJECT_SOURCE_DIR}/include/openspace/rendering/multidrawbatch.h
     ${PROJECT_SOURCE_DIR}/include/openspace/rendering/raycasterlistener.h
     ${PROJECT_SOURCE_DIR}/include/openspace/rendering/raycastermanager.h
     ${PROJECT_SOURCE_DIR}/include/openspace/rendering/renderable.h
@@ -607,6 +608,7 @@ target_sources(
     rendering/labelscomponent.cpp
     rendering/loadingscreen.cpp
     rendering/luaconsole.cpp
+    rendering/multidrawbatch.cpp
     rendering/raycastermanager.cpp
     rendering/renderable.cpp
     rendering/renderengine.cpp

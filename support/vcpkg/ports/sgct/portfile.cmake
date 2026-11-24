@@ -12,6 +12,10 @@ vcpkg_from_github(
   REF 4355a3f3f7b2ca564699711d903872a9ca837c50
   SHA512 3cf6037753cca8ca9705ed2abbf5943c101baa33fcf2f65c0f3a7f5f3a59df57aab8cfe22fa00ef7ac0773d3d98642cb2ad062501102e767814f419c7c5ab2e6
   HEAD_REF master
+  # TEMPORARY: lets hidden windows that render while hidden send their Spout output.
+  # Remove the patch once the fix is in SGCT upstream and REF points at a commit with it
+  PATCHES
+    render-hidden-windows-to-spout.patch
 )
 
 vcpkg_check_features(
